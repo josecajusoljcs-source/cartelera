@@ -428,17 +428,9 @@
     return f.includes("domingo") || f.includes("sábado") || f.includes("sabado");
   }
 
-  function agregarASet(set, valor) {
-    if (!valor) return;
-    const limpio = valor.trim();
-    if (!limpio) return;
-    set.add(limpio);
-  }
-
   async function cargarCartelera() {
-    const resumen = document.getElementById("count-resumen");
-    const sideCount = document.getElementById("side-count");
-    const contenedor = document.getElementById("assignments");
+    const sideCount = document.getElementById("side-count"); // contador de “X reuniones asignadas”
+    const contenedor = document.getElementById("assignments"); // contenedor de las tarjetas
 
     try {
       const res = await fetch(CSV_URL);
@@ -446,20 +438,18 @@
       const data = parseCSV(text);
 
       if (!data || data.length < 2) {
-        resumen.textContent = "Sin datos disponibles.";
-        sideCount.textContent = "0 reuniones";
+        if (sideCount) sideCount.textContent = "0 reuniones";
+        contenedor.innerHTML = "<p>No hay asignaciones cargadas.</p>";
         return;
       }
 
+      // Sacamos la cabecera y filtramos filas vacías
       const filas = data.slice(1).filter(row =>
         row.some(cell => cell && cell.trim() !== "")
       );
 
+      // Limpiamos el contenedor
       contenedor.innerHTML = "";
-
-      const audioSet = new Set();
-      const micSet = new Set();
-      const platformSet = new Set();
 
       filas.forEach(row => {
         const fecha = row[0] || "";
@@ -473,6 +463,7 @@
         const card = document.createElement("article");
         card.className = "assignment-card";
 
+        // Cabecera con fecha y badge
         const fechaDiv = document.createElement("div");
         fechaDiv.className = "assignment-date";
 
@@ -500,6 +491,7 @@
         fechaDiv.appendChild(daySpan);
         fechaDiv.appendChild(badge);
 
+        // Detalles
         const detallesDiv = document.createElement("div");
         detallesDiv.className = "assignment-details";
 
@@ -527,41 +519,18 @@
         card.appendChild(fechaDiv);
         card.appendChild(detallesDiv);
         contenedor.appendChild(card);
-
-        agregarASet(audioSet, audio);
-        agregarASet(audioSet, video);
-        agregarASet(micSet, mic1);
-        agregarASet(micSet, mic2);
-        agregarASet(platformSet, plataforma);
-        agregarASet(platformSet, acomodador);
       });
 
-      const countText = filas.length === 1
-        ? "1 reunión asignada"
-        : `${filas.length} reuniones asignadas`;
+      const countText =
+        filas.length === 1
+          ? "1 reunión asignada"
+          : `${filas.length} reuniones asignadas`;
 
-      resumen.textContent = countText;
-      sideCount.textContent = countText;
-
-      function renderLista(id, set) {
-        const ul = document.getElementById(id);
-        ul.innerHTML = "";
-        Array.from(set).sort().forEach(nombre => {
-          const li = document.createElement("li");
-          li.textContent = nombre;
-          ul.appendChild(li);
-        });
-      }
-
-      renderLista("audio-list", audioSet);
-      renderLista("mic-list", micSet);
-      renderLista("platform-list", platformSet);
+      if (sideCount) sideCount.textContent = countText;
     } catch (err) {
       console.error("Error cargando la cartelera:", err);
-      const resumen = document.getElementById("count-resumen");
-      const sideCount = document.getElementById("side-count");
-      if (resumen) resumen.textContent = "Error al cargar datos.";
       if (sideCount) sideCount.textContent = "0 reuniones";
+      contenedor.innerHTML = "<p>Error al cargar datos.</p>";
     }
   }
 
