@@ -345,7 +345,8 @@
   <main class="page">
     <header>
       <h1>Asignaciones para las reuniones</h1>
-      <p id="mes-actual">Cargando fecha…</p>
+      <!-- Mes dinámico desde el Excel -->
+      <p id="month-label"></p>
 
       <div class="pill-bar">
         <span class="pill-dot"></span>
@@ -391,70 +392,35 @@
       return f.includes("domingo") || f.includes("sábado") || f.includes("sabado");
     }
 
-    // 🔹 NUEVO: saca mes y año de la primera fecha del Excel
-    function actualizarFechaAutomatica(fechaTexto) {
-      const p = document.getElementById("mes-actual");
-      if (!fechaTexto || !p) return;
-
-      const meses = [
-        "enero","febrero","marzo","abril","mayo","junio",
-        "julio","agosto","setiembre","septiembre","octubre","noviembre","diciembre"
-      ];
-
-      const lower = fechaTexto.toLowerCase();
-      let mesEncontrado = null;
-      for (const m of meses) {
-        if (lower.includes(m)) {
-          mesEncontrado = m;
-          break;
-        }
-      }
-
-      const anioMatch = lower.match(/\b(20\d{2})\b/);
-      const anio = anioMatch ? anioMatch[1] : "";
-
-      if (!mesEncontrado) {
-        p.textContent = fechaTexto;
-        return;
-      }
-
-      const mesCapitalizado =
-        mesEncontrado.charAt(0).toUpperCase() + mesEncontrado.slice(1);
-
-      p.textContent = anio ? `${mesCapitalizado} ${anio}` : mesCapitalizado;
-    }
-
     async function cargarCartelera() {
       const resumen = document.getElementById("count-resumen");
       const contenedor = document.getElementById("assignments");
+      const monthLabel = document.getElementById("month-label");
 
       try {
         const res = await fetch(CSV_URL);
         const text = await res.text();
         const data = parseCSV(text);
 
-        // Sin datos
-        if (!data || data.length < 2) {
+        // Si no hay filas suficientes
+        if (!data || data.length < 3) {
           resumen.textContent = "0 reuniones";
           contenedor.innerHTML =
             "<p class='empty-msg'>Sin asignaciones cargadas.</p>";
+          monthLabel.textContent = "";
           return;
         }
 
-        // Filas de datos (salteamos encabezados)
+        // Fila 1 del Excel: título del mes (por ejemplo "Diciembre 2025")
+        const tituloMes = (data[0][0] || "").trim();
+        monthLabel.textContent = tituloMes;
+
+        // Filas de datos:
+        // Fila 2 = encabezados -> se saltea
+        // Desde la fila 3 en adelante van las reuniones
         const filas = data
-          .slice(1)
+          .slice(2)
           .filter((row) => row.some((cell) => cell && cell.trim() !== ""));
-
-        if (filas.length === 0) {
-          resumen.textContent = "0 reuniones";
-          contenedor.innerHTML =
-            "<p class='empty-msg'>Sin asignaciones cargadas.</p>";
-          return;
-        }
-
-        // 🔹 Usar la PRIMERA fila del Excel para fijar el mes/año
-        actualizarFechaAutomatica(filas[0][0] || "");
 
         contenedor.innerHTML = "";
 
@@ -561,6 +527,7 @@
         resumen.textContent = "Error al cargar";
         contenedor.innerHTML =
           "<p class='empty-msg'>Hubo un error al cargar las asignaciones.</p>";
+        monthLabel.textContent = "";
       }
     }
 
