@@ -6,14 +6,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
-      --bg: #f3f4f6;
-      --card-bg: #ffffff;
-      --primary: #1f4b99;
-      --primary-dark: #163467;
-      --header-text: #ffffff;
-      --text: #222222;
-      --border: #d0d4dc;
-      --row-alt: #f9fafb;
+      --bg: #0f172a;
+      --bg-soft: #020617;
+      --card-bg: #020617;
+      --card-soft: #020817;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.2);
+      --accent-strong: #facc15;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --border: rgba(148, 163, 184, 0.3);
+      --danger: #f97373;
+      --radius-xl: 18px;
+      --radius-md: 12px;
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.75);
     }
 
     * {
@@ -24,134 +30,438 @@
     }
 
     body {
-      background: radial-gradient(circle at top, #e0ebff, #f3f4f6 55%);
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top, rgba(56, 189, 248, 0.25), transparent 55%),
+        radial-gradient(circle at bottom, rgba(250, 204, 21, 0.18), transparent 55%),
+        linear-gradient(135deg, #020617, #020617 40%, #020617);
       color: var(--text);
       padding: 1.5rem;
+      display: flex;
+      justify-content: center;
     }
 
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
+    .page {
+      width: 100%;
+      max-width: 1200px;
     }
 
-    h1 {
-      text-align: center;
-      margin-bottom: 0.25rem;
-      font-size: 1.8rem;
-      color: var(--primary-dark);
-    }
-
-    h2 {
+    header {
       text-align: center;
       margin-bottom: 1.5rem;
-      font-size: 1.05rem;
-      color: #555;
-      font-weight: 400;
     }
 
-    .card {
-      background: var(--card-bg);
-      border-radius: 14px;
-      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.08);
-      padding: 1.2rem;
-      border: 1px solid rgba(0, 0, 0, 0.03);
+    header h1 {
+      font-size: clamp(1.9rem, 3vw, 2.3rem);
+      letter-spacing: 0.04em;
+      font-weight: 700;
+      color: #f9fafb;
+      text-shadow: 0 0 20px rgba(15, 23, 42, 0.8);
     }
 
-    .table-wrapper {
-      overflow-x: auto;
+    header p {
+      margin-top: 0.3rem;
+      font-size: 0.95rem;
+      color: var(--muted);
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 720px;
+    .pill-bar {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.3rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      margin-top: 0.6rem;
+      font-size: 0.78rem;
+      color: var(--muted);
     }
 
-    thead {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: var(--header-text);
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.9);
     }
 
-    th, td {
-      padding: 0.55rem 0.7rem;
-      border: 1px solid var(--border);
-      font-size: 0.88rem;
-      text-align: left;
-      vertical-align: middle;
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.1fr);
+      gap: 1.5rem;
     }
 
-    th {
+    /* Panel principal con las tarjetas */
+    .card-shell {
+      background: radial-gradient(circle at top left, rgba(148, 163, 184, 0.1), transparent 55%),
+                  radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.9), #020617);
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      padding: 1.2rem 1.15rem 1.35rem;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.12), transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .card-shell-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+      gap: 0.75rem;
+    }
+
+    .section-title h2 {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.11em;
+      color: var(--muted);
       font-weight: 600;
-      text-align: center;
-      white-space: nowrap;
     }
 
-    tbody tr:nth-child(odd) {
-      background: var(--row-alt);
-    }
-
-    tbody tr:hover {
-      background: #e9f1ff;
-    }
-
-    .footer-note {
-      margin-top: 0.9rem;
+    .section-title span {
       font-size: 0.8rem;
-      color: #666;
-      text-align: center;
+      color: var(--muted);
     }
 
-    @media (max-width: 768px) {
+    .assignments-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.75rem;
+      max-height: calc(100vh - 210px);
+      overflow-y: auto;
+      padding-right: 0.3rem;
+    }
+
+    .assignments-grid::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .assignments-grid::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.7);
+      border-radius: 999px;
+    }
+
+    .assignments-grid::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.8);
+      border-radius: 999px;
+    }
+
+    .assignment-card {
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.94), rgba(15, 23, 42, 0.98));
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      padding: 0.7rem 0.75rem 0.65rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 2.1fr);
+      gap: 0.2rem 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .assignment-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      border: 1px solid transparent;
+      background: linear-gradient(120deg,
+        rgba(56, 189, 248, 0.25),
+        rgba(250, 204, 21, 0.15),
+        transparent
+      );
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .assignment-card:hover::after {
+      opacity: 0.25;
+    }
+
+    .assignment-date {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+      font-size: 0.83rem;
+      padding-right: 0.2rem;
+    }
+
+    .assignment-day {
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    .assignment-day.church-day {
+      color: var(--accent-strong);
+    }
+
+    .assignment-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      margin-top: 0.2rem;
+      padding: 0.16rem 0.55rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      font-size: 0.7rem;
+      color: var(--muted);
+      width: fit-content;
+    }
+
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.9);
+    }
+
+    .assignment-details {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.25rem 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    .detail-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.05rem;
+    }
+
+    .detail-label {
+      font-size: 0.66rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+
+    .detail-value {
+      font-size: 0.8rem;
+      color: #e5e7eb;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .detail-value strong {
+      font-weight: 600;
+    }
+
+    /* Panel lateral con resumen */
+    .side-panel {
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.2), transparent 55%),
+                  linear-gradient(145deg, #020617, #020617 40%, #020617);
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      padding: 1rem 0.95rem 1.1rem;
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+    }
+
+    .side-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.6rem;
+    }
+
+    .side-header h3 {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      color: var(--muted);
+    }
+
+    .side-badge {
+      font-size: 0.72rem;
+      padding: 0.12rem 0.5rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: var(--muted);
+    }
+
+    .key-roles {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.6rem;
+    }
+
+    .role-card {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      padding: 0.6rem 0.65rem;
+    }
+
+    .role-title {
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .role-list {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+    }
+
+    .role-list li {
+      font-size: 0.76rem;
+      padding: 0.18rem 0.46rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      color: #e5e7eb;
+    }
+
+    .side-footer {
+      margin-top: 0.7rem;
+      font-size: 0.73rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .side-footer strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    @media (max-width: 900px) {
       body {
-        padding: 1rem 0.5rem;
+        padding: 1rem 0.6rem 1.2rem;
       }
-      h1 {
-        font-size: 1.5rem;
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
       }
-      .card {
-        padding: 0.8rem;
+      .side-panel {
+        order: -1;
       }
-      table {
-        min-width: 640px;
+    }
+
+    @media (max-width: 640px) {
+      .assignment-card {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .assignment-details {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Cartelera de Asignaciones</h1>
-    <h2>Diciembre 2025</h2>
+  <main class="page">
+    <header>
+      <h1>Cartelera de Asignaciones</h1>
+      <p>Diciembre 2025</p>
 
-    <div class="card">
-      <div class="table-wrapper">
-        <table id="cartelera">
-          <thead>
-            <tr id="head-row">
-              <!-- Encabezados se cargan desde la hoja -->
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Filas se cargan desde la hoja -->
-          </tbody>
-        </table>
+      <div class="pill-bar">
+        <span class="pill-dot"></span>
+        <span>Conectado a hoja de cálculo &middot; Actualización automática</span>
       </div>
-      <p class="footer-note">
-        Esta cartelera se actualiza automáticamente desde la hoja de cálculo de Google Sheets.
-      </p>
-    </div>
-  </div>
+    </header>
+
+    <section class="layout">
+      <!-- Panel principal -->
+      <section class="card-shell">
+        <div class="card-shell-inner">
+          <div class="section-title">
+            <h2>Próximas reuniones</h2>
+            <span id="count-resumen">Cargando asignaciones…</span>
+          </div>
+
+          <div id="assignments" class="assignments-grid">
+            <!-- Tarjetas se cargan desde Google Sheets -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel lateral -->
+      <aside class="side-panel">
+        <div class="side-header">
+          <h3>Resumen del mes</h3>
+          <div class="side-badge" id="side-count">0 reuniones</div>
+        </div>
+
+        <div class="key-roles">
+          <div class="role-card">
+            <div class="role-title">Audio / Video</div>
+            <ul class="role-list" id="audio-list">
+              <!-- Nombres desde Google Sheets -->
+            </ul>
+          </div>
+
+          <div class="role-card">
+            <div class="role-title">Micrófonos</div>
+            <ul class="role-list" id="mic-list">
+              <!-- Nombres desde Google Sheets -->
+            </ul>
+          </div>
+
+          <div class="role-card">
+            <div class="role-title">Plataforma / Acomodador</div>
+            <ul class="role-list" id="platform-list">
+              <!-- Nombres desde Google Sheets -->
+            </ul>
+          </div>
+        </div>
+
+        <div class="side-footer">
+          Editá las asignaciones directamente en la hoja de <strong>Google Sheets</strong>.  
+          La cartelera se actualiza automáticamente al recargar esta página.
+        </div>
+      </aside>
+    </section>
+  </main>
 
   <script>
-    // 🔗 URL del CSV de tu hoja (ID: 1uGtu4a0-e65oEm34fgQXscHp3BvVJbSW)
+    // URL del CSV de tu hoja
     const CSV_URL = "https://docs.google.com/spreadsheets/d/1uGtu4a0-e65oEm34fgQXscHp3BvVJbSW/export?format=csv";
 
     function parseCSV(text) {
       const rows = text.trim().split(/\r?\n/);
-      return rows.map(row => {
-        // Split simple por coma; si un día tenés comas dentro de las celdas,
-        // después lo afinamos con otro parser.
-        return row.split(",");
-      });
+      return rows.map(row => row.split(","));
+    }
+
+    function esDiaImportante(fecha) {
+      if (!fecha) return false;
+      const f = fecha.toLowerCase();
+      return f.includes("domingo") || f.includes("sábado") || f.includes("sabado");
+    }
+
+    function agregarASet(set, valor) {
+      if (!valor) return;
+      const limpio = valor.trim();
+      if (!limpio) return;
+      set.add(limpio);
     }
 
     async function cargarCartelera() {
@@ -160,38 +470,121 @@
         const text = await res.text();
         const data = parseCSV(text);
 
-        if (!data || data.length === 0) return;
+        if (!data || data.length < 2) {
+          document.getElementById("count-resumen").textContent = "Sin datos disponibles.";
+          return;
+        }
 
-        const theadRow = document.getElementById("head-row");
-        const tbody = document.querySelector("#cartelera tbody");
-
-        // Limpio por las dudas
-        theadRow.innerHTML = "";
-        tbody.innerHTML = "";
-
-        // Primera fila = encabezados
         const headers = data[0];
-        headers.forEach(h => {
-          const th = document.createElement("th");
-          th.textContent = h || "";
-          theadRow.appendChild(th);
+        const filas = data.slice(1).filter(row => row.some(cell => cell && cell.trim() !== ""));
+
+        const contenedor = document.getElementById("assignments");
+        contenedor.innerHTML = "";
+
+        const audioSet = new Set();
+        const micSet = new Set();
+        const platformSet = new Set();
+
+        filas.forEach((row) => {
+          const fecha = row[0] || "";
+          const audio = row[1] || "";
+          const video = row[2] || "";
+          const mic1 = row[3] || "";
+          const mic2 = row[4] || "";
+          const plataforma = row[5] || "";
+          const acomodador = row[6] || "";
+
+          // Tarjeta principal
+          const card = document.createElement("article");
+          card.className = "assignment-card";
+
+          const fechaDiv = document.createElement("div");
+          fechaDiv.className = "assignment-date";
+
+          const daySpan = document.createElement("span");
+          daySpan.className = "assignment-day";
+          if (esDiaImportante(fecha)) {
+            daySpan.classList.add("church-day");
+          }
+          daySpan.textContent = fecha;
+
+          const labelSpan = document.createElement("span");
+          labelSpan.className = "assignment-label";
+          labelSpan.textContent = "Reunión";
+
+          const badge = document.createElement("div");
+          badge.className = "badge";
+          const dot = document.createElement("span");
+          dot.className = "badge-dot";
+          const txt = document.createElement("span");
+          txt.textContent = esDiaImportante(fecha) ? "Reunión principal" : "Reunión de entre semana";
+          badge.appendChild(dot);
+          badge.appendChild(txt);
+
+          fechaDiv.appendChild(labelSpan);
+          fechaDiv.appendChild(daySpan);
+          fechaDiv.appendChild(badge);
+
+          const detallesDiv = document.createElement("div");
+          detallesDiv.className = "assignment-details";
+
+          function crearGrupo(label, value) {
+            const group = document.createElement("div");
+            group.className = "detail-group";
+            const l = document.createElement("div");
+            l.className = "detail-label";
+            l.textContent = label;
+            const v = document.createElement("div");
+            v.className = "detail-value";
+            v.textContent = value || "-";
+            group.appendChild(l);
+            group.appendChild(v);
+            return group;
+          }
+
+          detallesDiv.appendChild(crearGrupo("Audio", audio));
+          detallesDiv.appendChild(crearGrupo("Video", video));
+          detallesDiv.appendChild(crearGrupo("Mic 1", mic1));
+          detallesDiv.appendChild(crearGrupo("Mic 2", mic2));
+          detallesDiv.appendChild(crearGrupo("Plataforma", plataforma));
+          detallesDiv.appendChild(crearGrupo("Acomodador", acomodador));
+
+          card.appendChild(fechaDiv);
+          card.appendChild(detallesDiv);
+
+          contenedor.appendChild(card);
+
+          // Llenar sets para resumen
+          agregarASet(audioSet, audio);
+          agregarASet(audioSet, video);
+          agregarASet(micSet, mic1);
+          agregarASet(micSet, mic2);
+          agregarASet(platformSet, plataforma);
+          agregarASet(platformSet, acomodador);
         });
 
-        // Resto = filas
-        for (let i = 1; i < data.length; i++) {
-          const row = data[i];
-          if (row.every(cell => cell === "")) continue; // salta filas vacías
+        // Resumen
+        const countText = filas.length === 1 ? "1 reunión asignada" : ${filas.length} reuniones asignadas;
+        document.getElementById("count-resumen").textContent = countText;
+        document.getElementById("side-count").textContent = countText;
 
-          const tr = document.createElement("tr");
-          row.forEach(cell => {
-            const td = document.createElement("td");
-            td.textContent = cell;
-            tr.appendChild(td);
+        function renderLista(id, set) {
+          const ul = document.getElementById(id);
+          ul.innerHTML = "";
+          Array.from(set).sort().forEach(nombre => {
+            const li = document.createElement("li");
+            li.textContent = nombre;
+            ul.appendChild(li);
           });
-          tbody.appendChild(tr);
         }
+
+        renderLista("audio-list", audioSet);
+        renderLista("mic-list", micSet);
+        renderLista("platform-list", platformSet);
+
       } catch (err) {
         console.error("Error cargando la cartelera:", err);
+        document.getElementById("count-resumen").textContent = "Error al cargar datos.";
       }
     }
 
