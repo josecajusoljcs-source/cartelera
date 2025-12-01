@@ -413,9 +413,9 @@
     </section>
   </main>
 
-  <script>
+<script>
   // URL del CSV de tu hoja publicada
- const CSV_URL = "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337";
+  const CSV_URL = "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337";
 
   function parseCSV(text) {
     const rows = text.trim().split(/\r?\n/);
@@ -538,7 +538,7 @@
 
       const countText = filas.length === 1
         ? "1 reunión asignada"
-        : ${filas.length} reuniones asignadas;
+        : `${filas.length} reuniones asignadas`;
 
       resumen.textContent = countText;
       sideCount.textContent = countText;
@@ -558,15 +558,12 @@
       renderLista("platform-list", platformSet);
     } catch (err) {
       console.error("Error cargando la cartelera:", err);
-      resumen.textContent = "Error al cargar datos.";
-      sideCount.textContent = "0 reuniones";
+      const resumen = document.getElementById("count-resumen");
+      const sideCount = document.getElementById("side-count");
+      if (resumen) resumen.textContent = "Error al cargar datos.";
+      if (sideCount) sideCount.textContent = "0 reuniones";
     }
   }
 
   cargarCartelera();
 </script>
-
-
-
-
-
