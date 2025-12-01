@@ -415,13 +415,16 @@
 
 <script>
   // URL del CSV de tu hoja publicada
-  const CSV_URL = "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337";
+  const CSV_URL =
+    "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337";
 
+  // Convierte el texto CSV en un array de filas/columnas
   function parseCSV(text) {
     const rows = text.trim().split(/\r?\n/);
-    return rows.map(row => row.split(","));
+    return rows.map((row) => row.split(","));
   }
 
+  // Marca domingos y sábados
   function esDiaImportante(fecha) {
     if (!fecha) return false;
     const f = fecha.toLowerCase();
@@ -429,41 +432,53 @@
   }
 
   async function cargarCartelera() {
-    const sideCount = document.getElementById("side-count"); // contador de “X reuniones asignadas”
-    const contenedor = document.getElementById("assignments"); // contenedor de las tarjetas
+    const sideCount = document.getElementById("side-count");
+    const contenedor = document.getElementById("assignments");
 
     try {
       const res = await fetch(CSV_URL);
       const text = await res.text();
       const data = parseCSV(text);
 
+      // Sin datos
       if (!data || data.length < 2) {
-        if (sideCount) sideCount.textContent = "0 reuniones";
-        contenedor.innerHTML = "<p>No hay asignaciones cargadas.</p>";
+        sideCount.textContent = "0 reuniones";
+        contenedor.innerHTML =
+          "<p class='empty-msg'>Sin asignaciones cargadas.</p>";
         return;
       }
 
-      // Sacamos la cabecera y filtramos filas vacías
-      const filas = data.slice(1).filter(row =>
-        row.some(cell => cell && cell.trim() !== "")
-      );
+      // Filas de datos (salteamos encabezados)
+      const filas = data
+        .slice(1)
+        .filter((row) => row.some((cell) => cell && cell.trim() !== ""));
 
-      // Limpiamos el contenedor
       contenedor.innerHTML = "";
 
-      filas.forEach(row => {
+      filas.forEach((row) => {
+        // IMPORTANTE: columnas según tu hoja
+        // 0: Fecha
+        // 1: Video
+        // 2: Audio
+        // 3: Mic 1
+        // 4: Mic 2
+        // 5: Plataforma
+        // 6: Acomodador de Entrada
+        // 7: Acomodador de Auditorio
         const fecha = row[0] || "";
-        const audio = row[1] || "";
-        const video = row[2] || "";
+        const video = row[1] || "";
+        const audio = row[2] || "";
         const mic1 = row[3] || "";
         const mic2 = row[4] || "";
         const plataforma = row[5] || "";
-        const acomodador = row[6] || "";
+        const acomodadorEntrada = row[6] || "";
+        const acomodadorAuditorio = row[7] || "";
 
+        // Tarjeta de la reunión
         const card = document.createElement("article");
         card.className = "assignment-card";
 
-        // Cabecera con fecha y badge
+        // Cabecera con fecha y tipo
         const fechaDiv = document.createElement("div");
         fechaDiv.className = "assignment-date";
 
@@ -514,25 +529,32 @@
         detallesDiv.appendChild(crearGrupo("Mic 1", mic1));
         detallesDiv.appendChild(crearGrupo("Mic 2", mic2));
         detallesDiv.appendChild(crearGrupo("Plataforma", plataforma));
-        detallesDiv.appendChild(crearGrupo("Acomodador", acomodador));
+        detallesDiv.appendChild(
+          crearGrupo("Acomodador de entrada", acomodadorEntrada)
+        );
+        detallesDiv.appendChild(
+          crearGrupo("Acomodador de auditorio", acomodadorAuditorio)
+        );
 
         card.appendChild(fechaDiv);
         card.appendChild(detallesDiv);
         contenedor.appendChild(card);
       });
 
+      // Contador de reuniones en el encabezado
       const countText =
         filas.length === 1
           ? "1 reunión asignada"
           : `${filas.length} reuniones asignadas`;
-
-      if (sideCount) sideCount.textContent = countText;
+      sideCount.textContent = countText;
     } catch (err) {
       console.error("Error cargando la cartelera:", err);
-      if (sideCount) sideCount.textContent = "0 reuniones";
-      contenedor.innerHTML = "<p>Error al cargar datos.</p>";
+      sideCount.textContent = "Error al cargar";
+      contenedor.innerHTML =
+        "<p class='empty-msg'>Hubo un error al cargar las asignaciones.</p>";
     }
   }
 
+  // Ejecutar al cargar la página
   cargarCartelera();
 </script>
