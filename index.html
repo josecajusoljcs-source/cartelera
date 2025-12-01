@@ -414,143 +414,154 @@
   </main>
 
   <script>
-    // URL del CSV de tu hoja publicada
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSqqCp0GvVgYXea4r0LKzl5ko1IQnxxVh_RLU1h6-DOKGHe3zSEBCRO-iEVbYPiGQ/pub?gid=96081337&single=true&output=csv";
+  // URL del CSV de tu hoja publicada
+  const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSqqCp0GvVgYXea4r0LKzl5ko1IQnxxVh_RLU1h6-DOKGHe3zSEBCRO-iEVbYPiGQ/pub?gid=96081337&single=true&output=csv";
 
-    function parseCSV(text) {
-      const rows = text.trim().split(/\r?\n/);
-      return rows.map(row => row.split(","));
-    }
+  function parseCSV(text) {
+    const rows = text.trim().split(/\r?\n/);
+    return rows.map(row => row.split(","));
+  }
 
-    function esDiaImportante(fecha) {
-      if (!fecha) return false;
-      const f = fecha.toLowerCase();
-      return f.includes("domingo") || f.includes("sábado") || f.includes("sabado");
-    }
+  function esDiaImportante(fecha) {
+    if (!fecha) return false;
+    const f = fecha.toLowerCase();
+    return f.includes("domingo") || f.includes("sábado") || f.includes("sabado");
+  }
 
-    function agregarASet(set, valor) {
-      if (!valor) return;
-      const limpio = valor.trim();
-      if (!limpio) return;
-      set.add(limpio);
-    }
+  function agregarASet(set, valor) {
+    if (!valor) return;
+    const limpio = valor.trim();
+    if (!limpio) return;
+    set.add(limpio);
+  }
 
-    async function cargarCartelera() {
-      try {
-        const res = await fetch(CSV_URL);
-        const text = await res.text();
-        const data = parseCSV(text);
+  async function cargarCartelera() {
+    const resumen = document.getElementById("count-resumen");
+    const sideCount = document.getElementById("side-count");
+    const contenedor = document.getElementById("assignments");
 
-        if (!data || data.length < 2) {
-          document.getElementById("count-resumen").textContent = "Sin datos disponibles.";
-          return;
-        }
+    try {
+      const res = await fetch(CSV_URL);
+      const text = await res.text();
+      const data = parseCSV(text);
 
-        const filas = data.slice(1).filter(row => row.some(cell => cell && cell.trim() !== ""));
-        const contenedor = document.getElementById("assignments");
-        contenedor.innerHTML = "";
-
-        const audioSet = new Set();
-        const micSet = new Set();
-        const platformSet = new Set();
-
-        filas.forEach(row => {
-          const fecha = row[0] || "";
-          const audio = row[1] || "";
-          const video = row[2] || "";
-          const mic1 = row[3] || "";
-          const mic2 = row[4] || "";
-          const plataforma = row[5] || "";
-          const acomodador = row[6] || "";
-
-          const card = document.createElement("article");
-          card.className = "assignment-card";
-
-          const fechaDiv = document.createElement("div");
-          fechaDiv.className = "assignment-date";
-
-          const daySpan = document.createElement("span");
-          daySpan.className = "assignment-day";
-          if (esDiaImportante(fecha)) daySpan.classList.add("church-day");
-          daySpan.textContent = fecha;
-
-          const labelSpan = document.createElement("span");
-          labelSpan.className = "assignment-label";
-          labelSpan.textContent = "Reunión";
-
-          const badge = document.createElement("div");
-          badge.className = "badge";
-          const dot = document.createElement("span");
-          dot.className = "badge-dot";
-          const txt = document.createElement("span");
-          txt.textContent = esDiaImportante(fecha) ? "Reunión principal" : "Reunión de entre semana";
-          badge.appendChild(dot);
-          badge.appendChild(txt);
-
-          fechaDiv.appendChild(labelSpan);
-          fechaDiv.appendChild(daySpan);
-          fechaDiv.appendChild(badge);
-
-          const detallesDiv = document.createElement("div");
-          detallesDiv.className = "assignment-details";
-
-          function crearGrupo(label, value) {
-            const group = document.createElement("div");
-            group.className = "detail-group";
-            const l = document.createElement("div");
-            l.className = "detail-label";
-            l.textContent = label;
-            const v = document.createElement("div");
-            v.className = "detail-value";
-            v.textContent = value || "-";
-            group.appendChild(l);
-            group.appendChild(v);
-            return group;
-          }
-
-          detallesDiv.appendChild(crearGrupo("Audio", audio));
-          detallesDiv.appendChild(crearGrupo("Video", video));
-          detallesDiv.appendChild(crearGrupo("Mic 1", mic1));
-          detallesDiv.appendChild(crearGrupo("Mic 2", mic2));
-          detallesDiv.appendChild(crearGrupo("Plataforma", plataforma));
-          detallesDiv.appendChild(crearGrupo("Acomodador", acomodador));
-
-          card.appendChild(fechaDiv);
-          card.appendChild(detallesDiv);
-          contenedor.appendChild(card);
-
-          agregarASet(audioSet, audio);
-          agregarASet(audioSet, video);
-          agregarASet(micSet, mic1);
-          agregarASet(micSet, mic2);
-          agregarASet(platformSet, plataforma);
-          agregarASet(platformSet, acomodador);
-        });
-
-        const countText = filas.length === 1 ? "1 reunión asignada" : ${filas.length} reuniones asignadas;
-        document.getElementById("count-resumen").textContent = countText;
-        document.getElementById("side-count").textContent = countText;
-
-        function renderLista(id, set) {
-          const ul = document.getElementById(id);
-          ul.innerHTML = "";
-          Array.from(set).sort().forEach(nombre => {
-            const li = document.createElement("li");
-            li.textContent = nombre;
-            ul.appendChild(li);
-          });
-        }
-
-        renderLista("audio-list", audioSet);
-        renderLista("mic-list", micSet);
-        renderLista("platform-list", platformSet);
-      } catch (err) {
-        console.error("Error cargando la cartelera:", err);
-        document.getElementById("count-resumen").textContent = "Error al cargar datos.";
+      if (!data || data.length < 2) {
+        resumen.textContent = "Sin datos disponibles.";
+        sideCount.textContent = "0 reuniones";
+        return;
       }
-    }
 
-    cargarCartelera();
-  </script>
-</body>
-</html>
+      const filas = data.slice(1).filter(row =>
+        row.some(cell => cell && cell.trim() !== "")
+      );
+
+      contenedor.innerHTML = "";
+
+      const audioSet = new Set();
+      const micSet = new Set();
+      const platformSet = new Set();
+
+      filas.forEach(row => {
+        const fecha = row[0] || "";
+        const audio = row[1] || "";
+        const video = row[2] || "";
+        const mic1 = row[3] || "";
+        const mic2 = row[4] || "";
+        const plataforma = row[5] || "";
+        const acomodador = row[6] || "";
+
+        const card = document.createElement("article");
+        card.className = "assignment-card";
+
+        const fechaDiv = document.createElement("div");
+        fechaDiv.className = "assignment-date";
+
+        const daySpan = document.createElement("span");
+        daySpan.className = "assignment-day";
+        if (esDiaImportante(fecha)) daySpan.classList.add("church-day");
+        daySpan.textContent = fecha;
+
+        const labelSpan = document.createElement("span");
+        labelSpan.className = "assignment-label";
+        labelSpan.textContent = "Reunión";
+
+        const badge = document.createElement("div");
+        badge.className = "badge";
+        const dot = document.createElement("span");
+        dot.className = "badge-dot";
+        const txt = document.createElement("span");
+        txt.textContent = esDiaImportante(fecha)
+          ? "Reunión principal"
+          : "Reunión de entre semana";
+        badge.appendChild(dot);
+        badge.appendChild(txt);
+
+        fechaDiv.appendChild(labelSpan);
+        fechaDiv.appendChild(daySpan);
+        fechaDiv.appendChild(badge);
+
+        const detallesDiv = document.createElement("div");
+        detallesDiv.className = "assignment-details";
+
+        function crearGrupo(label, value) {
+          const group = document.createElement("div");
+          group.className = "detail-group";
+          const l = document.createElement("div");
+          l.className = "detail-label";
+          l.textContent = label;
+          const v = document.createElement("div");
+          v.className = "detail-value";
+          v.textContent = value || "-";
+          group.appendChild(l);
+          group.appendChild(v);
+          return group;
+        }
+
+        detallesDiv.appendChild(crearGrupo("Audio", audio));
+        detallesDiv.appendChild(crearGrupo("Video", video));
+        detallesDiv.appendChild(crearGrupo("Mic 1", mic1));
+        detallesDiv.appendChild(crearGrupo("Mic 2", mic2));
+        detallesDiv.appendChild(crearGrupo("Plataforma", plataforma));
+        detallesDiv.appendChild(crearGrupo("Acomodador", acomodador));
+
+        card.appendChild(fechaDiv);
+        card.appendChild(detallesDiv);
+        contenedor.appendChild(card);
+
+        agregarASet(audioSet, audio);
+        agregarASet(audioSet, video);
+        agregarASet(micSet, mic1);
+        agregarASet(micSet, mic2);
+        agregarASet(platformSet, plataforma);
+        agregarASet(platformSet, acomodador);
+      });
+
+      const countText = filas.length === 1
+        ? "1 reunión asignada"
+        : ${filas.length} reuniones asignadas;
+
+      resumen.textContent = countText;
+      sideCount.textContent = countText;
+
+      function renderLista(id, set) {
+        const ul = document.getElementById(id);
+        ul.innerHTML = "";
+        Array.from(set).sort().forEach(nombre => {
+          const li = document.createElement("li");
+          li.textContent = nombre;
+          ul.appendChild(li);
+        });
+      }
+
+      renderLista("audio-list", audioSet);
+      renderLista("mic-list", micSet);
+      renderLista("platform-list", platformSet);
+    } catch (err) {
+      console.error("Error cargando la cartelera:", err);
+      resumen.textContent = "Error al cargar datos.";
+      sideCount.textContent = "0 reuniones";
+    }
+  }
+
+  cargarCartelera();
+</script>
