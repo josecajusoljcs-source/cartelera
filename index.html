@@ -4,96 +4,249 @@
   <meta charset="UTF-8" />
   <title>Asignaciones para las reuniones</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <style>
     :root {
       --bg: #0f172a;
+      --bg-soft: #020617;
       --card-bg: #020617;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.2);
+      --accent-strong: #facc15;
       --text: #e5e7eb;
       --muted: #9ca3af;
-      --border: rgba(148,163,184,0.3);
-      --accent: #38bdf8;
-      --accent-strong: #facc15;
-      --radius-md: 14px;
+      --border: rgba(148, 163, 184, 0.3);
+      --radius-xl: 18px;
+      --radius-md: 12px;
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.75);
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui,-apple-system; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
 
     body {
-      background: linear-gradient(180deg, #0f172a, #020617);
-      padding: 1.5rem;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top, rgba(56, 189, 248, 0.25), transparent 55%),
+        radial-gradient(circle at bottom, rgba(250, 204, 21, 0.18), transparent 55%),
+        linear-gradient(135deg, #020617, #020617 40%, #020617);
       color: var(--text);
+      padding: 1.5rem;
       display: flex;
       justify-content: center;
     }
 
-    .page { width: 100%; max-width: 1050px; }
-
-    header { text-align: center; margin-bottom: 1.5rem; }
-
-    header h1 {
-      font-size: 2rem;
-      font-weight: 700;
-      color: #fff;
+    .page {
+      width: 100%;
+      max-width: 1200px;
     }
 
-    header p { margin-top: 0.25rem; color: var(--muted); }
+    header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    header h1 {
+      font-size: clamp(1.9rem, 3vw, 2.3rem);
+      letter-spacing: 0.04em;
+      font-weight: 700;
+      color: #f9fafb;
+      text-shadow: 0 0 20px rgba(15, 23, 42, 0.8);
+    }
+
+    header p {
+      margin-top: 0.3rem;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
 
     .pill-bar {
-      margin-top: 0.5rem;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      background: rgba(255,255,255,0.08);
+      gap: 0.55rem;
+      padding: 0.3rem 0.8rem;
       border-radius: 999px;
-      font-size: .78rem;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      margin-top: 0.6rem;
+      font-size: 0.78rem;
       color: var(--muted);
     }
 
     .pill-dot {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       border-radius: 999px;
       background: #22c55e;
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.9);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr);
+      gap: 1.5rem;
     }
 
     .card-shell {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      backdrop-filter: blur(10px);
-      padding: 1.2rem;
+      background: radial-gradient(circle at top left, rgba(148, 163, 184, 0.1), transparent 55%),
+                  radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.9), #020617);
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      padding: 1.2rem 1.15rem 1.35rem;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.12), transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .card-shell-inner {
+      position: relative;
+      z-index: 1;
     }
 
     .section-title {
       display: flex;
+      align-items: baseline;
       justify-content: space-between;
-      margin-bottom: 1rem;
+      margin-bottom: 0.4rem;
+      gap: 0.75rem;
     }
 
-    .assignments-grid { display: flex; flex-direction: column; gap: 1rem; }
+    .section-title h2 {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.11em;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .section-title span {
+      font-size: 0.8rem;
+      color: var(--muted);
+      padding: 0.15rem 0.8rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .assignments-info {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.65rem;
+    }
+
+    .assignments-info strong {
+      color: var(--accent);
+    }
+
+    .assignments-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.75rem;
+      max-height: calc(100vh - 220px);
+      overflow-y: auto;
+      padding-right: 0.3rem;
+    }
+
+    .assignments-grid::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .assignments-grid::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.7);
+      border-radius: 999px;
+    }
+
+    .assignments-grid::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.8);
+      border-radius: 999px;
+    }
 
     .assignment-card {
-      border: 1px solid var(--border);
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.94), rgba(15, 23, 42, 0.98));
       border-radius: var(--radius-md);
-      padding: 1rem;
-      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      padding: 0.7rem 0.75rem 0.65rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 2.2fr);
+      gap: 0.35rem 1rem;
+      position: relative;
+      overflow: hidden;
     }
 
-    .assignment-day { font-size: 1rem; font-weight: 600; }
+    .assignment-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      border: 1px solid transparent;
+      background: linear-gradient(120deg,
+        rgba(56, 189, 248, 0.25),
+        rgba(250, 204, 21, 0.15),
+        transparent
+      );
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .assignment-card:hover::after {
+      opacity: 0.25;
+    }
+
+    /* Primera reunión un poquito más destacada */
+    .assignment-card:first-child {
+      border-color: rgba(56, 189, 248, 0.6);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.25);
+    }
+
+    .assignment-date {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+      font-size: 0.83rem;
+      padding-right: 0.2rem;
+    }
+
+    .assignment-day {
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    .assignment-day.church-day {
+      color: var(--accent-strong);
+    }
+
+    .assignment-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
 
     .badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
+      gap: 0.3rem;
+      margin-top: 0.2rem;
+      padding: 0.16rem 0.55rem;
       border-radius: 999px;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.25);
-      font-size: .75rem;
-      margin-top: 4px;
-      margin-bottom: 10px;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      font-size: 0.7rem;
+      color: var(--muted);
+      width: fit-content;
     }
 
     .badge-dot {
@@ -101,166 +254,318 @@
       height: 8px;
       border-radius: 999px;
       background: var(--accent);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.9);
     }
 
     .assignment-details {
       display: grid;
-      grid-template-columns: repeat(2,1fr);
-      gap: .6rem .8rem;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.25rem 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    .detail-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.05rem;
     }
 
     .detail-label {
-      font-size: .7rem;
+      font-size: 0.66rem;
       text-transform: uppercase;
+      letter-spacing: 0.12em;
       color: var(--muted);
+      position: relative;
+      padding-left: 0.95rem;
     }
 
-    .detail-value { font-size: .85rem; color: #fff; }
-
-    .dot {
-      width: 8px;
-      height: 8px;
+    /* Puntito de color según rol */
+    .detail-label::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 6px;
+      height: 6px;
       border-radius: 999px;
-      display: inline-block;
-      margin-right: 6px;
+      background: var(--muted);
     }
 
+    .detail-label.label-audio::before {
+      background: #38bdf8; /* celeste */
+    }
+
+    .detail-label.label-video::before {
+      background: #a78bfa; /* violeta */
+    }
+
+    .detail-label.label-mic::before {
+      background: #4ade80; /* verde */
+    }
+
+    .detail-label.label-plataforma::before {
+      background: #facc15; /* amarillo */
+    }
+
+    .detail-label.label-entrada::before {
+      background: #fb923c; /* naranja */
+    }
+
+    .detail-label.label-auditorio::before {
+      background: #fb7185; /* rosa */
+    }
+
+    .detail-value {
+      font-size: 0.8rem;
+      color: #e5e7eb;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .empty-msg {
+      font-size: 0.85rem;
+      color: var(--muted);
+      padding-top: 0.5rem;
+    }
+
+    @media (max-width: 900px) {
+      body { padding: 1rem 0.6rem 1.2rem; }
+      .layout { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    @media (max-width: 640px) {
+      .assignment-card { grid-template-columns: minmax(0, 1fr); }
+      .assignment-details { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
   </style>
 </head>
-
 <body>
   <main class="page">
     <header>
       <h1>Asignaciones para las reuniones</h1>
-      <p id="mes-actual">Cargando mes…</p>
+      <p id="mes-actual">Cargando fecha…</p>
 
       <div class="pill-bar">
         <span class="pill-dot"></span>
-        Conectado a hoja de cálculo · Actualización automática
+        <span>Conectado a hoja de cálculo · Actualización automática</span>
       </div>
     </header>
 
-    <section class="card-shell">
-      <div class="section-title">
-        <h2>Próximas reuniones</h2>
-        <span id="count-resumen">Cargando…</span>
-      </div>
+    <section class="layout">
+      <section class="card-shell">
+        <div class="card-shell-inner">
+          <div class="section-title">
+            <h2>Próximas reuniones</h2>
+            <span id="count-resumen">Cargando asignaciones…</span>
+          </div>
 
-      <div id="assignments" class="assignments-grid"></div>
+          <p class="assignments-info">
+            Editá las asignaciones directamente en la hoja de  
+            <strong>Google Sheets</strong>. La cartelera se actualiza
+            automáticamente al recargar esta página.
+          </p>
+
+          <div id="assignments" class="assignments-grid"></div>
+        </div>
+      </section>
     </section>
   </main>
 
-<script>
-  const CSV_URL =
-    "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337";
+  <script>
+    // URL del CSV de tu hoja publicada
+    const CSV_URL =
+      "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337";
 
-  function parseCSV(text) {
-    return text.trim().split(/\r?\n/).map(r => r.split(","));
-  }
-
-  function esDiaImportante(f) {
-    return f.toLowerCase().includes("domingo");
-  }
-
-  async function cargarCartelera() {
-    const cont = document.getElementById("assignments");
-    const resumen = document.getElementById("count-resumen");
-    const mesActual = document.getElementById("mes-actual");
-
-    try {
-      const res = await fetch(CSV_URL);
-      const data = parseCSV(await res.text());
-
-      const filas = data.slice(1).filter(r => r.some(c => c.trim() !== ""));
-
-      if (filas.length === 0) return;
-
-      // FECHA AUTOMÁTICA (toma la primera fecha del Excel)
-      const primeraFecha = filas[0][0];
-      const palabras = primeraFecha.split(" ");
-      const mes = palabras[palabras.length - 2];
-      const mesCap = mes.charAt(0).toUpperCase() + mes.slice(1);
-      mesActual.textContent = `${mesCap} 2025`;
-
-      cont.innerHTML = "";
-
-      filas.forEach(row => {
-        const fecha = row[0];
-        const video = row[1];
-        const audio = row[2];
-        const mic1 = row[3];
-        const mic2 = row[4];
-        const plataforma = row[5];
-        const acomEntrada = row[6];
-        const acomAud = row[7];
-
-        const card = document.createElement("div");
-        card.className = "assignment-card";
-
-        card.innerHTML = `
-          <div class="assignment-day">${fecha}</div>
-
-          <div class="badge">
-            <span class="badge-dot"></span>
-            ${esDiaImportante(fecha) ? "Reunión principal" : "Reunión de entre semana"}
-          </div>
-
-          <div class="assignment-details">
-
-            <div>
-              <div class="detail-label"><span class="dot" style="background:#38bdf8"></span>Audio</div>
-              <div class="detail-value">${audio}</div>
-            </div>
-
-            <div>
-              <div class="detail-label"><span class="dot" style="background:#a78bfa"></span>Video</div>
-              <div class="detail-value">${video}</div>
-            </div>
-
-            <div>
-              <div class="detail-label"><span class="dot" style="background:#4ade80"></span>Mic 1</div>
-              <div class="detail-value">${mic1}</div>
-            </div>
-
-            <div>
-              <div class="detail-label"><span class="dot" style="background:#4ade80"></span>Mic 2</div>
-              <div class="detail-value">${mic2}</div>
-            </div>
-
-            <div>
-              <div class="detail-label"><span class="dot" style="background:#fb923c"></span>Plataforma</div>
-              <div class="detail-value">${plataforma}</div>
-            </div>
-
-            <div>
-              <div class="detail-label"><span class="dot" style="background:#f472b6"></span>Acomodador entrada</div>
-              <div class="detail-value">${acomEntrada}</div>
-            </div>
-
-            <div>
-              <div class="detail-label"><span class="dot" style="background:#ef4444"></span>Acomodador auditorio</div>
-              <div class="detail-value">${acomAud}</div>
-            </div>
-
-          </div>
-        `;
-
-        cont.appendChild(card);
-      });
-
-      resumen.textContent =
-        filas.length === 1
-          ? "1 reunión asignada"
-          : `${filas.length} reuniones asignadas`;
-
-    } catch (e) {
-      console.error(e);
-      cont.innerHTML = "<p>Error al cargar datos.</p>";
+    // Convierte el texto CSV en un array de filas/columnas
+    function parseCSV(text) {
+      const rows = text.trim().split(/\r?\n/);
+      return rows.map((row) => row.split(","));
     }
-  }
 
-  cargarCartelera();
-</script>
+    // Marca domingos y sábados
+    function esDiaImportante(fecha) {
+      if (!fecha) return false;
+      const f = fecha.toLowerCase();
+      return f.includes("domingo") || f.includes("sábado") || f.includes("sabado");
+    }
 
+    // 🔹 NUEVO: saca mes y año de la primera fecha del Excel
+    function actualizarFechaAutomatica(fechaTexto) {
+      const p = document.getElementById("mes-actual");
+      if (!fechaTexto || !p) return;
+
+      const meses = [
+        "enero","febrero","marzo","abril","mayo","junio",
+        "julio","agosto","setiembre","septiembre","octubre","noviembre","diciembre"
+      ];
+
+      const lower = fechaTexto.toLowerCase();
+      let mesEncontrado = null;
+      for (const m of meses) {
+        if (lower.includes(m)) {
+          mesEncontrado = m;
+          break;
+        }
+      }
+
+      const anioMatch = lower.match(/\b(20\d{2})\b/);
+      const anio = anioMatch ? anioMatch[1] : "";
+
+      if (!mesEncontrado) {
+        p.textContent = fechaTexto;
+        return;
+      }
+
+      const mesCapitalizado =
+        mesEncontrado.charAt(0).toUpperCase() + mesEncontrado.slice(1);
+
+      p.textContent = anio ? `${mesCapitalizado} ${anio}` : mesCapitalizado;
+    }
+
+    async function cargarCartelera() {
+      const resumen = document.getElementById("count-resumen");
+      const contenedor = document.getElementById("assignments");
+
+      try {
+        const res = await fetch(CSV_URL);
+        const text = await res.text();
+        const data = parseCSV(text);
+
+        // Sin datos
+        if (!data || data.length < 2) {
+          resumen.textContent = "0 reuniones";
+          contenedor.innerHTML =
+            "<p class='empty-msg'>Sin asignaciones cargadas.</p>";
+          return;
+        }
+
+        // Filas de datos (salteamos encabezados)
+        const filas = data
+          .slice(1)
+          .filter((row) => row.some((cell) => cell && cell.trim() !== ""));
+
+        if (filas.length === 0) {
+          resumen.textContent = "0 reuniones";
+          contenedor.innerHTML =
+            "<p class='empty-msg'>Sin asignaciones cargadas.</p>";
+          return;
+        }
+
+        // 🔹 Usar la PRIMERA fila del Excel para fijar el mes/año
+        actualizarFechaAutomatica(filas[0][0] || "");
+
+        contenedor.innerHTML = "";
+
+        filas.forEach((row) => {
+          // Columnas según tu hoja:
+          // 0: Fecha
+          // 1: Video
+          // 2: Audio
+          // 3: Mic 1
+          // 4: Mic 2
+          // 5: Plataforma
+          // 6: Acomodador de Entrada
+          // 7: Acomodador de Auditorio
+          const fecha = row[0] || "";
+          const video = row[1] || "";
+          const audio = row[2] || "";
+          const mic1 = row[3] || "";
+          const mic2 = row[4] || "";
+          const plataforma = row[5] || "";
+          const acomodadorEntrada = row[6] || "";
+          const acomodadorAuditorio = row[7] || "";
+
+          // Tarjeta de la reunión
+          const card = document.createElement("article");
+          card.className = "assignment-card";
+
+          // Cabecera con fecha y tipo
+          const fechaDiv = document.createElement("div");
+          fechaDiv.className = "assignment-date";
+
+          const daySpan = document.createElement("span");
+          daySpan.className = "assignment-day";
+          if (esDiaImportante(fecha)) daySpan.classList.add("church-day");
+          daySpan.textContent = fecha;
+
+          const labelSpan = document.createElement("span");
+          labelSpan.className = "assignment-label";
+          labelSpan.textContent = "Reunión";
+
+          const badge = document.createElement("div");
+          badge.className = "badge";
+          const dot = document.createElement("span");
+          dot.className = "badge-dot";
+          const txt = document.createElement("span");
+          txt.textContent = esDiaImportante(fecha)
+            ? "Reunión principal"
+            : "Reunión de entre semana";
+          badge.appendChild(dot);
+          badge.appendChild(txt);
+
+          fechaDiv.appendChild(labelSpan);
+          fechaDiv.appendChild(daySpan);
+          fechaDiv.appendChild(badge);
+
+          // Detalles
+          const detallesDiv = document.createElement("div");
+          detallesDiv.className = "assignment-details";
+
+          function crearGrupo(label, value, extraClass) {
+            const group = document.createElement("div");
+            group.className = "detail-group";
+
+            const l = document.createElement("div");
+            l.className = "detail-label";
+            if (extraClass) l.classList.add(extraClass);
+            l.textContent = label;
+
+            const v = document.createElement("div");
+            v.className = "detail-value";
+            v.textContent = value || "-";
+
+            group.appendChild(l);
+            group.appendChild(v);
+            return group;
+          }
+
+          detallesDiv.appendChild(crearGrupo("Audio", audio, "label-audio"));
+          detallesDiv.appendChild(crearGrupo("Video", video, "label-video"));
+          detallesDiv.appendChild(crearGrupo("Mic 1", mic1, "label-mic"));
+          detallesDiv.appendChild(crearGrupo("Mic 2", mic2, "label-mic"));
+          detallesDiv.appendChild(
+            crearGrupo("Plataforma", plataforma, "label-plataforma")
+          );
+          detallesDiv.appendChild(
+            crearGrupo("Acomodador de entrada", acomodadorEntrada, "label-entrada")
+          );
+          detallesDiv.appendChild(
+            crearGrupo("Acomodador de auditorio", acomodadorAuditorio, "label-auditorio")
+          );
+
+          card.appendChild(fechaDiv);
+          card.appendChild(detallesDiv);
+          contenedor.appendChild(card);
+        });
+
+        // Contador de reuniones en el encabezado
+        const countText =
+          filas.length === 1
+            ? "1 reunión asignada"
+            : `${filas.length} reuniones asignadas`;
+        resumen.textContent = countText;
+      } catch (err) {
+        console.error("Error cargando la cartelera:", err);
+        resumen.textContent = "Error al cargar";
+        contenedor.innerHTML =
+          "<p class='empty-msg'>Hubo un error al cargar las asignaciones.</p>";
+      }
+    }
+
+    // Ejecutar al cargar la página
+    cargarCartelera();
+  </script>
 </body>
 </html>
