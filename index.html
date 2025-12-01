@@ -140,8 +140,17 @@
       background: rgba(15, 23, 42, 0.9);
     }
 
+    .assignments-info {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.65rem;
+    }
+
+    .assignments-info strong {
+      color: var(--accent);
+    }
+
     .assignments-grid {
-      margin-top: 0.4rem;
       display: grid;
       grid-template-columns: minmax(0, 1fr);
       gap: 0.75rem;
@@ -168,7 +177,7 @@
       background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.94), rgba(15, 23, 42, 0.98));
       border-radius: var(--radius-md);
       border: 1px solid rgba(148, 163, 184, 0.35);
-      padding: 0.7rem 0.75rem 0.7rem;
+      padding: 0.7rem 0.75rem 0.65rem;
       display: grid;
       grid-template-columns: minmax(0, 1.2fr) minmax(0, 2.2fr);
       gap: 0.35rem 1rem;
@@ -196,32 +205,10 @@
       opacity: 0.25;
     }
 
-    /* PRÓXIMA reunión: destacada + sticky */
-    .assignment-card.is-next {
-      position: sticky;
-      top: 0;
-      z-index: 2;
-      border-color: rgba(56, 189, 248, 0.9);
-      box-shadow:
-        0 0 0 1px rgba(56, 189, 248, 0.35),
-        0 18px 45px rgba(15, 23, 42, 0.9);
-      background:
-        radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 55%),
-        radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.98), #020617);
-    }
-
-    .next-pill {
-      position: absolute;
-      top: 0.55rem;
-      right: 0.7rem;
-      font-size: 0.7rem;
-      padding: 0.14rem 0.6rem;
-      border-radius: 999px;
-      border: 1px solid rgba(56, 189, 248, 0.7);
-      background: rgba(15, 23, 42, 0.95);
-      color: #e0f2fe;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+    /* Primera reunión un poquito más destacada */
+    .assignment-card:first-child {
+      border-color: rgba(56, 189, 248, 0.6);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.25);
     }
 
     .assignment-date {
@@ -305,12 +292,12 @@
       background: var(--muted);
     }
 
-    .detail-label.label-audio::before { background: #38bdf8; }     /* celeste */
-    .detail-label.label-video::before { background: #a78bfa; }     /* violeta */
-    .detail-label.label-mic::before { background: #4ade80; }       /* verde */
-    .detail-label.label-plataforma::before { background: #facc15; }/* amarillo */
-    .detail-label.label-entrada::before { background: #fb923c; }   /* naranja */
-    .detail-label.label-auditorio::before { background: #fb7185; } /* rosa */
+    .detail-label.label-audio::before      { background: #38bdf8; }  /* celeste  */
+    .detail-label.label-video::before      { background: #a78bfa; }  /* violeta  */
+    .detail-label.label-mic::before        { background: #4ade80; }  /* verde    */
+    .detail-label.label-plataforma::before { background: #facc15; }  /* amarillo */
+    .detail-label.label-entrada::before    { background: #fb923c; }  /* naranja  */
+    .detail-label.label-auditorio::before  { background: #fb7185; }  /* rosa     */
 
     .detail-value {
       font-size: 0.8rem;
@@ -341,7 +328,8 @@
   <main class="page">
     <header>
       <h1>Asignaciones para las reuniones</h1>
-      <p id="month-label"></p>
+      <!-- Se actualizará automáticamente con la celda A1 si existe -->
+      <p id="header-month">Mes / año</p>
 
       <div class="pill-bar">
         <span class="pill-dot"></span>
@@ -357,6 +345,12 @@
             <span id="count-resumen">Cargando asignaciones…</span>
           </div>
 
+          <p class="assignments-info">
+            Editá las asignaciones directamente en la hoja de  
+            <strong>Google Sheets</strong>. La cartelera se actualiza
+            automáticamente al recargar esta página.
+          </p>
+
           <div id="assignments" class="assignments-grid"></div>
         </div>
       </section>
@@ -364,157 +358,86 @@
   </main>
 
   <script>
+    // URL del CSV de tu hoja publicada
     const CSV_URL =
       "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337";
 
+    // Convierte el texto CSV en un array de filas/columnas
     function parseCSV(text) {
       const rows = text.trim().split(/\r?\n/);
       return rows.map((row) => row.split(","));
     }
 
-    // Normaliza texto (minúsculas + sin tildes)
-    function normalize(str) {
-      return (str || "")
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "");
-    }
-
-    const mesesMapa = {
-      "enero": 0,
-      "febrero": 1,
-      "marzo": 2,
-      "abril": 3,
-      "mayo": 4,
-      "junio": 5,
-      "julio": 6,
-      "agosto": 7,
-      "setiembre": 8,
-      "septiembre": 8,
-      "octubre": 9,
-      "noviembre": 10,
-      "diciembre": 11
-    };
-
+    // Marca domingos y sábados
     function esDiaImportante(fecha) {
       if (!fecha) return false;
-      const f = normalize(fecha);
-      return f.includes("domingo") || f.includes("sabado");
-    }
-
-    function parseMesYAnio(desdeA1) {
-      const norm = normalize(desdeA1);
-      // ejemplo: "diciembre 2025"
-      const match = norm.match(/([a-zñ]+)\s+(\d{4})/);
-      if (!match) return null;
-      const mesNombre = match[1];
-      const anio = parseInt(match[2], 10);
-      const mesIdx = mesesMapa[mesNombre];
-      if (mesIdx == null || isNaN(anio)) return null;
-      return { mesIdx, anio };
-    }
-
-    function parseFechaReunion(textoFecha, mesIdx, anio) {
-      if (mesIdx == null || anio == null) return null;
-      const match = textoFecha && textoFecha.match(/(\d{1,2})\s+de/);
-      if (!match) return null;
-      const dia = parseInt(match[1], 10);
-      if (isNaN(dia)) return null;
-      return new Date(anio, mesIdx, dia);
+      const f = fecha.toLowerCase();
+      return f.includes("domingo") || f.includes("sábado") || f.includes("sabado");
     }
 
     async function cargarCartelera() {
-      const resumen = document.getElementById("count-resumen");
+      const resumen    = document.getElementById("count-resumen");
       const contenedor = document.getElementById("assignments");
-      const monthLabel = document.getElementById("month-label");
+      const headerMes  = document.getElementById("header-month");
 
       try {
-        const res = await fetch(CSV_URL);
+        const res  = await fetch(CSV_URL);
         const text = await res.text();
         const data = parseCSV(text);
 
-        if (!data || data.length < 3) {
+        if (!data || data.length === 0) {
           resumen.textContent = "0 reuniones";
           contenedor.innerHTML =
             "<p class='empty-msg'>Sin asignaciones cargadas.</p>";
-          monthLabel.textContent = "";
           return;
         }
 
-        // A1: título del mes
-        const tituloMes = (data[0][0] || "").trim();
-        monthLabel.textContent = tituloMes;
-        const mesInfo = parseMesYAnio(tituloMes);
-
-        // Fila 2 headers -> saltar; a partir de fila 3 datos
-        const filasCrudas = data
-          .slice(2)
-          .filter((row) => row.some((cell) => cell && cell.trim() !== ""));
-
-        const hoy = new Date();
-        hoy.setHours(0, 0, 0, 0);
-
-        // Agregamos la fecha Date para ordenar
-        const filasConFecha = filasCrudas.map((row) => {
-          const fechaTexto = row[0] || "";
-          const fechaDate = mesInfo
-            ? parseFechaReunion(fechaTexto, mesInfo.mesIdx, mesInfo.anio)
-            : null;
-          return { row, fechaTexto, fechaDate };
-        });
-
-        const futuras = [];
-        const pasadas = [];
-
-        filasConFecha.forEach((item) => {
-          if (item.fechaDate && !isNaN(item.fechaDate.getTime())) {
-            if (item.fechaDate >= hoy) {
-              futuras.push(item);
-            } else {
-              pasadas.push(item);
-            }
-          } else {
-            // Si no se puede parsear, lo consideramos futuro para no perderlo
-            futuras.push(item);
+        // === Mes / año automático desde A1 si no es "Fecha" ===
+        let startIndex = 1; // por defecto: salteamos solo la fila de encabezados
+        if (data[0] && data[0][0]) {
+          const firstCell = data[0][0].trim();
+          if (firstCell && !/^fecha/i.test(firstCell)) {
+            // A1 contiene algo tipo "Diciembre 2025"
+            headerMes.textContent = firstCell;
+            startIndex = 2; // fila 1 = títulos de columnas, datos desde la 3ª fila
           }
-        });
+        }
 
-        futuras.sort((a, b) => {
-          if (!a.fechaDate || !b.fechaDate) return 0;
-          return a.fechaDate - b.fechaDate;
-        });
-
-        pasadas.sort((a, b) => {
-          if (!a.fechaDate || !b.fechaDate) return 0;
-          return a.fechaDate - b.fechaDate;
-        });
-
-        const filasOrdenadas = futuras.concat(pasadas);
+        // Filas de datos efectivas
+        const filas = data
+          .slice(startIndex)
+          .filter((row) => row.some((cell) => cell && cell.trim() !== ""));
 
         contenedor.innerHTML = "";
 
-        filasOrdenadas.forEach((item, index) => {
-          const row = item.row;
-          const fecha = row[0] || "";
-          const video = row[1] || "";
-          const audio = row[2] || "";
-          const mic1 = row[3] || "";
-          const mic2 = row[4] || "";
-          const plataforma = row[5] || "";
-          const acomodadorEntrada = row[6] || "";
-          const acomodadorAuditorio = row[7] || "";
+        if (filas.length === 0) {
+          resumen.textContent = "0 reuniones";
+          contenedor.innerHTML =
+            "<p class='empty-msg'>Sin asignaciones cargadas.</p>";
+          return;
+        }
+
+        filas.forEach((row) => {
+          // Columnas según tu hoja:
+          // 0: Fecha
+          // 1: Video
+          // 2: Audio
+          // 3: Mic 1
+          // 4: Mic 2
+          // 5: Plataforma
+          // 6: Acomodador de Entrada
+          // 7: Acomodador de Auditorio
+          const fecha              = row[0] || "";
+          const video              = row[1] || "";
+          const audio              = row[2] || "";
+          const mic1               = row[3] || "";
+          const mic2               = row[4] || "";
+          const plataforma         = row[5] || "";
+          const acomodadorEntrada  = row[6] || "";
+          const acomodadorAuditorio= row[7] || "";
 
           const card = document.createElement("article");
           card.className = "assignment-card";
-
-          // PRÓXIMA reunión (primera futura) destacada
-          if (index === 0) {
-            card.classList.add("is-next");
-            const nextPill = document.createElement("div");
-            nextPill.className = "next-pill";
-            nextPill.textContent = "Próxima reunión";
-            card.appendChild(nextPill);
-          }
 
           const fechaDiv = document.createElement("div");
           fechaDiv.className = "assignment-date";
@@ -584,16 +507,15 @@
         });
 
         const countText =
-          filasOrdenadas.length === 1
+          filas.length === 1
             ? "1 reunión asignada"
-            : `${filasOrdenadas.length} reuniones asignadas`;
+            : `${filas.length} reuniones asignadas`;
         resumen.textContent = countText;
       } catch (err) {
         console.error("Error cargando la cartelera:", err);
         resumen.textContent = "Error al cargar";
         contenedor.innerHTML =
           "<p class='empty-msg'>Hubo un error al cargar las asignaciones.</p>";
-        monthLabel.textContent = "";
       }
     }
 
