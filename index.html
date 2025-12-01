@@ -196,8 +196,11 @@
       opacity: 0.25;
     }
 
-    /* Tarjeta de PRÓXIMA reunión destacada */
+    /* PRÓXIMA reunión: destacada + sticky */
     .assignment-card.is-next {
+      position: sticky;
+      top: 0;
+      z-index: 2;
       border-color: rgba(56, 189, 248, 0.9);
       box-shadow:
         0 0 0 1px rgba(56, 189, 248, 0.35),
@@ -302,29 +305,12 @@
       background: var(--muted);
     }
 
-    .detail-label.label-audio::before {
-      background: #38bdf8; /* celeste */
-    }
-
-    .detail-label.label-video::before {
-      background: #a78bfa; /* violeta */
-    }
-
-    .detail-label.label-mic::before {
-      background: #4ade80; /* verde */
-    }
-
-    .detail-label.label-plataforma::before {
-      background: #facc15; /* amarillo */
-    }
-
-    .detail-label.label-entrada::before {
-      background: #fb923c; /* naranja */
-    }
-
-    .detail-label.label-auditorio::before {
-      background: #fb7185; /* rosa */
-    }
+    .detail-label.label-audio::before { background: #38bdf8; }     /* celeste */
+    .detail-label.label-video::before { background: #a78bfa; }     /* violeta */
+    .detail-label.label-mic::before { background: #4ade80; }       /* verde */
+    .detail-label.label-plataforma::before { background: #facc15; }/* amarillo */
+    .detail-label.label-entrada::before { background: #fb923c; }   /* naranja */
+    .detail-label.label-auditorio::before { background: #fb7185; } /* rosa */
 
     .detail-value {
       font-size: 0.8rem;
@@ -355,7 +341,6 @@
   <main class="page">
     <header>
       <h1>Asignaciones para las reuniones</h1>
-      <!-- Mes dinámico desde el Excel -->
       <p id="month-label"></p>
 
       <div class="pill-bar">
@@ -379,7 +364,6 @@
   </main>
 
   <script>
-    // URL del CSV de tu hoja publicada
     const CSV_URL =
       "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337";
 
@@ -388,10 +372,55 @@
       return rows.map((row) => row.split(","));
     }
 
+    // Normaliza texto (minúsculas + sin tildes)
+    function normalize(str) {
+      return (str || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+    }
+
+    const mesesMapa = {
+      "enero": 0,
+      "febrero": 1,
+      "marzo": 2,
+      "abril": 3,
+      "mayo": 4,
+      "junio": 5,
+      "julio": 6,
+      "agosto": 7,
+      "setiembre": 8,
+      "septiembre": 8,
+      "octubre": 9,
+      "noviembre": 10,
+      "diciembre": 11
+    };
+
     function esDiaImportante(fecha) {
       if (!fecha) return false;
-      const f = fecha.toLowerCase();
-      return f.includes("domingo") || f.includes("sábado") || f.includes("sabado");
+      const f = normalize(fecha);
+      return f.includes("domingo") || f.includes("sabado");
+    }
+
+    function parseMesYAnio(desdeA1) {
+      const norm = normalize(desdeA1);
+      // ejemplo: "diciembre 2025"
+      const match = norm.match(/([a-zñ]+)\s+(\d{4})/);
+      if (!match) return null;
+      const mesNombre = match[1];
+      const anio = parseInt(match[2], 10);
+      const mesIdx = mesesMapa[mesNombre];
+      if (mesIdx == null || isNaN(anio)) return null;
+      return { mesIdx, anio };
+    }
+
+    function parseFechaReunion(textoFecha, mesIdx, anio) {
+      if (mesIdx == null || anio == null) return null;
+      const match = textoFecha && textoFecha.match(/(\d{1,2})\s+de/);
+      if (!match) return null;
+      const dia = parseInt(match[1], 10);
+      if (isNaN(dia)) return null;
+      return new Date(anio, mesIdx, dia);
     }
 
     async function cargarCartelera() {
@@ -412,19 +441,60 @@
           return;
         }
 
-        // Fila 1: título del mes (A1)
+        // A1: título del mes
         const tituloMes = (data[0][0] || "").trim();
         monthLabel.textContent = tituloMes;
+        const mesInfo = parseMesYAnio(tituloMes);
 
-        // Fila 2: encabezados -> se salta
-        // Desde la fila 3 en adelante, reuniones
-        const filas = data
+        // Fila 2 headers -> saltar; a partir de fila 3 datos
+        const filasCrudas = data
           .slice(2)
           .filter((row) => row.some((cell) => cell && cell.trim() !== ""));
 
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+
+        // Agregamos la fecha Date para ordenar
+        const filasConFecha = filasCrudas.map((row) => {
+          const fechaTexto = row[0] || "";
+          const fechaDate = mesInfo
+            ? parseFechaReunion(fechaTexto, mesInfo.mesIdx, mesInfo.anio)
+            : null;
+          return { row, fechaTexto, fechaDate };
+        });
+
+        const futuras = [];
+        const pasadas = [];
+
+        filasConFecha.forEach((item) => {
+          if (item.fechaDate && !isNaN(item.fechaDate.getTime())) {
+            if (item.fechaDate >= hoy) {
+              futuras.push(item);
+            } else {
+              pasadas.push(item);
+            }
+          } else {
+            // Si no se puede parsear, lo consideramos futuro para no perderlo
+            futuras.push(item);
+          }
+        });
+
+        futuras.sort((a, b) => {
+          if (!a.fechaDate || !b.fechaDate) return 0;
+          return a.fechaDate - b.fechaDate;
+        });
+
+        pasadas.sort((a, b) => {
+          if (!a.fechaDate || !b.fechaDate) return 0;
+          return a.fechaDate - b.fechaDate;
+        });
+
+        const filasOrdenadas = futuras.concat(pasadas);
+
         contenedor.innerHTML = "";
 
-        filas.forEach((row, index) => {
+        filasOrdenadas.forEach((item, index) => {
+          const row = item.row;
           const fecha = row[0] || "";
           const video = row[1] || "";
           const audio = row[2] || "";
@@ -437,7 +507,7 @@
           const card = document.createElement("article");
           card.className = "assignment-card";
 
-          // PRÓXIMA reunión (primera) destacada
+          // PRÓXIMA reunión (primera futura) destacada
           if (index === 0) {
             card.classList.add("is-next");
             const nextPill = document.createElement("div");
@@ -514,9 +584,9 @@
         });
 
         const countText =
-          filas.length === 1
+          filasOrdenadas.length === 1
             ? "1 reunión asignada"
-            : `${filas.length} reuniones asignadas`;
+            : `${filasOrdenadas.length} reuniones asignadas`;
         resumen.textContent = countText;
       } catch (err) {
         console.error("Error cargando la cartelera:", err);
