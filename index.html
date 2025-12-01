@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Asignaciones para las reuniones</title>
+  <title>Cartelera de Asignaciones</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
@@ -344,9 +344,8 @@
 <body>
   <main class="page">
     <header>
-      <h1>Asignaciones para las reuniones</h1>
-      <!-- Mes dinámico desde el Excel -->
-      <p id="month-label"></p>
+      <h1>Cartelera de Asignaciones</h1>
+      <p>Diciembre 2025</p>
 
       <div class="pill-bar">
         <span class="pill-dot"></span>
@@ -395,31 +394,23 @@
     async function cargarCartelera() {
       const resumen = document.getElementById("count-resumen");
       const contenedor = document.getElementById("assignments");
-      const monthLabel = document.getElementById("month-label");
 
       try {
         const res = await fetch(CSV_URL);
         const text = await res.text();
         const data = parseCSV(text);
 
-        // Si no hay filas suficientes
-        if (!data || data.length < 3) {
+        // Sin datos
+        if (!data || data.length < 2) {
           resumen.textContent = "0 reuniones";
           contenedor.innerHTML =
             "<p class='empty-msg'>Sin asignaciones cargadas.</p>";
-          monthLabel.textContent = "";
           return;
         }
 
-        // Fila 1 del Excel: título del mes (por ejemplo "Diciembre 2025")
-        const tituloMes = (data[0][0] || "").trim();
-        monthLabel.textContent = tituloMes;
-
-        // Filas de datos:
-        // Fila 2 = encabezados -> se saltea
-        // Desde la fila 3 en adelante van las reuniones
+        // Filas de datos (salteamos encabezados)
         const filas = data
-          .slice(2)
+          .slice(1)
           .filter((row) => row.some((cell) => cell && cell.trim() !== ""));
 
         contenedor.innerHTML = "";
@@ -527,7 +518,6 @@
         resumen.textContent = "Error al cargar";
         contenedor.innerHTML =
           "<p class='empty-msg'>Hubo un error al cargar las asignaciones.</p>";
-        monthLabel.textContent = "";
       }
     }
 
