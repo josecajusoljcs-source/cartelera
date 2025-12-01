@@ -9,14 +9,12 @@
       --bg: #0f172a;
       --bg-soft: #020617;
       --card-bg: #020617;
-      --card-soft: #020817;
       --accent: #38bdf8;
       --accent-soft: rgba(56, 189, 248, 0.2);
       --accent-strong: #facc15;
       --text: #e5e7eb;
       --muted: #9ca3af;
       --border: rgba(148, 163, 184, 0.3);
-      --danger: #f97373;
       --radius-xl: 18px;
       --radius-md: 12px;
       --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.75);
@@ -92,7 +90,6 @@
       gap: 1.5rem;
     }
 
-    /* Panel principal con las tarjetas */
     .card-shell {
       background: radial-gradient(circle at top left, rgba(148, 163, 184, 0.1), transparent 55%),
                   radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.9), #020617);
@@ -268,11 +265,6 @@
       text-overflow: ellipsis;
     }
 
-    .detail-value strong {
-      font-weight: 600;
-    }
-
-    /* Panel lateral con resumen */
     .side-panel {
       background: radial-gradient(circle at top, rgba(15, 23, 42, 0.2), transparent 55%),
                   linear-gradient(145deg, #020617, #020617 40%, #020617);
@@ -356,24 +348,14 @@
     }
 
     @media (max-width: 900px) {
-      body {
-        padding: 1rem 0.6rem 1.2rem;
-      }
-      .layout {
-        grid-template-columns: minmax(0, 1fr);
-      }
-      .side-panel {
-        order: -1;
-      }
+      body { padding: 1rem 0.6rem 1.2rem; }
+      .layout { grid-template-columns: minmax(0, 1fr); }
+      .side-panel { order: -1; }
     }
 
     @media (max-width: 640px) {
-      .assignment-card {
-        grid-template-columns: minmax(0, 1fr);
-      }
-      .assignment-details {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
+      .assignment-card { grid-template-columns: minmax(0, 1fr); }
+      .assignment-details { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
   </style>
 </head>
@@ -385,26 +367,21 @@
 
       <div class="pill-bar">
         <span class="pill-dot"></span>
-        <span>Conectado a hoja de cálculo &middot; Actualización automática</span>
+        <span>Conectado a hoja de cálculo · Actualización automática</span>
       </div>
     </header>
 
     <section class="layout">
-      <!-- Panel principal -->
       <section class="card-shell">
         <div class="card-shell-inner">
           <div class="section-title">
             <h2>Próximas reuniones</h2>
             <span id="count-resumen">Cargando asignaciones…</span>
           </div>
-
-          <div id="assignments" class="assignments-grid">
-            <!-- Tarjetas se cargan desde Google Sheets -->
-          </div>
+          <div id="assignments" class="assignments-grid"></div>
         </div>
       </section>
 
-      <!-- Panel lateral -->
       <aside class="side-panel">
         <div class="side-header">
           <h3>Resumen del mes</h3>
@@ -414,23 +391,17 @@
         <div class="key-roles">
           <div class="role-card">
             <div class="role-title">Audio / Video</div>
-            <ul class="role-list" id="audio-list">
-              <!-- Nombres desde Google Sheets -->
-            </ul>
+            <ul class="role-list" id="audio-list"></ul>
           </div>
 
           <div class="role-card">
             <div class="role-title">Micrófonos</div>
-            <ul class="role-list" id="mic-list">
-              <!-- Nombres desde Google Sheets -->
-            </ul>
+            <ul class="role-list" id="mic-list"></ul>
           </div>
 
           <div class="role-card">
             <div class="role-title">Plataforma / Acomodador</div>
-            <ul class="role-list" id="platform-list">
-              <!-- Nombres desde Google Sheets -->
-            </ul>
+            <ul class="role-list" id="platform-list"></ul>
           </div>
         </div>
 
@@ -443,8 +414,9 @@
   </main>
 
   <script>
-    // URL del CSV de tu hoja
+    // URL del CSV de tu hoja publicada
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSqqCp0GvVgYXea4r0LKzl5ko1IQnxxVh_RLU1h6-DOKGHe3zSEBCRO-iEVbYPiGQ/pub?gid=96081337&single=true&output=csv";
+
     function parseCSV(text) {
       const rows = text.trim().split(/\r?\n/);
       return rows.map(row => row.split(","));
@@ -474,9 +446,7 @@
           return;
         }
 
-        const headers = data[0];
         const filas = data.slice(1).filter(row => row.some(cell => cell && cell.trim() !== ""));
-
         const contenedor = document.getElementById("assignments");
         contenedor.innerHTML = "";
 
@@ -484,7 +454,7 @@
         const micSet = new Set();
         const platformSet = new Set();
 
-        filas.forEach((row) => {
+        filas.forEach(row => {
           const fecha = row[0] || "";
           const audio = row[1] || "";
           const video = row[2] || "";
@@ -493,7 +463,6 @@
           const plataforma = row[5] || "";
           const acomodador = row[6] || "";
 
-          // Tarjeta principal
           const card = document.createElement("article");
           card.className = "assignment-card";
 
@@ -502,9 +471,7 @@
 
           const daySpan = document.createElement("span");
           daySpan.className = "assignment-day";
-          if (esDiaImportante(fecha)) {
-            daySpan.classList.add("church-day");
-          }
+          if (esDiaImportante(fecha)) daySpan.classList.add("church-day");
           daySpan.textContent = fecha;
 
           const labelSpan = document.createElement("span");
@@ -550,10 +517,8 @@
 
           card.appendChild(fechaDiv);
           card.appendChild(detallesDiv);
-
           contenedor.appendChild(card);
 
-          // Llenar sets para resumen
           agregarASet(audioSet, audio);
           agregarASet(audioSet, video);
           agregarASet(micSet, mic1);
@@ -562,7 +527,6 @@
           agregarASet(platformSet, acomodador);
         });
 
-        // Resumen
         const countText = filas.length === 1 ? "1 reunión asignada" : ${filas.length} reuniones asignadas;
         document.getElementById("count-resumen").textContent = countText;
         document.getElementById("side-count").textContent = countText;
@@ -580,7 +544,6 @@
         renderLista("audio-list", audioSet);
         renderLista("mic-list", micSet);
         renderLista("platform-list", platformSet);
-
       } catch (err) {
         console.error("Error cargando la cartelera:", err);
         document.getElementById("count-resumen").textContent = "Error al cargar datos.";
@@ -591,4 +554,3 @@
   </script>
 </body>
 </html>
-
