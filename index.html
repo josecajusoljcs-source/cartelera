@@ -150,11 +150,24 @@
       color: var(--accent);
     }
 
+    /* Contenedor de próxima reunión (fijo) */
+    .featured-wrapper {
+      margin-bottom: 0.8rem;
+    }
+
+    .featured-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+
     .assignments-grid {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
       gap: 0.75rem;
-      max-height: calc(100vh - 220px);
+      max-height: calc(100vh - 260px);
       overflow-y: auto;
       padding-right: 0.3rem;
     }
@@ -205,10 +218,10 @@
       opacity: 0.25;
     }
 
-    /* Primera reunión un poquito más destacada */
-    .assignment-card:first-child {
-      border-color: rgba(56, 189, 248, 0.6);
-      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.25);
+    /* Destacada fija */
+    .assignment-card.featured {
+      border-color: rgba(56, 189, 248, 0.8);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.35);
     }
 
     .assignment-date {
@@ -292,12 +305,12 @@
       background: var(--muted);
     }
 
-    .detail-label.label-audio::before      { background: #38bdf8; }  /* celeste  */
-    .detail-label.label-video::before      { background: #a78bfa; }  /* violeta  */
-    .detail-label.label-mic::before        { background: #4ade80; }  /* verde    */
-    .detail-label.label-plataforma::before { background: #facc15; }  /* amarillo */
-    .detail-label.label-entrada::before    { background: #fb923c; }  /* naranja  */
-    .detail-label.label-auditorio::before  { background: #fb7185; }  /* rosa     */
+    .detail-label.label-audio::before      { background: #38bdf8; }
+    .detail-label.label-video::before      { background: #a78bfa; }
+    .detail-label.label-mic::before        { background: #4ade80; }
+    .detail-label.label-plataforma::before { background: #facc15; }
+    .detail-label.label-entrada::before    { background: #fb923c; }
+    .detail-label.label-auditorio::before  { background: #fb7185; }
 
     .detail-value {
       font-size: 0.8rem;
@@ -328,7 +341,6 @@
   <main class="page">
     <header>
       <h1>Asignaciones para las reuniones</h1>
-      <!-- Se actualizará automáticamente con la celda A1 si existe -->
       <p id="header-month">Mes / año</p>
 
       <div class="pill-bar">
@@ -346,11 +358,15 @@
           </div>
 
           <p class="assignments-info">
-            Editá las asignaciones directamente en la hoja de  
+            Editá las asignaciones directamente en la hoja de
             <strong>Google Sheets</strong>. La cartelera se actualiza
             automáticamente al recargar esta página.
           </p>
 
+          <!-- Próxima reunión fija -->
+          <div class="featured-wrapper" id="featured-assignment"></div>
+
+          <!-- Resto de las reuniones con scroll -->
           <div id="assignments" class="assignments-grid"></div>
         </div>
       </section>
@@ -358,27 +374,106 @@
   </main>
 
   <script>
-    // URL del CSV de tu hoja publicada
     const CSV_URL =
       "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337";
 
-    // Convierte el texto CSV en un array de filas/columnas
     function parseCSV(text) {
       const rows = text.trim().split(/\r?\n/);
       return rows.map((row) => row.split(","));
     }
 
-    // Marca domingos y sábados
     function esDiaImportante(fecha) {
       if (!fecha) return false;
       const f = fecha.toLowerCase();
       return f.includes("domingo") || f.includes("sábado") || f.includes("sabado");
     }
 
+    function crearTarjeta(row, isFeatured = false) {
+      const fecha              = row[0] || "";
+      const video              = row[1] || "";
+      const audio              = row[2] || "";
+      const mic1               = row[3] || "";
+      const mic2               = row[4] || "";
+      const plataforma         = row[5] || "";
+      const acomodadorEntrada  = row[6] || "";
+      const acomodadorAuditorio= row[7] || "";
+
+      const card = document.createElement("article");
+      card.className = "assignment-card";
+      if (isFeatured) card.classList.add("featured");
+
+      const fechaDiv = document.createElement("div");
+      fechaDiv.className = "assignment-date";
+
+      const daySpan = document.createElement("span");
+      daySpan.className = "assignment-day";
+      if (esDiaImportante(fecha)) daySpan.classList.add("church-day");
+      daySpan.textContent = fecha;
+
+      const labelSpan = document.createElement("span");
+      labelSpan.className = "assignment-label";
+      labelSpan.textContent = "Reunión";
+
+      const badge = document.createElement("div");
+      badge.className = "badge";
+      const dot = document.createElement("span");
+      dot.className = "badge-dot";
+      const txt = document.createElement("span");
+      txt.textContent = esDiaImportante(fecha)
+        ? "Reunión principal"
+        : "Reunión de entre semana";
+      badge.appendChild(dot);
+      badge.appendChild(txt);
+
+      fechaDiv.appendChild(labelSpan);
+      fechaDiv.appendChild(daySpan);
+      fechaDiv.appendChild(badge);
+
+      const detallesDiv = document.createElement("div");
+      detallesDiv.className = "assignment-details";
+
+      function crearGrupo(label, value, extraClass) {
+        const group = document.createElement("div");
+        group.className = "detail-group";
+
+        const l = document.createElement("div");
+        l.className = "detail-label";
+        if (extraClass) l.classList.add(extraClass);
+        l.textContent = label;
+
+        const v = document.createElement("div");
+        v.className = "detail-value";
+        v.textContent = value || "-";
+
+        group.appendChild(l);
+        group.appendChild(v);
+        return group;
+      }
+
+      detallesDiv.appendChild(crearGrupo("Audio", audio, "label-audio"));
+      detallesDiv.appendChild(crearGrupo("Video", video, "label-video"));
+      detallesDiv.appendChild(crearGrupo("Mic 1", mic1, "label-mic"));
+      detallesDiv.appendChild(crearGrupo("Mic 2", mic2, "label-mic"));
+      detallesDiv.appendChild(
+        crearGrupo("Plataforma", plataforma, "label-plataforma")
+      );
+      detallesDiv.appendChild(
+        crearGrupo("Acomodador de entrada", acomodadorEntrada, "label-entrada")
+      );
+      detallesDiv.appendChild(
+        crearGrupo("Acomodador de auditorio", acomodadorAuditorio, "label-auditorio")
+      );
+
+      card.appendChild(fechaDiv);
+      card.appendChild(detallesDiv);
+      return card;
+    }
+
     async function cargarCartelera() {
-      const resumen    = document.getElementById("count-resumen");
-      const contenedor = document.getElementById("assignments");
-      const headerMes  = document.getElementById("header-month");
+      const resumen        = document.getElementById("count-resumen");
+      const contenedor     = document.getElementById("assignments");
+      const featuredHolder = document.getElementById("featured-assignment");
+      const headerMes      = document.getElementById("header-month");
 
       try {
         const res  = await fetch(CSV_URL);
@@ -387,27 +482,26 @@
 
         if (!data || data.length === 0) {
           resumen.textContent = "0 reuniones";
+          featuredHolder.innerHTML = "";
           contenedor.innerHTML =
             "<p class='empty-msg'>Sin asignaciones cargadas.</p>";
           return;
         }
 
-        // === Mes / año automático desde A1 si no es "Fecha" ===
-        let startIndex = 1; // por defecto: salteamos solo la fila de encabezados
+        let startIndex = 1;
         if (data[0] && data[0][0]) {
           const firstCell = data[0][0].trim();
           if (firstCell && !/^fecha/i.test(firstCell)) {
-            // A1 contiene algo tipo "Diciembre 2025"
             headerMes.textContent = firstCell;
-            startIndex = 2; // fila 1 = títulos de columnas, datos desde la 3ª fila
+            startIndex = 2;
           }
         }
 
-        // Filas de datos efectivas
         const filas = data
           .slice(startIndex)
           .filter((row) => row.some((cell) => cell && cell.trim() !== ""));
 
+        featuredHolder.innerHTML = "";
         contenedor.innerHTML = "";
 
         if (filas.length === 0) {
@@ -417,93 +511,19 @@
           return;
         }
 
-        filas.forEach((row) => {
-          // Columnas según tu hoja:
-          // 0: Fecha
-          // 1: Video
-          // 2: Audio
-          // 3: Mic 1
-          // 4: Mic 2
-          // 5: Plataforma
-          // 6: Acomodador de Entrada
-          // 7: Acomodador de Auditorio
-          const fecha              = row[0] || "";
-          const video              = row[1] || "";
-          const audio              = row[2] || "";
-          const mic1               = row[3] || "";
-          const mic2               = row[4] || "";
-          const plataforma         = row[5] || "";
-          const acomodadorEntrada  = row[6] || "";
-          const acomodadorAuditorio= row[7] || "";
+        // Próxima reunión fija (primera fila)
+        const primera = filas[0];
+        const resto   = filas.slice(1);
 
-          const card = document.createElement("article");
-          card.className = "assignment-card";
+        const label = document.createElement("div");
+        label.className = "featured-label";
+        label.textContent = "Próxima reunión";
+        featuredHolder.appendChild(label);
+        featuredHolder.appendChild(crearTarjeta(primera, true));
 
-          const fechaDiv = document.createElement("div");
-          fechaDiv.className = "assignment-date";
-
-          const daySpan = document.createElement("span");
-          daySpan.className = "assignment-day";
-          if (esDiaImportante(fecha)) daySpan.classList.add("church-day");
-          daySpan.textContent = fecha;
-
-          const labelSpan = document.createElement("span");
-          labelSpan.className = "assignment-label";
-          labelSpan.textContent = "Reunión";
-
-          const badge = document.createElement("div");
-          badge.className = "badge";
-          const dot = document.createElement("span");
-          dot.className = "badge-dot";
-          const txt = document.createElement("span");
-          txt.textContent = esDiaImportante(fecha)
-            ? "Reunión principal"
-            : "Reunión de entre semana";
-          badge.appendChild(dot);
-          badge.appendChild(txt);
-
-          fechaDiv.appendChild(labelSpan);
-          fechaDiv.appendChild(daySpan);
-          fechaDiv.appendChild(badge);
-
-          const detallesDiv = document.createElement("div");
-          detallesDiv.className = "assignment-details";
-
-          function crearGrupo(label, value, extraClass) {
-            const group = document.createElement("div");
-            group.className = "detail-group";
-
-            const l = document.createElement("div");
-            l.className = "detail-label";
-            if (extraClass) l.classList.add(extraClass);
-            l.textContent = label;
-
-            const v = document.createElement("div");
-            v.className = "detail-value";
-            v.textContent = value || "-";
-
-            group.appendChild(l);
-            group.appendChild(v);
-            return group;
-          }
-
-          detallesDiv.appendChild(crearGrupo("Audio", audio, "label-audio"));
-          detallesDiv.appendChild(crearGrupo("Video", video, "label-video"));
-          detallesDiv.appendChild(crearGrupo("Mic 1", mic1, "label-mic"));
-          detallesDiv.appendChild(crearGrupo("Mic 2", mic2, "label-mic"));
-          detallesDiv.appendChild(
-            crearGrupo("Plataforma", plataforma, "label-plataforma")
-          );
-          detallesDiv.appendChild(
-            crearGrupo("Acomodador de entrada", acomodadorEntrada, "label-entrada")
-          );
-          detallesDiv.appendChild(
-            crearGrupo("Acomodador de auditorio", acomodadorAuditorio, "label-auditorio")
-          );
-
-          card.appendChild(fechaDiv);
-          card.appendChild(detallesDiv);
-          contenedor.appendChild(card);
+        // Resto en el listado scrollable
+        resto.forEach((row) => {
+          contenedor.appendChild(crearTarjeta(row, false));
         });
 
         const countText =
@@ -514,6 +534,7 @@
       } catch (err) {
         console.error("Error cargando la cartelera:", err);
         resumen.textContent = "Error al cargar";
+        featuredHolder.innerHTML = "";
         contenedor.innerHTML =
           "<p class='empty-msg'>Hubo un error al cargar las asignaciones.</p>";
       }
