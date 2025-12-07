@@ -157,6 +157,7 @@
       max-height: calc(100vh - 220px);
       overflow-y: auto;
       padding-right: 0.3rem;
+      position: relative;
     }
 
     .assignments-grid::-webkit-scrollbar {
@@ -183,6 +184,7 @@
       gap: 0.35rem 1rem;
       position: relative;
       overflow: hidden;
+      background-clip: padding-box;
     }
 
     .assignment-card::after {
@@ -205,10 +207,18 @@
       opacity: 0.25;
     }
 
-    /* PRÓXIMA REUNIÓN un poquito más destacada (primer tarjeta) */
+    /* PRÓXIMA REUNIÓN destacada */
     .assignment-card:first-child {
       border-color: rgba(56, 189, 248, 0.8);
       box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.35);
+    }
+
+    /* Que la primera (próxima reunión) quede anclada arriba al hacer scroll */
+    .assignment-card.sticky-card {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background-color: rgba(15, 23, 42, 0.98);
     }
 
     .assignment-date {
@@ -255,6 +265,30 @@
       border-radius: 999px;
       background: var(--accent);
       box-shadow: 0 0 12px rgba(56, 189, 248, 0.9);
+    }
+
+    /* Píldora HOY TE TOCA */
+    .today-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-top: 0.3rem;
+      padding: 0.18rem 0.7rem;
+      border-radius: 999px;
+      background: rgba(34, 197, 94, 0.18);
+      border: 1px solid rgba(34, 197, 94, 0.9);
+      font-size: 0.68rem;
+      color: #bbf7d0;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    .today-pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
     }
 
     .assignment-details {
@@ -387,7 +421,7 @@
       return f.includes("domingo") || f.includes("sábado") || f.includes("sabado");
     }
 
-    // Saca el número de día de "Viernes 5 de diciembre"
+    // Extrae el número de día: "Viernes 5 de diciembre" → 5
     function obtenerDiaNumero(fecha) {
       if (!fecha) return null;
       const match = fecha.match(/(\d{1,2})/);
@@ -411,7 +445,6 @@
           return;
         }
 
-        // Filas "reales" (viernes/domingo) saltando encabezado
         const filas = data
           .slice(1)
           .filter((row) => {
@@ -435,8 +468,6 @@
           return;
         }
 
-        // Ordenar: primero las reuniones de hoy y futuras,
-        // luego las pasadas, todo según el número de día.
         const hoy = new Date();
         const diaHoy = hoy.getDate();
 
@@ -452,7 +483,7 @@
 
         contenedor.innerHTML = "";
 
-        ordenadas.forEach((item) => {
+        ordenadas.forEach((item, index) => {
           const row = item.raw;
 
           const fecha = row[0] || "";
@@ -464,8 +495,14 @@
           const acomodadorEntrada = row[6] || "";
           const acomodadorAuditorio = row[7] || "";
 
+          const isToday = item.dayNumber === diaHoy;
+
           const card = document.createElement("article");
           card.className = "assignment-card";
+          if (index === 0) {
+            // la próxima reunión queda sticky
+            card.classList.add("sticky-card");
+          }
 
           const fechaDiv = document.createElement("div");
           fechaDiv.className = "assignment-date";
@@ -493,6 +530,19 @@
           fechaDiv.appendChild(labelSpan);
           fechaDiv.appendChild(daySpan);
           fechaDiv.appendChild(badge);
+
+          // Si la reunión es HOY, mostramos la píldora verde
+          if (isToday) {
+            const todayPill = document.createElement("div");
+            todayPill.className = "today-pill";
+            const pillDot = document.createElement("span");
+            pillDot.className = "today-pill-dot";
+            const pillText = document.createElement("span");
+            pillText.textContent = "HOY TE TOCA";
+            todayPill.appendChild(pillDot);
+            todayPill.appendChild(pillText);
+            fechaDiv.appendChild(todayPill);
+          }
 
           const detallesDiv = document.createElement("div");
           detallesDiv.className = "assignment-details";
@@ -539,7 +589,6 @@
           total === 1 ? "1 reunión asignada" : `${total} reuniones asignadas`;
       } catch (err) {
         console.error("Error cargando la cartelera:", err);
-        const contenedor = document.getElementById("assignments");
         resumen.textContent = "Error al cargar";
         contenedor.innerHTML =
           "<p class='empty-msg'>Hubo un error al cargar las asignaciones.</p>";
