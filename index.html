@@ -7,17 +7,16 @@
   <style>
     :root {
       --bg: #0f172a;
-      --bg-soft: #020617;
       --card-bg: #020617;
       --accent: #38bdf8;
       --accent-soft: rgba(56, 189, 248, 0.2);
       --accent-strong: #facc15;
-      --text: #e5e7eb;
+      --text: #f9fafb;
       --muted: #9ca3af;
-      --border: rgba(148, 163, 184, 0.3);
-      --radius-xl: 18px;
-      --radius-md: 12px;
-      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.75);
+      --border: rgba(148, 163, 184, 0.4);
+      --radius-xl: 20px;
+      --radius-md: 14px;
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.85);
     }
 
     * {
@@ -41,44 +40,39 @@
 
     .page {
       width: 100%;
-      max-width: 1200px;
+      max-width: 960px;
     }
 
     header {
       text-align: center;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.4rem;
     }
 
     header h1 {
-      font-size: clamp(1.9rem, 3vw, 2.3rem);
-      letter-spacing: 0.04em;
+      font-size: clamp(2.1rem, 5vw, 2.7rem);
+      letter-spacing: 0.03em;
       font-weight: 700;
       color: #f9fafb;
-      text-shadow: 0 0 20px rgba(15, 23, 42, 0.8);
-    }
-
-    header p {
-      margin-top: 0.3rem;
-      font-size: 0.95rem;
-      color: var(--muted);
+      text-shadow: 0 0 22px rgba(15, 23, 42, 0.9);
+      line-height: 1.15;
     }
 
     .pill-bar {
       display: inline-flex;
       align-items: center;
       gap: 0.55rem;
-      padding: 0.3rem 0.8rem;
+      padding: 0.35rem 0.9rem;
       border-radius: 999px;
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      margin-top: 0.6rem;
-      font-size: 0.78rem;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      margin-top: 0.7rem;
+      font-size: 0.9rem;
       color: var(--muted);
     }
 
     .pill-dot {
-      width: 7px;
-      height: 7px;
+      width: 8px;
+      height: 8px;
       border-radius: 999px;
       background: #22c55e;
       box-shadow: 0 0 12px rgba(34, 197, 94, 0.9);
@@ -86,16 +80,15 @@
 
     .layout {
       display: grid;
-      grid-template-columns: minmax(0, 1.6fr);
-      gap: 1.5rem;
+      grid-template-columns: minmax(0, 1fr);
     }
 
     .card-shell {
       background: radial-gradient(circle at top left, rgba(148, 163, 184, 0.1), transparent 55%),
-                  radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.9), #020617);
+                  radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.95), #020617);
       border-radius: var(--radius-xl);
-      border: 1px solid rgba(148, 163, 184, 0.28);
-      padding: 1.2rem 1.15rem 1.35rem;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      padding: 1.25rem 1.1rem 1.35rem;
       box-shadow: var(--shadow-soft);
       position: relative;
       overflow: hidden;
@@ -105,7 +98,7 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.12), transparent 55%);
+      background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.15), transparent 55%);
       opacity: 0.9;
       pointer-events: none;
     }
@@ -117,47 +110,37 @@
 
     .section-title {
       display: flex;
-      align-items: baseline;
+      align-items: center;
       justify-content: space-between;
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.6rem;
       gap: 0.75rem;
     }
 
     .section-title h2 {
-      font-size: 0.95rem;
+      font-size: 1rem;
       text-transform: uppercase;
-      letter-spacing: 0.11em;
+      letter-spacing: 0.18em;
       color: var(--muted);
       font-weight: 600;
     }
 
     .section-title span {
-      font-size: 0.8rem;
+      font-size: 0.9rem;
       color: var(--muted);
-      padding: 0.15rem 0.8rem;
+      padding: 0.15rem 0.9rem;
       border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.5);
-      background: rgba(15, 23, 42, 0.9);
-    }
-
-    .assignments-info {
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-bottom: 0.65rem;
-    }
-
-    .assignments-info strong {
-      color: var(--accent);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.95);
+      white-space: nowrap;
     }
 
     .assignments-grid {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
-      gap: 0.75rem;
-      max-height: calc(100vh - 220px);
+      gap: 0.9rem;
+      max-height: calc(100vh - 230px);
       overflow-y: auto;
-      padding-right: 0.3rem;
-      position: relative;
+      padding-right: 0.35rem;
     }
 
     .assignments-grid::-webkit-scrollbar {
@@ -170,91 +153,67 @@
     }
 
     .assignments-grid::-webkit-scrollbar-thumb {
-      background: rgba(148, 163, 184, 0.8);
+      background: rgba(148, 163, 184, 0.9);
       border-radius: 999px;
     }
 
     .assignment-card {
-      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.94), rgba(15, 23, 42, 0.98));
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.99));
       border-radius: var(--radius-md);
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      padding: 0.7rem 0.75rem 0.65rem;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      padding: 0.85rem 0.8rem 0.8rem;
       display: grid;
-      grid-template-columns: minmax(0, 1.2fr) minmax(0, 2.2fr);
-      gap: 0.35rem 1rem;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 2.1fr);
+      gap: 0.4rem 1.1rem;
       position: relative;
-      overflow: hidden;
-      background-clip: padding-box;
     }
 
-    .assignment-card::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      pointer-events: none;
-      border: 1px solid transparent;
-      background: linear-gradient(120deg,
-        rgba(56, 189, 248, 0.25),
-        rgba(250, 204, 21, 0.15),
-        transparent
-      );
-      opacity: 0;
-      transition: opacity 0.25s ease;
-    }
-
-    .assignment-card:hover::after {
-      opacity: 0.25;
-    }
-
-    /* PRÓXIMA REUNIÓN destacada */
-    .assignment-card:first-child {
-      border-color: rgba(56, 189, 248, 0.8);
-      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.35);
-    }
-
-    /* Que la primera (próxima reunión) quede anclada arriba al hacer scroll */
-    .assignment-card.sticky-card {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      background-color: rgba(15, 23, 42, 0.98);
+    /* tarjeta destacada (próxima reunión) */
+    .assignment-card.destacada {
+      border-color: rgba(56, 189, 248, 0.9);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
     }
 
     .assignment-date {
       display: flex;
       flex-direction: column;
-      gap: 0.1rem;
-      font-size: 0.83rem;
-      padding-right: 0.2rem;
+      gap: 0.15rem;
+      font-size: 0.95rem;
+    }
+
+    .assignment-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--muted);
     }
 
     .assignment-day {
-      font-weight: 600;
-      color: #e5e7eb;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #f9fafb;
     }
 
     .assignment-day.church-day {
       color: var(--accent-strong);
     }
 
-    .assignment-label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--muted);
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-top: 0.25rem;
     }
 
     .badge {
       display: inline-flex;
       align-items: center;
-      gap: 0.3rem;
-      margin-top: 0.2rem;
-      padding: 0.16rem 0.55rem;
+      gap: 0.35rem;
+      padding: 0.2rem 0.8rem;
       border-radius: 999px;
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(148, 163, 184, 0.5);
-      font-size: 0.7rem;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      font-size: 0.78rem;
       color: var(--muted);
       width: fit-content;
     }
@@ -267,35 +226,22 @@
       box-shadow: 0 0 12px rgba(56, 189, 248, 0.9);
     }
 
-    /* Píldora HOY TE TOCA */
-    .today-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      margin-top: 0.3rem;
-      padding: 0.18rem 0.7rem;
-      border-radius: 999px;
-      background: rgba(34, 197, 94, 0.18);
-      border: 1px solid rgba(34, 197, 94, 0.9);
-      font-size: 0.68rem;
+    .badge-hoy {
+      border-color: #22c55e;
       color: #bbf7d0;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
+      background: rgba(22, 163, 74, 0.22);
     }
 
-    .today-pill-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
+    .badge-hoy .badge-dot {
       background: #22c55e;
-      box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
+      box-shadow: 0 0 12px rgba(22, 163, 74, 0.9);
     }
 
     .assignment-details {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 0.25rem 0.75rem;
-      font-size: 0.8rem;
+      gap: 0.3rem 0.9rem;
+      font-size: 0.9rem;
     }
 
     .detail-group {
@@ -305,12 +251,12 @@
     }
 
     .detail-label {
-      font-size: 0.66rem;
+      font-size: 0.78rem;
       text-transform: uppercase;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.13em;
       color: var(--muted);
       position: relative;
-      padding-left: 0.95rem;
+      padding-left: 1rem;
     }
 
     .detail-label::before {
@@ -319,8 +265,8 @@
       left: 0;
       top: 50%;
       transform: translateY(-50%);
-      width: 6px;
-      height: 6px;
+      width: 7px;
+      height: 7px;
       border-radius: 999px;
       background: var(--muted);
     }
@@ -350,7 +296,7 @@
     }
 
     .detail-value {
-      font-size: 0.8rem;
+      font-size: 0.96rem;
       color: #e5e7eb;
       white-space: nowrap;
       overflow: hidden;
@@ -358,19 +304,22 @@
     }
 
     .empty-msg {
-      font-size: 0.85rem;
+      font-size: 0.95rem;
       color: var(--muted);
       padding-top: 0.5rem;
     }
 
     @media (max-width: 900px) {
-      body { padding: 1rem 0.6rem 1.2rem; }
-      .layout { grid-template-columns: minmax(0, 1fr); }
+      body { padding: 1rem 0.7rem 1.2rem; }
     }
 
     @media (max-width: 640px) {
-      .assignment-card { grid-template-columns: minmax(0, 1fr); }
-      .assignment-details { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .assignment-card {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .assignment-details {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
     }
   </style>
 </head>
@@ -378,7 +327,6 @@
   <main class="page">
     <header>
       <h1>Asignaciones para las reuniones</h1>
-      <p>Mes / año</p>
 
       <div class="pill-bar">
         <span class="pill-dot"></span>
@@ -391,14 +339,8 @@
         <div class="card-shell-inner">
           <div class="section-title">
             <h2>Próximas reuniones</h2>
-            <span id="count-resumen">Cargando asignaciones…</span>
+            <span id="count-resumen">Cargando…</span>
           </div>
-
-          <p class="assignments-info">
-            Editá las asignaciones directamente en la hoja de  
-            <strong>Google Sheets</strong>. La cartelera se actualiza
-            automáticamente al recargar esta página.
-          </p>
 
           <div id="assignments" class="assignments-grid"></div>
         </div>
@@ -407,6 +349,7 @@
   </main>
 
   <script>
+    // URL del CSV de tu hoja publicada
     const CSV_URL =
       "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337";
 
@@ -415,18 +358,67 @@
       return rows.map((row) => row.split(","));
     }
 
-    function esDiaImportante(fecha) {
-      if (!fecha) return false;
-      const f = fecha.toLowerCase();
-      return f.includes("domingo") || f.includes("sábado") || f.includes("sabado");
+    function normalizarTexto(str) {
+      return (str || "")
+        .toString()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/,/g, "")
+        .trim();
     }
 
-    // Extrae el número de día: "Viernes 5 de diciembre" → 5
-    function obtenerDiaNumero(fecha) {
-      if (!fecha) return null;
-      const match = fecha.match(/(\d{1,2})/);
-      if (!match) return null;
-      return parseInt(match[1], 10);
+    // Convierte "Viernes 5 de diciembre" en un objeto Date del año actual
+    function parseFechaTexto(fechaTexto) {
+      const limpio = normalizarTexto(fechaTexto);
+      if (!limpio) return null;
+      const partes = limpio.split(" "); // ["viernes","5","de","diciembre"]
+      if (partes.length < 4) return null;
+      const dia = parseInt(partes[1], 10);
+      const mesNombre = partes[3];
+
+      const meses = {
+        enero: 0,
+        febrero: 1,
+        marzo: 2,
+        abril: 3,
+        mayo: 4,
+        junio: 5,
+        julio: 6,
+        agosto: 7,
+        septiembre: 8,
+        setiembre: 8,
+        octubre: 9,
+        noviembre: 10,
+        diciembre: 11
+      };
+
+      const mes = meses[mesNombre];
+      if (isNaN(dia) || mes == null) return null;
+
+      const hoy = new Date();
+      const year = hoy.getFullYear();
+      return new Date(year, mes, dia);
+    }
+
+    // Devuelve true si la fecha de la fila es "hoy"
+    function esHoy(fechaTexto) {
+      const fecha = parseFechaTexto(fechaTexto);
+      if (!fecha) return false;
+      const hoy = new Date();
+      const soloHoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+      const soloFecha = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
+      return soloFecha.getTime() === soloHoy.getTime();
+    }
+
+    // Marca domingos y sábados (para color amarillo del título)
+    function esDiaImportante(fechaTexto) {
+      const limpio = normalizarTexto(fechaTexto);
+      return (
+        limpio.startsWith("domingo") ||
+        limpio.startsWith("sabado") ||
+        limpio.startsWith("sábado")
+      );
     }
 
     async function cargarCartelera() {
@@ -445,48 +437,72 @@
           return;
         }
 
-        const filas = data
+        // filas de datos (saltamos encabezados)
+        const filasOriginales = data
           .slice(1)
-          .filter((row) => {
-            const f = (row[0] || "").toLowerCase().trim();
-            if (!f) return false;
-            return /(viernes|domingo)/i.test(f);
-          })
-          .map((row) => {
-            const fecha = row[0] || "";
-            return {
-              raw: row,
-              fecha,
-              dayNumber: obtenerDiaNumero(fecha)
-            };
-          });
+          .filter((row) => row.some((cell) => cell && cell.trim() !== ""));
 
-        if (!filas.length) {
-          resumen.textContent = "0 reuniones";
-          contenedor.innerHTML =
-            "<p class='empty-msg'>Sin asignaciones cargadas.</p>";
-          return;
-        }
-
+        // separo futuras / hoy y pasadas
         const hoy = new Date();
-        const diaHoy = hoy.getDate();
+        const hoySolo = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
 
-        const futuras = filas
-          .filter((f) => f.dayNumber === null || f.dayNumber >= diaHoy)
-          .sort((a, b) => (a.dayNumber || 0) - (b.dayNumber || 0));
+        const futurasOHoy = [];
+        const pasadas = [];
 
-        const pasadas = filas
-          .filter((f) => f.dayNumber !== null && f.dayNumber < diaHoy)
-          .sort((a, b) => a.dayNumber - b.dayNumber);
+        filasOriginales.forEach((row) => {
+          const fechaTexto = row[0] || "";
+          const fecha = parseFechaTexto(fechaTexto);
+          if (!fecha) {
+            futurasOHoy.push({ row, fecha: null }); // si no se puede parsear, lo dejo arriba
+            return;
+          }
+          const soloFecha = new Date(
+            fecha.getFullYear(),
+            fecha.getMonth(),
+            fecha.getDate()
+          );
+          if (soloFecha.getTime() < hoySolo.getTime()) {
+            pasadas.push({ row, fecha: soloFecha });
+          } else {
+            futurasOHoy.push({ row, fecha: soloFecha });
+          }
+        });
 
-        const ordenadas = [...futuras, ...pasadas];
+        // ordeno por fecha
+        futurasOHoy.sort((a, b) => {
+          if (!a.fecha && !b.fecha) return 0;
+          if (!a.fecha) return 1;
+          if (!b.fecha) return -1;
+          return a.fecha - b.fecha;
+        });
+        pasadas.sort((a, b) => {
+          if (!a.fecha && !b.fecha) return 0;
+          if (!a.fecha) return 1;
+          if (!b.fecha) return -1;
+          return a.fecha - b.fecha;
+        });
+
+        const filasOrdenadas = [...futurasOHoy, ...pasadas];
 
         contenedor.innerHTML = "";
 
-        ordenadas.forEach((item, index) => {
-          const row = item.raw;
+        const total = filasOrdenadas.length;
+        resumen.textContent =
+          total === 1 ? "1 reunión asignada" : total + " reuniones asignadas";
 
-          const fecha = row[0] || "";
+        filasOrdenadas.forEach((item, index) => {
+          const row = item.row;
+
+          // columnas según tu hoja:
+          // 0: Fecha
+          // 1: Video
+          // 2: Audio
+          // 3: Mic 1
+          // 4: Mic 2
+          // 5: Plataforma
+          // 6: Acomodador de Entrada
+          // 7: Acomodador de Auditorio
+          const fechaTexto = row[0] || "";
           const video = row[1] || "";
           const audio = row[2] || "";
           const mic1 = row[3] || "";
@@ -495,55 +511,63 @@
           const acomodadorEntrada = row[6] || "";
           const acomodadorAuditorio = row[7] || "";
 
-          const isToday = item.dayNumber === diaHoy;
-
           const card = document.createElement("article");
           card.className = "assignment-card";
-          if (index === 0) {
-            // la próxima reunión queda sticky
-            card.classList.add("sticky-card");
+
+          const esPrimeraFutura = index === 0; // próxima reunión
+          const esDiaHoy = esHoy(fechaTexto);
+
+          if (esPrimeraFutura) {
+            card.classList.add("destacada");
           }
 
+          // columna izquierda: fecha + badges
           const fechaDiv = document.createElement("div");
           fechaDiv.className = "assignment-date";
 
-          const daySpan = document.createElement("span");
-          daySpan.className = "assignment-day";
-          if (esDiaImportante(fecha)) daySpan.classList.add("church-day");
-          daySpan.textContent = fecha;
-
           const labelSpan = document.createElement("span");
           labelSpan.className = "assignment-label";
-          labelSpan.textContent = "Reunión";
+          labelSpan.textContent = esPrimeraFutura ? "Próxima reunión" : "Reunión";
 
-          const badge = document.createElement("div");
-          badge.className = "badge";
-          const dot = document.createElement("span");
-          dot.className = "badge-dot";
-          const txt = document.createElement("span");
-          txt.textContent = esDiaImportante(fecha)
+          const daySpan = document.createElement("span");
+          daySpan.className = "assignment-day";
+          if (esDiaImportante(fechaTexto)) {
+            daySpan.classList.add("church-day");
+          }
+          daySpan.textContent = fechaTexto;
+
+          const badgesRow = document.createElement("div");
+          badgesRow.className = "badge-row";
+
+          const badgeTipo = document.createElement("div");
+          badgeTipo.className = "badge";
+          const dotTipo = document.createElement("span");
+          dotTipo.className = "badge-dot";
+          const txtTipo = document.createElement("span");
+          txtTipo.textContent = esDiaImportante(fechaTexto)
             ? "Reunión principal"
             : "Reunión de entre semana";
-          badge.appendChild(dot);
-          badge.appendChild(txt);
+          badgeTipo.appendChild(dotTipo);
+          badgeTipo.appendChild(txtTipo);
+          badgesRow.appendChild(badgeTipo);
+
+          if (esDiaHoy) {
+            const badgeHoy = document.createElement("div");
+            badgeHoy.className = "badge badge-hoy";
+            const dotHoy = document.createElement("span");
+            dotHoy.className = "badge-dot";
+            const txtHoy = document.createElement("span");
+            txtHoy.textContent = "HOY TE TOCA";
+            badgeHoy.appendChild(dotHoy);
+            badgeHoy.appendChild(txtHoy);
+            badgesRow.appendChild(badgeHoy);
+          }
 
           fechaDiv.appendChild(labelSpan);
           fechaDiv.appendChild(daySpan);
-          fechaDiv.appendChild(badge);
+          fechaDiv.appendChild(badgesRow);
 
-          // Si la reunión es HOY, mostramos la píldora verde
-          if (isToday) {
-            const todayPill = document.createElement("div");
-            todayPill.className = "today-pill";
-            const pillDot = document.createElement("span");
-            pillDot.className = "today-pill-dot";
-            const pillText = document.createElement("span");
-            pillText.textContent = "HOY TE TOCA";
-            todayPill.appendChild(pillDot);
-            todayPill.appendChild(pillText);
-            fechaDiv.appendChild(todayPill);
-          }
-
+          // columna derecha: detalles
           const detallesDiv = document.createElement("div");
           detallesDiv.className = "assignment-details";
 
@@ -573,20 +597,16 @@
             crearGrupo("Plataforma", plataforma, "label-plataforma")
           );
           detallesDiv.appendChild(
-            crearGrupo("Acomodador de entrada", acomodadorEntrada, "label-entrada")
+            crearGrupo("Acomodador entrada", acomodadorEntrada, "label-entrada")
           );
           detallesDiv.appendChild(
-            crearGrupo("Acomodador de auditorio", acomodadorAuditorio, "label-auditorio")
+            crearGrupo("Acomodador auditorio", acomodadorAuditorio, "label-auditorio")
           );
 
           card.appendChild(fechaDiv);
           card.appendChild(detallesDiv);
           contenedor.appendChild(card);
         });
-
-        const total = ordenadas.length;
-        resumen.textContent =
-          total === 1 ? "1 reunión asignada" : `${total} reuniones asignadas`;
       } catch (err) {
         console.error("Error cargando la cartelera:", err);
         resumen.textContent = "Error al cargar";
