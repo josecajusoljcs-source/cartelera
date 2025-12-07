@@ -95,7 +95,7 @@
                   radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.9), #020617);
       border-radius: var(--radius-xl);
       border: 1px solid rgba(148, 163, 184, 0.28);
-      padding: 1.1rem 1.05rem 1.2rem;
+      padding: 1.2rem 1.15rem 1.35rem;
       box-shadow: var(--shadow-soft);
       position: relative;
       overflow: hidden;
@@ -140,27 +140,23 @@
       background: rgba(15, 23, 42, 0.9);
     }
 
-    /* Contenedor de próxima reunión (fijo) */
-    .featured-wrapper {
-      margin-top: 0.4rem;
-      margin-bottom: 0.7rem;
+    .assignments-info {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.65rem;
     }
 
-    .featured-label {
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: var(--muted);
-      margin-bottom: 0.25rem;
+    .assignments-info strong {
+      color: var(--accent);
     }
 
     .assignments-grid {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
-      gap: 0.55rem;
-      max-height: calc(100vh - 250px);
+      gap: 0.75rem;
+      max-height: calc(100vh - 220px);
       overflow-y: auto;
-      padding-right: 0.2rem;
+      padding-right: 0.3rem;
     }
 
     .assignments-grid::-webkit-scrollbar {
@@ -181,10 +177,10 @@
       background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.94), rgba(15, 23, 42, 0.98));
       border-radius: var(--radius-md);
       border: 1px solid rgba(148, 163, 184, 0.35);
-      padding: 0.6rem 0.65rem 0.55rem;
+      padding: 0.7rem 0.75rem 0.65rem;
       display: grid;
-      grid-template-columns: minmax(0, 1.3fr) minmax(0, 2.1fr);
-      gap: 0.25rem 0.8rem;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 2.2fr);
+      gap: 0.35rem 1rem;
       position: relative;
       overflow: hidden;
     }
@@ -209,46 +205,18 @@
       opacity: 0.25;
     }
 
-    /* Destacada fija */
-    .assignment-card.featured {
+    /* PRÓXIMA REUNIÓN un poquito más destacada (primer tarjeta) */
+    .assignment-card:first-child {
       border-color: rgba(56, 189, 248, 0.8);
       box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.35);
-    }
-
-    /* Tarjeta del día de hoy */
-    .assignment-card.today {
-      border-color: #22c55e;
-      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.35);
-    }
-
-    .today-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.25rem;
-      margin-top: 0.2rem;
-      font-size: 0.7rem;
-      padding: 0.15rem 0.55rem;
-      border-radius: 999px;
-      background: rgba(22, 163, 74, 0.18);
-      border: 1px solid rgba(22, 163, 74, 0.7);
-      color: #bbf7d0;
-    }
-
-    .today-chip::before {
-      content: "";
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: #22c55e;
-      box-shadow: 0 0 8px rgba(34, 197, 94, 0.85);
     }
 
     .assignment-date {
       display: flex;
       flex-direction: column;
-      gap: 0.08rem;
-      font-size: 0.8rem;
-      padding-right: 0.1rem;
+      gap: 0.1rem;
+      font-size: 0.83rem;
+      padding-right: 0.2rem;
     }
 
     .assignment-day {
@@ -261,7 +229,7 @@
     }
 
     .assignment-label {
-      font-size: 0.68rem;
+      font-size: 0.7rem;
       text-transform: uppercase;
       letter-spacing: 0.12em;
       color: var(--muted);
@@ -271,19 +239,19 @@
       display: inline-flex;
       align-items: center;
       gap: 0.3rem;
-      margin-top: 0.15rem;
-      padding: 0.12rem 0.5rem;
+      margin-top: 0.2rem;
+      padding: 0.16rem 0.55rem;
       border-radius: 999px;
       background: rgba(15, 23, 42, 0.85);
       border: 1px solid rgba(148, 163, 184, 0.5);
-      font-size: 0.68rem;
+      font-size: 0.7rem;
       color: var(--muted);
       width: fit-content;
     }
 
     .badge-dot {
-      width: 7px;
-      height: 7px;
+      width: 8px;
+      height: 8px;
       border-radius: 999px;
       background: var(--accent);
       box-shadow: 0 0 12px rgba(56, 189, 248, 0.9);
@@ -292,23 +260,23 @@
     .assignment-details {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 0.2rem 0.6rem;
-      font-size: 0.78rem;
+      gap: 0.25rem 0.75rem;
+      font-size: 0.8rem;
     }
 
     .detail-group {
       display: flex;
       flex-direction: column;
-      gap: 0.02rem;
+      gap: 0.05rem;
     }
 
     .detail-label {
-      font-size: 0.64rem;
+      font-size: 0.66rem;
       text-transform: uppercase;
       letter-spacing: 0.12em;
       color: var(--muted);
       position: relative;
-      padding-left: 0.9rem;
+      padding-left: 0.95rem;
     }
 
     .detail-label::before {
@@ -323,15 +291,32 @@
       background: var(--muted);
     }
 
-    .detail-label.label-audio::before      { background: #38bdf8; }
-    .detail-label.label-video::before      { background: #a78bfa; }
-    .detail-label.label-mic::before        { background: #4ade80; }
-    .detail-label.label-plataforma::before { background: #facc15; }
-    .detail-label.label-entrada::before    { background: #fb923c; }
-    .detail-label.label-auditorio::before  { background: #fb7185; }
+    .detail-label.label-audio::before {
+      background: #38bdf8;
+    }
+
+    .detail-label.label-video::before {
+      background: #a78bfa;
+    }
+
+    .detail-label.label-mic::before {
+      background: #4ade80;
+    }
+
+    .detail-label.label-plataforma::before {
+      background: #facc15;
+    }
+
+    .detail-label.label-entrada::before {
+      background: #fb923c;
+    }
+
+    .detail-label.label-auditorio::before {
+      background: #fb7185;
+    }
 
     .detail-value {
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       color: #e5e7eb;
       white-space: nowrap;
       overflow: hidden;
@@ -347,22 +332,11 @@
     @media (max-width: 900px) {
       body { padding: 1rem 0.6rem 1.2rem; }
       .layout { grid-template-columns: minmax(0, 1fr); }
-      .card-shell { padding: 1rem; }
     }
 
     @media (max-width: 640px) {
-      .assignment-card {
-        grid-template-columns: minmax(0, 1fr);
-        padding: 0.55rem 0.55rem 0.5rem;
-        gap: 0.2rem 0.4rem;
-      }
-      .assignment-details {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        font-size: 0.75rem;
-      }
-      .assignment-date {
-        font-size: 0.78rem;
-      }
+      .assignment-card { grid-template-columns: minmax(0, 1fr); }
+      .assignment-details { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
   </style>
 </head>
@@ -370,7 +344,7 @@
   <main class="page">
     <header>
       <h1>Asignaciones para las reuniones</h1>
-      <p id="header-month">Mes / año</p>
+      <p>Mes / año</p>
 
       <div class="pill-bar">
         <span class="pill-dot"></span>
@@ -386,10 +360,12 @@
             <span id="count-resumen">Cargando asignaciones…</span>
           </div>
 
-          <!-- Próxima reunión fija -->
-          <div class="featured-wrapper" id="featured-assignment"></div>
+          <p class="assignments-info">
+            Editá las asignaciones directamente en la hoja de  
+            <strong>Google Sheets</strong>. La cartelera se actualiza
+            automáticamente al recargar esta página.
+          </p>
 
-          <!-- Resto de las reuniones con scroll -->
           <div id="assignments" class="assignments-grid"></div>
         </div>
       </section>
@@ -411,233 +387,160 @@
       return f.includes("domingo") || f.includes("sábado") || f.includes("sabado");
     }
 
-    // Extrae dd/mm/aa (o dd/mm/aaaa) de un texto y lo convierte a Date
-    function extraerFecha(fechaStr) {
-      if (!fechaStr) return null;
-      const match = fechaStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
+    // Saca el número de día de "Viernes 5 de diciembre"
+    function obtenerDiaNumero(fecha) {
+      if (!fecha) return null;
+      const match = fecha.match(/(\d{1,2})/);
       if (!match) return null;
-      let [, d, m, y] = match;
-      const day = parseInt(d, 10);
-      const month = parseInt(m, 10) - 1;
-      let year = parseInt(y, 10);
-      if (y.length === 2) year = 2000 + year;
-      const date = new Date(year, month, day);
-      if (isNaN(date.getTime())) return null;
-      date.setHours(0, 0, 0, 0);
-      return date;
-    }
-
-    function mismoDia(d1, d2) {
-      return (
-        d1 &&
-        d2 &&
-        d1.getFullYear() === d2.getFullYear() &&
-        d1.getMonth() === d2.getMonth() &&
-        d1.getDate() === d2.getDate()
-      );
-    }
-
-    function crearTarjeta(row, opciones = {}) {
-      const { esDestacada = false, esHoy = false } = opciones;
-
-      const fechaStr           = row[0] || "";
-      const video              = row[1] || "";
-      const audio              = row[2] || "";
-      const mic1               = row[3] || "";
-      const mic2               = row[4] || "";
-      const plataforma         = row[5] || "";
-      const acomodadorEntrada  = row[6] || "";
-      const acomodadorAuditorio= row[7] || "";
-
-      const card = document.createElement("article");
-      card.className = "assignment-card";
-      if (esDestacada) card.classList.add("featured");
-      if (esHoy) card.classList.add("today");
-
-      const fechaDiv = document.createElement("div");
-      fechaDiv.className = "assignment-date";
-
-      const daySpan = document.createElement("span");
-      daySpan.className = "assignment-day";
-      if (esDiaImportante(fechaStr)) daySpan.classList.add("church-day");
-      daySpan.textContent = fechaStr;
-
-      const labelSpan = document.createElement("span");
-      labelSpan.className = "assignment-label";
-      labelSpan.textContent = "Reunión";
-
-      const badge = document.createElement("div");
-      badge.className = "badge";
-      const dot = document.createElement("span");
-      dot.className = "badge-dot";
-      const txt = document.createElement("span");
-      txt.textContent = esDiaImportante(fechaStr)
-        ? "Reunión principal"
-        : "Reunión de entre semana";
-      badge.appendChild(dot);
-      badge.appendChild(txt);
-
-      fechaDiv.appendChild(labelSpan);
-      fechaDiv.appendChild(daySpan);
-      fechaDiv.appendChild(badge);
-
-      if (esHoy) {
-        const todayChip = document.createElement("div");
-        todayChip.className = "today-chip";
-        todayChip.textContent = "HOY TE TOCA";
-        fechaDiv.appendChild(todayChip);
-      }
-
-      const detallesDiv = document.createElement("div");
-      detallesDiv.className = "assignment-details";
-
-      function crearGrupo(label, value, extraClass) {
-        const group = document.createElement("div");
-        group.className = "detail-group";
-
-        const l = document.createElement("div");
-        l.className = "detail-label";
-        if (extraClass) l.classList.add(extraClass);
-        l.textContent = label;
-
-        const v = document.createElement("div");
-        v.className = "detail-value";
-        v.textContent = value || "-";
-
-        group.appendChild(l);
-        group.appendChild(v);
-        return group;
-      }
-
-      detallesDiv.appendChild(crearGrupo("Audio", audio, "label-audio"));
-      detallesDiv.appendChild(crearGrupo("Video", video, "label-video"));
-      detallesDiv.appendChild(crearGrupo("Mic 1", mic1, "label-mic"));
-      detallesDiv.appendChild(crearGrupo("Mic 2", mic2, "label-mic"));
-      detallesDiv.appendChild(
-        crearGrupo("Plataforma", plataforma, "label-plataforma")
-      );
-      detallesDiv.appendChild(
-        crearGrupo("Acomodador de entrada", acomodadorEntrada, "label-entrada")
-      );
-      detallesDiv.appendChild(
-        crearGrupo("Acomodador de auditorio", acomodadorAuditorio, "label-auditorio")
-      );
-
-      card.appendChild(fechaDiv);
-      card.appendChild(detallesDiv);
-      return card;
+      return parseInt(match[1], 10);
     }
 
     async function cargarCartelera() {
-      const resumen        = document.getElementById("count-resumen");
-      const contenedor     = document.getElementById("assignments");
-      const featuredHolder = document.getElementById("featured-assignment");
-      const headerMes      = document.getElementById("header-month");
+      const resumen = document.getElementById("count-resumen");
+      const contenedor = document.getElementById("assignments");
 
       try {
-        const res  = await fetch(CSV_URL);
+        const res = await fetch(CSV_URL);
         const text = await res.text();
         const data = parseCSV(text);
 
-        if (!data || data.length === 0) {
+        if (!data || data.length < 2) {
           resumen.textContent = "0 reuniones";
-          featuredHolder.innerHTML = "";
           contenedor.innerHTML =
             "<p class='empty-msg'>Sin asignaciones cargadas.</p>";
           return;
         }
 
-        let startIndex = 1;
-        if (data[0] && data[0][0]) {
-          const firstCell = data[0][0].trim();
-          if (firstCell && !/^fecha/i.test(firstCell)) {
-            headerMes.textContent = firstCell;  // Mes/año desde A1
-            startIndex = 2;                     // A2 = encabezados
-          }
+        // Filas "reales" (viernes/domingo) saltando encabezado
+        const filas = data
+          .slice(1)
+          .filter((row) => {
+            const f = (row[0] || "").toLowerCase().trim();
+            if (!f) return false;
+            return /(viernes|domingo)/i.test(f);
+          })
+          .map((row) => {
+            const fecha = row[0] || "";
+            return {
+              raw: row,
+              fecha,
+              dayNumber: obtenerDiaNumero(fecha)
+            };
+          });
+
+        if (!filas.length) {
+          resumen.textContent = "0 reuniones";
+          contenedor.innerHTML =
+            "<p class='empty-msg'>Sin asignaciones cargadas.</p>";
+          return;
         }
 
-        const filas = data
-          .slice(startIndex)
-          .filter((row) => row.some((cell) => cell && cell.trim() !== ""));
+        // Ordenar: primero las reuniones de hoy y futuras,
+        // luego las pasadas, todo según el número de día.
+        const hoy = new Date();
+        const diaHoy = hoy.getDate();
 
-        featuredHolder.innerHTML = "";
+        const futuras = filas
+          .filter((f) => f.dayNumber === null || f.dayNumber >= diaHoy)
+          .sort((a, b) => (a.dayNumber || 0) - (b.dayNumber || 0));
+
+        const pasadas = filas
+          .filter((f) => f.dayNumber !== null && f.dayNumber < diaHoy)
+          .sort((a, b) => a.dayNumber - b.dayNumber);
+
+        const ordenadas = [...futuras, ...pasadas];
+
         contenedor.innerHTML = "";
 
-        if (filas.length === 0) {
-          resumen.textContent = "0 reuniones";
-          contenedor.innerHTML =
-            "<p class='empty-msg'>Sin asignaciones cargadas.</p>";
-          return;
-        }
+        ordenadas.forEach((item) => {
+          const row = item.raw;
 
-        const hoy = new Date();
-        hoy.setHours(0, 0, 0, 0);
+          const fecha = row[0] || "";
+          const video = row[1] || "";
+          const audio = row[2] || "";
+          const mic1 = row[3] || "";
+          const mic2 = row[4] || "";
+          const plataforma = row[5] || "";
+          const acomodadorEntrada = row[6] || "";
+          const acomodadorAuditorio = row[7] || "";
 
-        // Calcular índice de la próxima reunión según fecha
-        let indiceFuture = -1;
-        let fechaFutureMin = null;
+          const card = document.createElement("article");
+          card.className = "assignment-card";
 
-        let indicePastMasReciente = 0;
-        let fechaPastMax = null;
+          const fechaDiv = document.createElement("div");
+          fechaDiv.className = "assignment-date";
 
-        const fechasFilas = filas.map((row) => extraerFecha(row[0]));
+          const daySpan = document.createElement("span");
+          daySpan.className = "assignment-day";
+          if (esDiaImportante(fecha)) daySpan.classList.add("church-day");
+          daySpan.textContent = fecha;
 
-        fechasFilas.forEach((f, idx) => {
-          if (!f) return;
-          if (f.getTime() >= hoy.getTime()) {
-            if (!fechaFutureMin || f.getTime() < fechaFutureMin.getTime()) {
-              fechaFutureMin = f;
-              indiceFuture = idx;
-            }
-          } else {
-            if (!fechaPastMax || f.getTime() > fechaPastMax.getTime()) {
-              fechaPastMax = f;
-              indicePastMasReciente = idx;
-            }
+          const labelSpan = document.createElement("span");
+          labelSpan.className = "assignment-label";
+          labelSpan.textContent = "Reunión";
+
+          const badge = document.createElement("div");
+          badge.className = "badge";
+          const dot = document.createElement("span");
+          dot.className = "badge-dot";
+          const txt = document.createElement("span");
+          txt.textContent = esDiaImportante(fecha)
+            ? "Reunión principal"
+            : "Reunión de entre semana";
+          badge.appendChild(dot);
+          badge.appendChild(txt);
+
+          fechaDiv.appendChild(labelSpan);
+          fechaDiv.appendChild(daySpan);
+          fechaDiv.appendChild(badge);
+
+          const detallesDiv = document.createElement("div");
+          detallesDiv.className = "assignment-details";
+
+          function crearGrupo(label, value, extraClass) {
+            const group = document.createElement("div");
+            group.className = "detail-group";
+
+            const l = document.createElement("div");
+            l.className = "detail-label";
+            if (extraClass) l.classList.add(extraClass);
+            l.textContent = label;
+
+            const v = document.createElement("div");
+            v.className = "detail-value";
+            v.textContent = value || "-";
+
+            group.appendChild(l);
+            group.appendChild(v);
+            return group;
           }
-        });
 
-        let featuredIndex =
-          indiceFuture !== -1 ? indiceFuture : indicePastMasReciente;
-
-        // Armamos destacada
-        const filaDestacada = filas[featuredIndex];
-        const fechaDestacada = fechasFilas[featuredIndex];
-
-        const label = document.createElement("div");
-        label.className = "featured-label";
-        label.textContent = "Próxima reunión";
-        featuredHolder.appendChild(label);
-
-        const esHoyDestacada =
-          fechaDestacada && mismoDia(fechaDestacada, hoy);
-
-        featuredHolder.appendChild(
-          crearTarjeta(filaDestacada, {
-            esDestacada: true,
-            esHoy: esHoyDestacada,
-          })
-        );
-
-        // Resto en el listado scrollable
-        filas.forEach((row, idx) => {
-          if (idx === featuredIndex) return;
-          const f = fechasFilas[idx];
-          const esHoy = f && mismoDia(f, hoy);
-          contenedor.appendChild(
-            crearTarjeta(row, { esDestacada: false, esHoy })
+          detallesDiv.appendChild(crearGrupo("Audio", audio, "label-audio"));
+          detallesDiv.appendChild(crearGrupo("Video", video, "label-video"));
+          detallesDiv.appendChild(crearGrupo("Mic 1", mic1, "label-mic"));
+          detallesDiv.appendChild(crearGrupo("Mic 2", mic2, "label-mic"));
+          detallesDiv.appendChild(
+            crearGrupo("Plataforma", plataforma, "label-plataforma")
           );
+          detallesDiv.appendChild(
+            crearGrupo("Acomodador de entrada", acomodadorEntrada, "label-entrada")
+          );
+          detallesDiv.appendChild(
+            crearGrupo("Acomodador de auditorio", acomodadorAuditorio, "label-auditorio")
+          );
+
+          card.appendChild(fechaDiv);
+          card.appendChild(detallesDiv);
+          contenedor.appendChild(card);
         });
 
-        const countText =
-          filas.length === 1
-            ? "1 reunión asignada"
-            : `${filas.length} reuniones asignadas`;
-        resumen.textContent = countText;
+        const total = ordenadas.length;
+        resumen.textContent =
+          total === 1 ? "1 reunión asignada" : `${total} reuniones asignadas`;
       } catch (err) {
         console.error("Error cargando la cartelera:", err);
+        const contenedor = document.getElementById("assignments");
         resumen.textContent = "Error al cargar";
-        featuredHolder.innerHTML = "";
         contenedor.innerHTML =
           "<p class='empty-msg'>Hubo un error al cargar las asignaciones.</p>";
       }
