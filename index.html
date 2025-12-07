@@ -168,11 +168,14 @@
       position: relative;
     }
 
-    /* tarjeta destacada (próxima reunión) */
-    .assignment-card.destacada {
-      border-color: rgba(56, 189, 248, 0.9);
-      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
-    }
+    /* tarjeta destacada (próxima reunión) - fija arriba al hacer scroll */
+.assignment-card.destacada {
+  border-color: rgba(56, 189, 248, 0.9);
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
 
     .assignment-date {
       display: flex;
