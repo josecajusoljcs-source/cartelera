@@ -312,26 +312,22 @@
       padding-top: 0.5rem;
     }
 
-    @media (max-width: 900px) {
-      body { padding: 1rem 0.7rem 1.2rem; }
-    }
+    /* Ajustes generales para pantallas medianas (tablet, etc.) */
+@media (max-width: 900px) {
+  body {
+    padding: 1rem 0.7rem 1.2rem;
+  }
+}
 
-    @media (max-width: 640px) {
-      .assignment-card {
-        grid-template-columns: minmax(0, 1fr);
-      }
-      .assignment-details {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-    /* Ajustes especiales para celular */
+/* Ajustes especiales para celular */
 @media (max-width: 640px) {
   body {
     padding: 0.8rem 0.4rem 1.2rem;
   }
 
+  /* Título más grande en móvil */
   header h1 {
-    font-size: 1.7rem;          /* Título grande para leer mejor */
+    font-size: 1.7rem;
     line-height: 1.2;
   }
 
@@ -339,14 +335,14 @@
     padding: 0.9rem 0.8rem 1rem;
   }
 
-  /* Quitar el scroll interno y dejar un solo scroll en toda la página */
+  /* Quitar scroll interno y dejar un solo scroll general */
   .assignments-grid {
     max-height: none;
     overflow-y: visible;
     padding-right: 0;
   }
 
-  /* Reuniones en una sola columna para que se lea más grande */
+  /* Reuniones en una sola columna para que se lea mejor */
   .assignment-card {
     grid-template-columns: minmax(0, 1fr);
     padding: 0.9rem 0.85rem;
