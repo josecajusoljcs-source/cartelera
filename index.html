@@ -324,6 +324,52 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
+    /* Ajustes especiales para celular */
+@media (max-width: 640px) {
+  body {
+    padding: 0.8rem 0.4rem 1.2rem;
+  }
+
+  header h1 {
+    font-size: 1.7rem;          /* Título grande para leer mejor */
+    line-height: 1.2;
+  }
+
+  .card-shell {
+    padding: 0.9rem 0.8rem 1rem;
+  }
+
+  /* Quitar el scroll interno y dejar un solo scroll en toda la página */
+  .assignments-grid {
+    max-height: none;
+    overflow-y: visible;
+    padding-right: 0;
+  }
+
+  /* Reuniones en una sola columna para que se lea más grande */
+  .assignment-card {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0.9rem 0.85rem;
+  }
+
+  .assignment-details {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0.35rem;
+  }
+
+  /* Texto un poco más grande */
+  .assignment-day {
+    font-size: 1.05rem;
+  }
+
+  .detail-label {
+    font-size: 0.7rem;
+  }
+
+  .detail-value {
+    font-size: 0.9rem;
+  }
+}
   </style>
 </head>
 <body>
