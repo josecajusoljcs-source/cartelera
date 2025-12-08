@@ -651,8 +651,15 @@ const filasOrdenadas = futurasOHoy;
           contenedor.innerHTML = "";
 
           const total = filasOrdenadas.length;
-          resumen.textContent =
-            total === 1 ? "1 reunión asignada" : total + " reuniones asignadas";
+
+if (total === 0) {
+  resumen.textContent = "0 reuniones asignadas";
+  contenedor.innerHTML = "<p class='empty-msg'>No hay reuniones futuras en este mes.</p>";
+  return;
+}
+
+resumen.textContent =
+  total === 1 ? "1 reunión asignada" : total + " reuniones asignadas";
 
           filasOrdenadas.forEach((item, index) => {
             const row = item.row;
