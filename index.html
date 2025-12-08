@@ -458,38 +458,49 @@
         .trim();
     }
 
-    // Convierte "Viernes 5 de diciembre" en un objeto Date del año actual
-    function parseFechaTexto(fechaTexto) {
-      const limpio = normalizarTexto(fechaTexto);
-      if (!limpio) return null;
-      const partes = limpio.split(" "); // ["viernes","5","de","diciembre"]
-      if (partes.length < 4) return null;
-      const dia = parseInt(partes[1], 10);
-      const mesNombre = partes[3];
+    // Convierte "Viernes 5 de diciembre 2025" (o sin año) en Date
+function parseFechaTexto(fechaTexto) {
+  const limpio = normalizarTexto(fechaTexto);
+  if (!limpio) return null;
 
-      const meses = {
-        enero: 0,
-        febrero: 1,
-        marzo: 2,
-        abril: 3,
-        mayo: 4,
-        junio: 5,
-        julio: 6,
-        agosto: 7,
-        septiembre: 8,
-        setiembre: 8,
-        octubre: 9,
-        noviembre: 10,
-        diciembre: 11
-      };
+  const partes = limpio.split(" ").filter(Boolean);
+  // Puede venir: ["viernes","5","de","diciembre"]
+  // o:          ["viernes","5","de","diciembre","2025"]
+  if (partes.length < 4) return null;
 
-      const mes = meses[mesNombre];
-      if (isNaN(dia) || mes == null) return null;
+  const dia = parseInt(partes[1], 10);
+  const mesNombre = partes[3];
 
-      const hoy = new Date();
-      const year = hoy.getFullYear();
-      return new Date(year, mes, dia);
+  const meses = {
+    enero: 0,
+    febrero: 1,
+    marzo: 2,
+    abril: 3,
+    mayo: 4,
+    junio: 5,
+    julio: 6,
+    agosto: 7,
+    septiembre: 8,
+    setiembre: 8,
+    octubre: 9,
+    noviembre: 10,
+    diciembre: 11
+  };
+
+  const mes = meses[mesNombre];
+  if (isNaN(dia) || mes == null) return null;
+
+  // Si viene año en el texto lo usamos; si no, usamos el año actual
+  let year = new Date().getFullYear();
+  if (partes.length >= 5) {
+    const posibleYear = parseInt(partes[4], 10);
+    if (!isNaN(posibleYear)) {
+      year = posibleYear;
     }
+  }
+
+  return new Date(year, mes, dia);
+}
 
     // Devuelve true si la fecha de la fila es "hoy"
     function esHoy(fechaTexto) {
