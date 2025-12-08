@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>Asignaciones para las reuniones</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <style>
     :root {
       --bg: #0f172a;
@@ -45,7 +46,7 @@
 
     header {
       text-align: center;
-      margin-bottom: 0.9rem;
+      margin-bottom: 1.4rem;
     }
 
     header h1 {
@@ -81,44 +82,103 @@
     .layout {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
+      gap: 0.9rem;
     }
 
-    .month-selector {
-      margin: 0.9rem auto 0.6rem;
-      max-width: 360px;
+    /* Barra de controles extra */
+    .controls-bar {
       display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-      align-items: stretch;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.35rem;
     }
 
-    .month-selector-label {
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      color: var(--muted);
-      text-align: left;
+    .controls-left,
+    .controls-right {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
     }
 
-    .month-selector select {
+    .select-wrapper {
       width: 100%;
-      padding: 0.45rem 0.8rem;
+      max-width: 260px;
+    }
+
+    .select-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.25rem;
+    }
+
+    select {
+      width: 100%;
       border-radius: 999px;
+      padding: 0.45rem 0.9rem;
       border: 1px solid rgba(148, 163, 184, 0.7);
       background: rgba(15, 23, 42, 0.96);
       color: var(--text);
       font-size: 0.9rem;
       outline: none;
-      appearance: none;
-      -moz-appearance: none;
-      -webkit-appearance: none;
-      background-image: linear-gradient(45deg, transparent 50%, #9ca3af 50%),
-        linear-gradient(135deg, #9ca3af 50%, transparent 50%);
-      background-position:
-        calc(100% - 15px) calc(50% - 3px),
-        calc(100% - 10px) calc(50% - 3px);
-      background-size: 6px 6px, 6px 6px;
-      background-repeat: no-repeat;
+    }
+
+    .toggle-btn {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--muted);
+      font-size: 0.78rem;
+      padding: 0.25rem 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .toggle-btn.active {
+      border-color: var(--accent);
+      color: #e0f2fe;
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
+    }
+
+    .toggle-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.7);
+    }
+
+    .toggle-btn.active .toggle-dot {
+      background: var(--accent);
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.8);
+    }
+
+    .view-tabs {
+      display: inline-flex;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.9);
+      overflow: hidden;
+    }
+
+    .view-tab {
+      padding: 0.25rem 0.75rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .view-tab.active {
+      background: rgba(15, 23, 42, 0.96);
+      color: #e5e7eb;
     }
 
     .card-shell {
@@ -172,11 +232,17 @@
       white-space: nowrap;
     }
 
+    .view-message {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+
     .assignments-grid {
       display: grid;
       grid-template-columns: minmax(0, 1fr);
       gap: 1rem;
-      max-height: calc(100vh - 230px);
+      max-height: calc(100vh - 260px);
       overflow-y: auto;
       padding-right: 0.35rem;
     }
@@ -213,6 +279,7 @@
       position: sticky;
       top: 0;
       z-index: 2;
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 1));
     }
 
     .assignment-date {
@@ -312,29 +379,12 @@
       background: var(--muted);
     }
 
-    .detail-label.label-audio::before {
-      background: #38bdf8;
-    }
-
-    .detail-label.label-video::before {
-      background: #a78bfa;
-    }
-
-    .detail-label.label-mic::before {
-      background: #4ade80;
-    }
-
-    .detail-label.label-plataforma::before {
-      background: #facc15;
-    }
-
-    .detail-label.label-entrada::before {
-      background: #fb923c;
-    }
-
-    .detail-label.label-auditorio::before {
-      background: #fb7185;
-    }
+    .detail-label.label-audio::before { background: #38bdf8; }
+    .detail-label.label-video::before { background: #a78bfa; }
+    .detail-label.label-mic::before { background: #4ade80; }
+    .detail-label.label-plataforma::before { background: #facc15; }
+    .detail-label.label-entrada::before { background: #fb923c; }
+    .detail-label.label-auditorio::before { background: #fb7185; }
 
     .detail-value {
       font-size: 0.96rem;
@@ -350,14 +400,53 @@
       padding-top: 0.5rem;
     }
 
-    /* Ajustes generales para pantallas medianas (tablet, etc.) */
+    .separator {
+      font-size: 0.8rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 0.6rem;
+      margin-bottom: 0.15rem;
+    }
+
+    /* Modo texto grande */
+    body.modo-texto-grande .assignment-day {
+      font-size: 1.2rem;
+    }
+    body.modo-texto-grande .detail-value {
+      font-size: 1.05rem;
+    }
+    body.modo-texto-grande .detail-label {
+      font-size: 0.8rem;
+    }
+    body.modo-texto-grande .assignment-card {
+      padding: 1rem 0.95rem;
+    }
+
+    /* Modo alto contraste */
+    body.modo-alto-contraste {
+      background: #020617;
+    }
+    body.modo-alto-contraste .card-shell {
+      background: #020617;
+    }
+    body.modo-alto-contraste .assignment-card {
+      background: #020617;
+      border-color: rgba(148, 163, 184, 0.9);
+    }
+    body.modo-alto-contraste .section-title h2,
+    body.modo-alto-contraste .detail-label,
+    body.modo-alto-contraste .assignment-label {
+      color: #e5e7eb;
+    }
+
+    /* Responsivo */
     @media (max-width: 900px) {
       body {
         padding: 1rem 0.7rem 1.2rem;
       }
     }
 
-    /* Ajustes especiales para celular */
     @media (max-width: 640px) {
       body {
         padding: 0.8rem 0.4rem 1.2rem;
@@ -388,10 +477,6 @@
         row-gap: 0.35rem;
       }
 
-      .assignment-day {
-        font-size: 1.05rem;
-      }
-
       .detail-label {
         font-size: 0.7rem;
       }
@@ -399,9 +484,19 @@
       .detail-value {
         font-size: 0.9rem;
       }
+
+      .controls-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .controls-right {
+        justify-content: flex-start;
+      }
     }
   </style>
 </head>
+
 <body>
   <main class="page">
     <header>
@@ -413,19 +508,43 @@
       </div>
     </header>
 
-    <!-- Selector de Mes / año -->
-    <section class="month-selector">
-      <span class="month-selector-label">Mes / año</span>
-      <select id="monthYearSelect"></select>
-    </section>
-
     <section class="layout">
+      <!-- Barra de controles -->
+      <div class="controls-bar">
+        <div class="controls-left">
+          <div class="select-wrapper">
+            <div class="select-label">Mes / año</div>
+            <select id="monthYearSelect"></select>
+          </div>
+        </div>
+
+        <div class="controls-right">
+          <div class="view-tabs" aria-label="Ver">
+            <button class="view-tab active" data-view="mes" id="tab-mes">Todo el mes</button>
+            <button class="view-tab" data-view="semana" id="tab-semana">Esta semana</button>
+            <button class="view-tab" data-view="hoy" id="tab-hoy">Hoy</button>
+          </div>
+
+          <button class="toggle-btn" id="btn-texto-grande">
+            <span class="toggle-dot"></span>
+            Texto grande
+          </button>
+
+          <button class="toggle-btn" id="btn-alto-contraste">
+            <span class="toggle-dot"></span>
+            Alto contraste
+          </button>
+        </div>
+      </div>
+
       <section class="card-shell">
         <div class="card-shell-inner">
           <div class="section-title">
             <h2>Próximas reuniones</h2>
             <span id="count-resumen">Cargando…</span>
           </div>
+
+          <p id="view-message" class="view-message"></p>
 
           <div id="assignments" class="assignments-grid"></div>
         </div>
@@ -434,14 +553,13 @@
   </main>
 
   <script>
-    // URL del CSV de tu hoja publicada
-    const CSV_URL =
-      "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337";
+    // ⚠️ IMPORTANTE:
+    // PONÉ ACÁ LA MISMA URL CSV QUE TIENE HOY TU CARTELERA (la que ya funciona).
+    const CSV_URL = "AQUI_VA_TU_URL_CSV_ACTUAL";
 
-    const NOMBRES_MESES = [
-      "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-    ];
+    let todasLasFilas = [];   // [{ row, fecha }]
+    let mesAnioActual = null; // { year, month }
+    let modoVista = "mes";    // "mes" | "semana" | "hoy"
 
     function parseCSV(text) {
       const rows = text.trim().split(/\r?\n/);
@@ -458,54 +576,67 @@
         .trim();
     }
 
-    // Convierte "Viernes 5 de diciembre 2025" (o sin año) en Date
-function parseFechaTexto(fechaTexto) {
-  const limpio = normalizarTexto(fechaTexto);
-  if (!limpio) return null;
+    // Convierte distintos formatos a Date:
+    // - "Viernes 5 de diciembre"  (asume año actual)
+    // - "Viernes 5 de diciembre 2026"
+    // - "05/01/2026" o "5/1/2026"
+    function parseFechaTexto(fechaTexto) {
+      if (!fechaTexto) return null;
+      const limpio = fechaTexto.toString().trim();
 
-  const partes = limpio.split(" ").filter(Boolean);
-  // Puede venir: ["viernes","5","de","diciembre"]
-  // o:          ["viernes","5","de","diciembre","2025"]
-  if (partes.length < 4) return null;
+      // 1) dd/mm/yyyy
+      const matchNum = limpio.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+      if (matchNum) {
+        const d = parseInt(matchNum[1], 10);
+        const m = parseInt(matchNum[2], 10) - 1;
+        let y = parseInt(matchNum[3], 10);
+        if (y < 100) y += 2000;
+        return new Date(y, m, d);
+      }
 
-  const dia = parseInt(partes[1], 10);
-  const mesNombre = partes[3];
+      // 2) "viernes 5 de diciembre" (con o sin año)
+      const limpioNorm = normalizarTexto(limpio);
+      const partes = limpioNorm.split(" ").filter(Boolean);
+      // buscamos primer número como día
+      let dia = null;
+      for (const p of partes) {
+        const n = parseInt(p, 10);
+        if (!isNaN(n)) {
+          dia = n;
+          break;
+        }
+      }
+      if (dia == null) return null;
 
-  const meses = {
-    enero: 0,
-    febrero: 1,
-    marzo: 2,
-    abril: 3,
-    mayo: 4,
-    junio: 5,
-    julio: 6,
-    agosto: 7,
-    septiembre: 8,
-    setiembre: 8,
-    octubre: 9,
-    noviembre: 10,
-    diciembre: 11
-  };
+      const meses = {
+        enero: 0, febrero: 1, marzo: 2, abril: 3,
+        mayo: 4, junio: 5, julio: 6, agosto: 7,
+        septiembre: 8, setiembre: 8, octubre: 9,
+        noviembre: 10, diciembre: 11
+      };
 
-  const mes = meses[mesNombre];
-  if (isNaN(dia) || mes == null) return null;
+      let mes = null;
+      let year = null;
 
-  // Si viene año en el texto lo usamos; si no, usamos el año actual
-  let year = new Date().getFullYear();
-  if (partes.length >= 5) {
-    const posibleYear = parseInt(partes[4], 10);
-    if (!isNaN(posibleYear)) {
-      year = posibleYear;
+      partes.forEach((p, idx) => {
+        if (meses[p] != null) mes = meses[p];
+        // último token número puede ser año
+        const n = parseInt(p, 10);
+        if (!isNaN(n) && idx === partes.length - 1 && n > 1900) {
+          year = n;
+        }
+      });
+
+      if (mes == null) return null;
+      if (!year) {
+        const hoy = new Date();
+        year = hoy.getFullYear();
+      }
+
+      return new Date(year, mes, dia);
     }
-  }
 
-  return new Date(year, mes, dia);
-}
-
-    // Devuelve true si la fecha de la fila es "hoy"
-    function esHoy(fechaTexto) {
-      const fecha = parseFechaTexto(fechaTexto);
-      if (!fecha) return false;
+    function esHoyDate(fecha) {
       const hoy = new Date();
       const soloHoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
       const soloFecha = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
@@ -513,7 +644,7 @@ function parseFechaTexto(fechaTexto) {
     }
 
     // Marca domingos y sábados (para color amarillo del título)
-    function esDiaImportante(fechaTexto) {
+    function esDiaImportanteTexto(fechaTexto) {
       const limpio = normalizarTexto(fechaTexto);
       return (
         limpio.startsWith("domingo") ||
@@ -522,10 +653,35 @@ function parseFechaTexto(fechaTexto) {
       );
     }
 
+    function obtenerMesAnioKey(date) {
+      const meses = [
+        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Septiembre", "Octubre",
+        "Noviembre", "Diciembre"
+      ];
+      return {
+        label: meses[date.getMonth()] + " " + date.getFullYear(),
+        month: date.getMonth(),
+        year: date.getFullYear(),
+      };
+    }
+
+    function mismoMesAnio(date, year, month) {
+      return (
+        date &&
+        date.getFullYear() === year &&
+        date.getMonth() === month
+      );
+    }
+
+    function soloFecha(date) {
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    }
+
     async function cargarCartelera() {
       const resumen = document.getElementById("count-resumen");
       const contenedor = document.getElementById("assignments");
-      const selectorMes = document.getElementById("monthYearSelect");
+      const selectMes = document.getElementById("monthYearSelect");
 
       try {
         const res = await fetch(CSV_URL);
@@ -534,274 +690,313 @@ function parseFechaTexto(fechaTexto) {
 
         if (!data || data.length < 2) {
           resumen.textContent = "0 reuniones";
-          contenedor.innerHTML =
-            "<p class='empty-msg'>Sin asignaciones cargadas.</p>";
+          contenedor.innerHTML = "<p class='empty-msg'>Sin asignaciones cargadas.</p>";
           return;
         }
 
-        // filas de datos (saltamos encabezados)
         const filas = data
           .slice(1)
           .filter((row) => row.some((cell) => cell && cell.trim() !== ""));
 
-        // Preparamos estructura con fecha real (para poder separar meses)
-        const asignaciones = filas.map((row) => {
+        const hoy = soloFecha(new Date());
+        todasLasFilas = [];
+
+        const opcionesMesSet = new Map(); // key "year-month" -> label
+
+        filas.forEach((row) => {
           const fechaTexto = row[0] || "";
           const fecha = parseFechaTexto(fechaTexto);
-          let year = null;
-          let month = null;
-          if (fecha) {
-            year = fecha.getFullYear();
-            month = fecha.getMonth();
+          if (!fecha) return;
+
+          const dSolo = soloFecha(fecha);
+          const keyObj = obtenerMesAnioKey(fecha);
+          const key = keyObj.year + "-" + keyObj.month;
+
+          if (!opcionesMesSet.has(key)) {
+            opcionesMesSet.set(key, keyObj.label);
           }
-          return { row, fechaTexto, fecha, year, month };
+
+          todasLasFilas.push({
+            row,
+            fecha: dSolo,
+            fechaTexto,
+            esPasada: dSolo.getTime() < hoy.getTime(),
+          });
         });
 
-        // Si no hay ninguna fecha válida
-        if (asignaciones.length === 0) {
-          resumen.textContent = "0 reuniones";
-          contenedor.innerHTML =
-            "<p class='empty-msg'>Sin asignaciones cargadas.</p>";
-          return;
-        }
+        // Ordenar por fecha
+        todasLasFilas.sort((a, b) => a.fecha - b.fecha);
 
-        // Construir lista de meses/años disponibles
-        const mesesMap = new Map();
-        asignaciones.forEach((a) => {
-          if (!a.fecha) return;
-          const key = `${a.year}-${a.month}`;
-          if (!mesesMap.has(key)) {
-            mesesMap.set(key, { year: a.year, month: a.month });
-          }
+        // Construir select de mes/año (ordenado)
+        const opcionesOrdenadas = Array.from(opcionesMesSet.entries())
+          .map(([key, label]) => {
+            const [yearStr, monthStr] = key.split("-");
+            return {
+              key,
+              label,
+              year: parseInt(yearStr, 10),
+              month: parseInt(monthStr, 10),
+            };
+          })
+          .sort((a, b) => (a.year - b.year) || (a.month - b.month));
+
+        selectMes.innerHTML = "";
+        opcionesOrdenadas.forEach((opt) => {
+          const option = document.createElement("option");
+          option.value = opt.key;
+          option.textContent = opt.label;
+          selectMes.appendChild(option);
         });
 
-        const mesesDisponibles = Array.from(mesesMap.values()).sort((a, b) => {
-          if (a.year !== b.year) return a.year - b.year;
-          return a.month - b.month;
-        });
-
-        // Popular el select
-        selectorMes.innerHTML = "";
-        mesesDisponibles.forEach((m) => {
-          const opt = document.createElement("option");
-          opt.value = `${m.year}-${m.month}`;
-          opt.textContent = `${NOMBRES_MESES[m.month]} ${m.year}`;
-          selectorMes.appendChild(opt);
-        });
-
-        // Seleccionar por defecto el mes actual si existe, si no el primero
-        const hoy = new Date();
-        const claveHoy = `${hoy.getFullYear()}-${hoy.getMonth()}`;
-        let valorPorDefecto = selectorMes.options[0].value;
-        for (const m of mesesDisponibles) {
-          const key = `${m.year}-${m.month}`;
-          if (key === claveHoy) {
-            valorPorDefecto = key;
+        // Mes por defecto: el de la próxima reunión futura
+        let mesDefaultKey = opcionesOrdenadas.length ? opcionesOrdenadas[0].key : "";
+        for (const fila of todasLasFilas) {
+          if (!fila.esPasada) {
+            const kObj = obtenerMesAnioKey(fila.fecha);
+            mesDefaultKey = kObj.year + "-" + kObj.month;
             break;
           }
         }
-        selectorMes.value = valorPorDefecto;
 
-        function renderizar() {
-          const value = selectorMes.value;
-          const [yearStr, monthStr] = value.split("-");
-          const selYear = parseInt(yearStr, 10);
-          const selMonth = parseInt(monthStr, 10);
-
-          // Filtrar asignaciones por mes/año seleccionado
-          const asignacionesMes = asignaciones.filter(
-            (a) => a.fecha && a.year === selYear && a.month === selMonth
-          );
-
-          if (asignacionesMes.length === 0) {
-            resumen.textContent = "0 reuniones";
-            contenedor.innerHTML =
-              "<p class='empty-msg'>Sin asignaciones para este mes.</p>";
-            return;
-          }
-
-          const hoy = new Date();
-          const hoySolo = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
-
-          const futurasOHoy = [];
-          const pasadas = [];
-
-          asignacionesMes.forEach((a) => {
-            if (!a.fecha) {
-              futurasOHoy.push({ row: a.row, fecha: null });
-              return;
-            }
-            const soloFecha = new Date(
-              a.fecha.getFullYear(),
-              a.fecha.getMonth(),
-              a.fecha.getDate()
-            );
-            if (soloFecha.getTime() < hoySolo.getTime()) {
-              pasadas.push({ row: a.row, fecha: soloFecha });
-            } else {
-              futurasOHoy.push({ row: a.row, fecha: soloFecha });
-            }
-          });
-
-          futurasOHoy.sort((a, b) => {
-            if (!a.fecha && !b.fecha) return 0;
-            if (!a.fecha) return 1;
-            if (!b.fecha) return -1;
-            return a.fecha - b.fecha;
-          });
-          pasadas.sort((a, b) => {
-            if (!a.fecha && !b.fecha) return 0;
-            if (!a.fecha) return 1;
-            if (!b.fecha) return -1;
-            return a.fecha - b.fecha;
-          });
-
-          // Solo mostramos las reuniones de hoy y futuras
-const filasOrdenadas = futurasOHoy;
-
-          contenedor.innerHTML = "";
-
-          const total = filasOrdenadas.length;
-
-if (total === 0) {
-  resumen.textContent = "0 reuniones asignadas";
-  contenedor.innerHTML = "<p class='empty-msg'>No hay reuniones futuras en este mes.</p>";
-  return;
-}
-
-resumen.textContent =
-  total === 1 ? "1 reunión asignada" : total + " reuniones asignadas";
-
-          filasOrdenadas.forEach((item, index) => {
-            const row = item.row;
-
-            // columnas según tu hoja:
-            // 0: Fecha
-            // 1: Video
-            // 2: Audio
-            // 3: Mic 1
-            // 4: Mic 2
-            // 5: Plataforma
-            // 6: Acomodador de Entrada
-            // 7: Acomodador de Auditorio
-            const fechaTexto = row[0] || "";
-            const video = row[1] || "";
-            const audio = row[2] || "";
-            const mic1 = row[3] || "";
-            const mic2 = row[4] || "";
-            const plataforma = row[5] || "";
-            const acomodadorEntrada = row[6] || "";
-            const acomodadorAuditorio = row[7] || "";
-
-            const card = document.createElement("article");
-            card.className = "assignment-card";
-
-            const esPrimeraFutura = index === 0; // próxima reunión dentro de este mes
-            const esDiaHoy = esHoy(fechaTexto);
-
-            if (esPrimeraFutura) {
-              card.classList.add("destacada");
-            }
-
-            // columna izquierda: fecha + badges
-            const fechaDiv = document.createElement("div");
-            fechaDiv.className = "assignment-date";
-
-            const labelSpan = document.createElement("span");
-            labelSpan.className = "assignment-label";
-            labelSpan.textContent = esPrimeraFutura ? "Próxima reunión" : "Reunión";
-
-            const daySpan = document.createElement("span");
-            daySpan.className = "assignment-day";
-            if (esDiaImportante(fechaTexto)) {
-              daySpan.classList.add("church-day");
-            }
-            daySpan.textContent = fechaTexto;
-
-            const badgesRow = document.createElement("div");
-            badgesRow.className = "badge-row";
-
-            const badgeTipo = document.createElement("div");
-            badgeTipo.className = "badge";
-            const dotTipo = document.createElement("span");
-            dotTipo.className = "badge-dot";
-            const txtTipo = document.createElement("span");
-            txtTipo.textContent = esDiaImportante(fechaTexto)
-              ? "Reunión principal"
-              : "Reunión de entre semana";
-            badgeTipo.appendChild(dotTipo);
-            badgeTipo.appendChild(txtTipo);
-            badgesRow.appendChild(badgeTipo);
-
-            if (esDiaHoy) {
-              const badgeHoy = document.createElement("div");
-              badgeHoy.className = "badge badge-hoy";
-              const dotHoy = document.createElement("span");
-              dotHoy.className = "badge-dot";
-              const txtHoy = document.createElement("span");
-              txtHoy.textContent = "HOY TE TOCA";
-              badgeHoy.appendChild(dotHoy);
-              badgeHoy.appendChild(txtHoy);
-              badgesRow.appendChild(badgeHoy);
-            }
-
-            fechaDiv.appendChild(labelSpan);
-            fechaDiv.appendChild(daySpan);
-            fechaDiv.appendChild(badgesRow);
-
-            // columna derecha: detalles
-            const detallesDiv = document.createElement("div");
-            detallesDiv.className = "assignment-details";
-
-            function crearGrupo(label, value, extraClass) {
-              const group = document.createElement("div");
-              group.className = "detail-group";
-
-              const l = document.createElement("div");
-              l.className = "detail-label";
-              if (extraClass) l.classList.add(extraClass);
-              l.textContent = label;
-
-              const v = document.createElement("div");
-              v.className = "detail-value";
-              v.textContent = value || "-";
-
-              group.appendChild(l);
-              group.appendChild(v);
-              return group;
-            }
-
-            detallesDiv.appendChild(crearGrupo("Audio", audio, "label-audio"));
-            detallesDiv.appendChild(crearGrupo("Video", video, "label-video"));
-            detallesDiv.appendChild(crearGrupo("Mic 1", mic1, "label-mic"));
-            detallesDiv.appendChild(crearGrupo("Mic 2", mic2, "label-mic"));
-            detallesDiv.appendChild(
-              crearGrupo("Plataforma", plataforma, "label-plataforma")
-            );
-            detallesDiv.appendChild(
-              crearGrupo("Acomodador entrada", acomodadorEntrada, "label-entrada")
-            );
-            detallesDiv.appendChild(
-              crearGrupo("Acomodador auditorio", acomodadorAuditorio, "label-auditorio")
-            );
-
-            card.appendChild(fechaDiv);
-            card.appendChild(detallesDiv);
-            contenedor.appendChild(card);
-          });
+        if (mesDefaultKey) {
+          selectMes.value = mesDefaultKey;
+          const [yStr, mStr] = mesDefaultKey.split("-");
+          mesAnioActual = { year: parseInt(yStr, 10), month: parseInt(mStr, 10) };
         }
 
-        // Primera renderización
-        renderizar();
+        selectMes.addEventListener("change", () => {
+          const [yStr, mStr] = selectMes.value.split("-");
+          mesAnioActual = { year: parseInt(yStr, 10), month: parseInt(mStr, 10) };
+          renderizar();
+        });
 
-        // Al cambiar de mes en el selector
-        selectorMes.addEventListener("change", renderizar);
+        // Listeners de vista
+        document.querySelectorAll(".view-tab").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            document.querySelectorAll(".view-tab").forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
+            modoVista = btn.dataset.view || "mes";
+            renderizar();
+          });
+        });
+
+        // Toggles accesibilidad
+        const btnTexto = document.getElementById("btn-texto-grande");
+        const btnAlto = document.getElementById("btn-alto-contraste");
+
+        btnTexto.addEventListener("click", () => {
+          const active = document.body.classList.toggle("modo-texto-grande");
+          btnTexto.classList.toggle("active", active);
+        });
+
+        btnAlto.addEventListener("click", () => {
+          const active = document.body.classList.toggle("modo-alto-contraste");
+          btnAlto.classList.toggle("active", active);
+        });
+
+        renderizar();
       } catch (err) {
         console.error("Error cargando la cartelera:", err);
-        resumen.textContent = "Error al cargar";
-        contenedor.innerHTML =
+        document.getElementById("count-resumen").textContent = "Error al cargar";
+        document.getElementById("assignments").innerHTML =
           "<p class='empty-msg'>Hubo un error al cargar las asignaciones.</p>";
       }
+    }
+
+    function renderizar() {
+      const resumen = document.getElementById("count-resumen");
+      const contenedor = document.getElementById("assignments");
+      const msgVista = document.getElementById("view-message");
+
+      contenedor.innerHTML = "";
+      msgVista.textContent = "";
+
+      if (!todasLasFilas.length || !mesAnioActual) {
+        resumen.textContent = "0 reuniones";
+        contenedor.innerHTML = "<p class='empty-msg'>Sin asignaciones para mostrar.</p>";
+        return;
+      }
+
+      const hoy = soloFecha(new Date());
+
+      // 1) Filtrar por mes/año y quitar pasadas
+      let lista = todasLasFilas.filter(
+        (item) =>
+          mismoMesAnio(item.fecha, mesAnioActual.year, mesAnioActual.month) &&
+          item.fecha.getTime() >= hoy.getTime()
+      );
+
+      // 2) Aplicar modo de vista
+      if (modoVista === "hoy") {
+        const hoyLista = lista.filter((item) => esHoyDate(item.fecha));
+        if (hoyLista.length) {
+          lista = hoyLista;
+          msgVista.textContent = "Mostrando la reunión de hoy.";
+        } else if (lista.length) {
+          lista = [lista[0]];
+          msgVista.textContent =
+            "Hoy no hay reunión. Se muestra la próxima reunión de este mes.";
+        } else {
+          msgVista.textContent = "Hoy no hay reunión programada en este mes.";
+        }
+      } else if (modoVista === "semana") {
+        const semanaFin = new Date(hoy);
+        semanaFin.setDate(hoy.getDate() + 6);
+
+        const semanaLista = lista.filter(
+          (item) =>
+            item.fecha.getTime() >= hoy.getTime() &&
+            item.fecha.getTime() <= semanaFin.getTime()
+        );
+
+        if (semanaLista.length) {
+          lista = semanaLista;
+          msgVista.textContent = "Reuniones de esta semana.";
+        } else {
+          msgVista.textContent = "No hay reuniones esta semana en este mes.";
+          // dejamos lista vacía; abajo se mostrará mensaje
+        }
+      } else {
+        // modo "mes"
+        msgVista.textContent = "";
+      }
+
+      if (!lista.length) {
+        resumen.textContent = "0 reuniones";
+        contenedor.innerHTML = "<p class='empty-msg'>Sin asignaciones futuras para este mes.</p>";
+        return;
+      }
+
+      // 3) Orden por fecha
+      lista.sort((a, b) => a.fecha - b.fecha);
+
+      const total = lista.length;
+      resumen.textContent = total === 1 ? "1 reunión asignada" : total + " reuniones asignadas";
+
+      // 4) Render, agregando separadores Viernes / Domingo y destacando primera reunión
+      let primeraFutura = true;
+      let ultimoTipoDia = null; // "viernes" | "domingo" | otro
+
+      lista.forEach((item) => {
+        const row = item.row;
+        const fechaTexto = row[0] || "";
+        const video = row[1] || "";
+        const audio = row[2] || "";
+        const mic1 = row[3] || "";
+        const mic2 = row[4] || "";
+        const plataforma = row[5] || "";
+        const acomodadorEntrada = row[6] || "";
+        const acomodadorAuditorio = row[7] || "";
+
+        // tipo de día para separador
+        const norm = normalizarTexto(fechaTexto);
+        let tipoDia = null;
+        if (norm.startsWith("viernes")) tipoDia = "viernes";
+        else if (norm.startsWith("domingo")) tipoDia = "domingo";
+
+        if (tipoDia && tipoDia !== ultimoTipoDia) {
+          const sep = document.createElement("div");
+          sep.className = "separator";
+          sep.textContent =
+            tipoDia === "viernes" ? "REUNIONES DE VIERNES" : "REUNIONES DE DOMINGO";
+          contenedor.appendChild(sep);
+          ultimoTipoDia = tipoDia;
+        }
+
+        const card = document.createElement("article");
+        card.className = "assignment-card";
+
+        const esPrimeraFutura = primeraFutura;
+        if (esPrimeraFutura) {
+          card.classList.add("destacada");
+          primeraFutura = false;
+        }
+
+        const esImportante = esDiaImportanteTexto(fechaTexto);
+        const esDiaHoy = esHoyDate(item.fecha);
+
+        // columna izquierda: fecha + badges
+        const fechaDiv = document.createElement("div");
+        fechaDiv.className = "assignment-date";
+
+        const labelSpan = document.createElement("span");
+        labelSpan.className = "assignment-label";
+        labelSpan.textContent = esPrimeraFutura ? "Próxima reunión" : "Reunión";
+
+        const daySpan = document.createElement("span");
+        daySpan.className = "assignment-day";
+        if (esImportante) {
+          daySpan.classList.add("church-day");
+        }
+        daySpan.textContent = fechaTexto;
+
+        const badgesRow = document.createElement("div");
+        badgesRow.className = "badge-row";
+
+        const badgeTipo = document.createElement("div");
+        badgeTipo.className = "badge";
+        const dotTipo = document.createElement("span");
+        dotTipo.className = "badge-dot";
+        const txtTipo = document.createElement("span");
+        txtTipo.textContent = esImportante ? "Reunión principal" : "Reunión de entre semana";
+        badgeTipo.appendChild(dotTipo);
+        badgeTipo.appendChild(txtTipo);
+        badgesRow.appendChild(badgeTipo);
+
+        if (esDiaHoy) {
+          const badgeHoy = document.createElement("div");
+          badgeHoy.className = "badge badge-hoy";
+          const dotHoy = document.createElement("span");
+          dotHoy.className = "badge-dot";
+          const txtHoy = document.createElement("span");
+          txtHoy.textContent = "HOY TE TOCA";
+          badgeHoy.appendChild(dotHoy);
+          badgeHoy.appendChild(txtHoy);
+          badgesRow.appendChild(badgeHoy);
+        }
+
+        fechaDiv.appendChild(labelSpan);
+        fechaDiv.appendChild(daySpan);
+        fechaDiv.appendChild(badgesRow);
+
+        // columna derecha: detalles
+        const detallesDiv = document.createElement("div");
+        detallesDiv.className = "assignment-details";
+
+        function crearGrupo(label, value, extraClass) {
+          const group = document.createElement("div");
+          group.className = "detail-group";
+
+          const l = document.createElement("div");
+          l.className = "detail-label";
+          if (extraClass) l.classList.add(extraClass);
+          l.textContent = label;
+
+          const v = document.createElement("div");
+          v.className = "detail-value";
+          v.textContent = value || "-";
+
+          group.appendChild(l);
+          group.appendChild(v);
+          return group;
+        }
+
+        detallesDiv.appendChild(crearGrupo("Audio", audio, "label-audio"));
+        detallesDiv.appendChild(crearGrupo("Video", video, "label-video"));
+        detallesDiv.appendChild(crearGrupo("Mic 1", mic1, "label-mic"));
+        detallesDiv.appendChild(crearGrupo("Mic 2", mic2, "label-mic"));
+        detallesDiv.appendChild(crearGrupo("Plataforma", plataforma, "label-plataforma"));
+        detallesDiv.appendChild(
+          crearGrupo("Acomodador entrada", acomodadorEntrada, "label-entrada")
+        );
+        detallesDiv.appendChild(
+          crearGrupo("Acomodador auditorio", acomodadorAuditorio, "label-auditorio")
+        );
+
+        card.appendChild(fechaDiv);
+        card.appendChild(detallesDiv);
+        contenedor.appendChild(card);
+      });
     }
 
     cargarCartelera();
