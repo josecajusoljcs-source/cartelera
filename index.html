@@ -445,297 +445,266 @@
   </main>
 
   <script>
-    // === CONFIGURACIÓN DE HOJAS (V3) ===
-// Acá definís cada mes/año con su hoja de Google Sheets
-const SHEETS = {
-  "2025-12": {
-    label: "Diciembre 2025",
-    year: 2025,
-    url: "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337"
-  },
-
-  // Ejemplos para cuando tengas 2026:
-  // "2026-01": {
-  //   label: "Enero 2026",
-  //   year: 2026,
-  //   url: "URL_DEL_CSV_DE_ENERO_2026"
-  // },
-  // "2026-02": {
-  //   label: "Febrero 2026",
-  //   year: 2026,
-  //   url: "URL_DEL_CSV_DE_FEBRERO_2026"
-  // },
-};
-
-let currentSheetKey = "2025-12";
-
-function getCurrentSheet() {
-  return SHEETS[currentSheetKey];
-}
-
-    function parseCSV(text) {
-      const rows = text.trim().split(/\r?\n/);
-      return rows.map((row) => row.split(","));
+  // ==== CONFIGURACIÓN DE HOJAS (ACÁ AGREGÁS 2026 DESPUÉS) ====
+  const SHEETS = {
+    "2025-12": {
+      label: "Diciembre 2025",
+      url: "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337"
     }
+    // Ejemplo para el futuro:
+    // "2026-01": {
+    //   label: "Enero 2026",
+    //   url: "URL_CSV_DE_ENERO_2026"
+    // }
+  };
 
-    function normalizarTexto(str) {
-      return (str || "")
-        .toString()
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/,/g, "")
-        .trim();
-    }
+  let currentSheetKey = "2025-12";
 
-    // Convierte "Viernes 5 de diciembre" en un objeto Date del año actual
-    function parseFechaTexto(fechaTexto) {
-      const limpio = normalizarTexto(fechaTexto);
-      if (!limpio) return null;
-      const partes = limpio.split(" "); // ["viernes","5","de","diciembre"]
-      if (partes.length < 4) return null;
-      const dia = parseInt(partes[1], 10);
-      const mesNombre = partes[3];
+  // Meses en español para leer "Viernes 5 de diciembre"
+  const MESES = {
+    enero: 0, febrero: 1, marzo: 2, abril: 3, mayo: 4, junio: 5,
+    julio: 6, agosto: 7, septiembre: 8, setiembre: 8, octubre: 9,
+    noviembre: 10, diciembre: 11
+  };
 
-      const meses = {
-        enero: 0,
-        febrero: 1,
-        marzo: 2,
-        abril: 3,
-        mayo: 4,
-        junio: 5,
-        julio: 6,
-        agosto: 7,
-        septiembre: 8,
-        setiembre: 8,
-        octubre: 9,
-        noviembre: 10,
-        diciembre: 11
-      };
+  // --- Utilidad: parsear CSV con comillas ---
+  function parseCSV(text) {
+    const rows = text.trim().split(/\r?\n/);
+    return rows.map(row => {
+      const cells = [];
+      let actual = "";
+      let dentroComillas = false;
 
-      const mes = meses[mesNombre];
-      if (isNaN(dia) || mes == null) return null;
+      for (let i = 0; i < row.length; i++) {
+        const c = row[i];
+        if (c === '"') {
+          if (dentroComillas && row[i + 1] === '"') {
+            actual += '"';
+            i++;
+          } else {
+            dentroComillas = !dentroComillas;
+          }
+        } else if (c === "," && !dentroComillas) {
+          cells.push(actual);
+          actual = "";
+        } else {
+          actual += c;
+        }
+      }
+      cells.push(actual);
+      return cells;
+    });
+  }
 
-      const hoy = new Date();
-      const year = hoy.getFullYear();
-      return new Date(year, mes, dia);
-    }
+  // Domingo = reunión principal
+  function esDiaImportante(fechaTexto) {
+    if (!fechaTexto) return false;
+    const f = fechaTexto.toLowerCase();
+    return f.includes("domingo") || f.includes("sábado") || f.includes("sabado");
+  }
 
-    // Devuelve true si la fecha de la fila es "hoy"
-    function esHoy(fechaTexto) {
-      const fecha = parseFechaTexto(fechaTexto);
-      if (!fecha) return false;
-      const hoy = new Date();
-      const soloHoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
-      const soloFecha = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
-      return soloFecha.getTime() === soloHoy.getTime();
-    }
+  // Pasar "Viernes 5 de diciembre" a objeto Date
+  function parseFechaDesdeTexto(fechaTexto) {
+    if (!fechaTexto) return null;
+    const limpio = fechaTexto.toLowerCase().replace(/,/g, "");
+    const partes = limpio.split(/\s+/);
+    const indiceNumero = partes.findIndex(p => /^\d+$/.test(p));
+    if (indiceNumero === -1 || indiceNumero + 1 >= partes.length) return null;
 
-    // Marca domingos y sábados (para color amarillo del título)
-    function esDiaImportante(fechaTexto) {
-      const limpio = normalizarTexto(fechaTexto);
-      return (
-        limpio.startsWith("domingo") ||
-        limpio.startsWith("sabado") ||
-        limpio.startsWith("sábado")
-      );
-    }
+    const dia = parseInt(partes[indiceNumero], 10);
+    const mesNombre = partes[indiceNumero + 2] || partes[indiceNumero + 1];
+    const mes = MESES[mesNombre];
+    if (mes == null) return null;
 
-    async function cargarCartelera() {
-      const resumen = document.getElementById("count-resumen");
-      const contenedor = document.getElementById("assignments");
+    const [anioStr] = currentSheetKey.split("-");
+    const anio = parseInt(anioStr, 10) || (new Date()).getFullYear();
+    return new Date(anio, mes, dia);
+  }
 
-      try {
-        const res = await fetch(CSV_URL);
-        const text = await res.text();
-        const data = parseCSV(text);
+  // Selector de mes / año
+  function initMonthSelect() {
+    const select = document.getElementById("month-select");
+    if (!select) return; // por si no existe todavía
 
-        if (!data || data.length < 2) {
-          resumen.textContent = "0 reuniones";
-          contenedor.innerHTML =
-            "<p class='empty-msg'>Sin asignaciones cargadas.</p>";
-          return;
+    select.innerHTML = "";
+    Object.entries(SHEETS).forEach(([key, sheet]) => {
+      const opt = document.createElement("option");
+      opt.value = key;
+      opt.textContent = sheet.label;
+      if (key === currentSheetKey) opt.selected = true;
+      select.appendChild(opt);
+    });
+
+    select.addEventListener("change", () => {
+      currentSheetKey = select.value;
+      cargarCartelera();
+    });
+  }
+
+  async function cargarCartelera() {
+    const resumen = document.getElementById("count-resumen");
+    const contenedor = document.getElementById("assignments");
+    if (!resumen || !contenedor) return;
+
+    resumen.textContent = "Cargando…";
+    contenedor.innerHTML = "";
+
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    try {
+      const sheet = SHEETS[currentSheetKey];
+      if (!sheet) throw new Error("Hoja no configurada");
+
+      const res = await fetch(sheet.url);
+      if (!res.ok) throw new Error("HTTP " + res.status);
+
+      const text = await res.text();
+      const data = parseCSV(text);
+
+      if (!data || data.length < 2) {
+        resumen.textContent = "0 reuniones";
+        contenedor.innerHTML = "<p class='empty-msg'>Sin asignaciones cargadas.</p>";
+        return;
+      }
+
+      // Saltamos encabezado
+      const filas = data
+        .slice(1)
+        .filter(row => row.some(c => c && c.trim() !== ""));
+
+      const reuniones = filas
+        .map(row => {
+          const fechaTexto = row[0] || "";
+          const fechaDate = parseFechaDesdeTexto(fechaTexto);
+          return {
+            fechaTexto,
+            fechaDate,
+            // OJO: ajustado a tu orden real de columnas:
+            video: row[1] || "",
+            audio: row[2] || "",
+            mic1: row[3] || "",
+            mic2: row[4] || "",
+            plataforma: row[5] || "",
+            acomEntrada: row[6] || "",
+            acomAuditorio: row[7] || ""
+          };
+        })
+        .filter(r => r.fechaDate instanceof Date && !isNaN(r.fechaDate));
+
+      if (!reuniones.length) {
+        resumen.textContent = "0 reuniones";
+        contenedor.innerHTML = "<p class='empty-msg'>Sin asignaciones válidas.</p>";
+        return;
+      }
+
+      // Ordenar por fecha
+      reuniones.sort((a, b) => a.fechaDate - b.fechaDate);
+
+      // Futuras arriba, pasadas abajo
+      const futuras = [];
+      const pasadas = [];
+      reuniones.forEach(r => {
+        if (r.fechaDate < hoy) pasadas.push(r);
+        else futuras.push(r);
+      });
+      const ordenadas = futuras.concat(pasadas);
+
+      contenedor.innerHTML = "";
+
+      ordenadas.forEach((r, index) => {
+        const card = document.createElement("article");
+        card.className = "assignment-card";
+        if (index === 0) card.classList.add("assignment-card-featured");
+
+        // --- Columna de fecha ---
+        const fechaDiv = document.createElement("div");
+        fechaDiv.className = "assignment-date";
+
+        const daySpan = document.createElement("span");
+        daySpan.className = "assignment-day";
+        if (esDiaImportante(r.fechaTexto)) daySpan.classList.add("church-day");
+        daySpan.textContent = r.fechaTexto || "Sin fecha";
+
+        const labelSpan = document.createElement("span");
+        labelSpan.className = "assignment-label";
+        labelSpan.textContent = "Reunión";
+
+        const badge = document.createElement("div");
+        badge.className = "badge";
+        const dot = document.createElement("span");
+        dot.className = "badge-dot";
+        const txt = document.createElement("span");
+        txt.textContent = esDiaImportante(r.fechaTexto)
+          ? "Reunión principal"
+          : "Reunión de entre semana";
+        badge.appendChild(dot);
+        badge.appendChild(txt);
+
+        fechaDiv.appendChild(labelSpan);
+        fechaDiv.appendChild(daySpan);
+        fechaDiv.appendChild(badge);
+
+        // HOY TE TOCA
+        if (r.fechaDate.getTime() === hoy.getTime()) {
+          const hoyPill = document.createElement("div");
+          hoyPill.className = "today-pill";
+          hoyPill.textContent = "HOY TE TOCA";
+          fechaDiv.appendChild(hoyPill);
         }
 
-        // filas de datos (saltamos encabezados)
-        const filasOriginales = data
-          .slice(1)
-          .filter((row) => row.some((cell) => cell && cell.trim() !== ""));
+        // --- Detalles ---
+        const detallesDiv = document.createElement("div");
+        detallesDiv.className = "assignment-details";
 
-        // separo futuras / hoy y pasadas
-        const hoy = new Date();
-        const hoySolo = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+        function addGrupo(label, value, extraClass) {
+          const group = document.createElement("div");
+          group.className = "detail-group";
 
-        const futurasOHoy = [];
-        const pasadas = [];
+          const l = document.createElement("div");
+          l.className = "detail-label";
+          if (extraClass) l.classList.add(extraClass);
+          l.textContent = label;
 
-        filasOriginales.forEach((row) => {
-          const fechaTexto = row[0] || "";
-          const fecha = parseFechaTexto(fechaTexto);
-          if (!fecha) {
-            futurasOHoy.push({ row, fecha: null }); // si no se puede parsear, lo dejo arriba
-            return;
-          }
-          const soloFecha = new Date(
-            fecha.getFullYear(),
-            fecha.getMonth(),
-            fecha.getDate()
-          );
-          if (soloFecha.getTime() < hoySolo.getTime()) {
-            pasadas.push({ row, fecha: soloFecha });
-          } else {
-            futurasOHoy.push({ row, fecha: soloFecha });
-          }
-        });
+          const v = document.createElement("div");
+          v.className = "detail-value";
+          v.textContent = value || "—";
 
-        // ordeno por fecha
-        futurasOHoy.sort((a, b) => {
-          if (!a.fecha && !b.fecha) return 0;
-          if (!a.fecha) return 1;
-          if (!b.fecha) return -1;
-          return a.fecha - b.fecha;
-        });
-        pasadas.sort((a, b) => {
-          if (!a.fecha && !b.fecha) return 0;
-          if (!a.fecha) return 1;
-          if (!b.fecha) return -1;
-          return a.fecha - b.fecha;
-        });
+          group.appendChild(l);
+          group.appendChild(v);
+          detallesDiv.appendChild(group);
+        }
 
-        const filasOrdenadas = [...futurasOHoy, ...pasadas];
+        addGrupo("Audio", r.audio, "label-audio");
+        addGrupo("Video", r.video, "label-video");
+        addGrupo("Mic 1", r.mic1, "label-mic");
+        addGrupo("Mic 2", r.mic2, "label-mic");
+        addGrupo("Plataforma", r.plataforma, "label-plataforma");
+        addGrupo("Acomodador entrada", r.acomEntrada, "label-entrada");
+        addGrupo("Acomodador auditorio", r.acomAuditorio, "label-auditorio");
 
-        contenedor.innerHTML = "";
+        card.appendChild(fechaDiv);
+        card.appendChild(detallesDiv);
+        contenedor.appendChild(card);
+      });
 
-        const total = filasOrdenadas.length;
-        resumen.textContent =
-          total === 1 ? "1 reunión asignada" : total + " reuniones asignadas";
-
-        filasOrdenadas.forEach((item, index) => {
-          const row = item.row;
-
-          // columnas según tu hoja:
-          // 0: Fecha
-          // 1: Video
-          // 2: Audio
-          // 3: Mic 1
-          // 4: Mic 2
-          // 5: Plataforma
-          // 6: Acomodador de Entrada
-          // 7: Acomodador de Auditorio
-          const fechaTexto = row[0] || "";
-          const video = row[1] || "";
-          const audio = row[2] || "";
-          const mic1 = row[3] || "";
-          const mic2 = row[4] || "";
-          const plataforma = row[5] || "";
-          const acomodadorEntrada = row[6] || "";
-          const acomodadorAuditorio = row[7] || "";
-
-          const card = document.createElement("article");
-          card.className = "assignment-card";
-
-          const esPrimeraFutura = index === 0; // próxima reunión
-          const esDiaHoy = esHoy(fechaTexto);
-
-          if (esPrimeraFutura) {
-            card.classList.add("destacada");
-          }
-
-          // columna izquierda: fecha + badges
-          const fechaDiv = document.createElement("div");
-          fechaDiv.className = "assignment-date";
-
-          const labelSpan = document.createElement("span");
-          labelSpan.className = "assignment-label";
-          labelSpan.textContent = esPrimeraFutura ? "Próxima reunión" : "Reunión";
-
-          const daySpan = document.createElement("span");
-          daySpan.className = "assignment-day";
-          if (esDiaImportante(fechaTexto)) {
-            daySpan.classList.add("church-day");
-          }
-          daySpan.textContent = fechaTexto;
-
-          const badgesRow = document.createElement("div");
-          badgesRow.className = "badge-row";
-
-          const badgeTipo = document.createElement("div");
-          badgeTipo.className = "badge";
-          const dotTipo = document.createElement("span");
-          dotTipo.className = "badge-dot";
-          const txtTipo = document.createElement("span");
-          txtTipo.textContent = esDiaImportante(fechaTexto)
-            ? "Reunión principal"
-            : "Reunión de entre semana";
-          badgeTipo.appendChild(dotTipo);
-          badgeTipo.appendChild(txtTipo);
-          badgesRow.appendChild(badgeTipo);
-
-          if (esDiaHoy) {
-            const badgeHoy = document.createElement("div");
-            badgeHoy.className = "badge badge-hoy";
-            const dotHoy = document.createElement("span");
-            dotHoy.className = "badge-dot";
-            const txtHoy = document.createElement("span");
-            txtHoy.textContent = "HOY TE TOCA";
-            badgeHoy.appendChild(dotHoy);
-            badgeHoy.appendChild(txtHoy);
-            badgesRow.appendChild(badgeHoy);
-          }
-
-          fechaDiv.appendChild(labelSpan);
-          fechaDiv.appendChild(daySpan);
-          fechaDiv.appendChild(badgesRow);
-
-          // columna derecha: detalles
-          const detallesDiv = document.createElement("div");
-          detallesDiv.className = "assignment-details";
-
-          function crearGrupo(label, value, extraClass) {
-            const group = document.createElement("div");
-            group.className = "detail-group";
-
-            const l = document.createElement("div");
-            l.className = "detail-label";
-            if (extraClass) l.classList.add(extraClass);
-            l.textContent = label;
-
-            const v = document.createElement("div");
-            v.className = "detail-value";
-            v.textContent = value || "-";
-
-            group.appendChild(l);
-            group.appendChild(v);
-            return group;
-          }
-
-          detallesDiv.appendChild(crearGrupo("Audio", audio, "label-audio"));
-          detallesDiv.appendChild(crearGrupo("Video", video, "label-video"));
-          detallesDiv.appendChild(crearGrupo("Mic 1", mic1, "label-mic"));
-          detallesDiv.appendChild(crearGrupo("Mic 2", mic2, "label-mic"));
-          detallesDiv.appendChild(
-            crearGrupo("Plataforma", plataforma, "label-plataforma")
-          );
-          detallesDiv.appendChild(
-            crearGrupo("Acomodador entrada", acomodadorEntrada, "label-entrada")
-          );
-          detallesDiv.appendChild(
-            crearGrupo("Acomodador auditorio", acomodadorAuditorio, "label-auditorio")
-          );
-
-          card.appendChild(fechaDiv);
-          card.appendChild(detallesDiv);
-          contenedor.appendChild(card);
-        });
-      } catch (err) {
-        console.error("Error cargando la cartelera:", err);
-        resumen.textContent = "Error al cargar";
-        contenedor.innerHTML =
-          "<p class='empty-msg'>Hubo un error al cargar las asignaciones.</p>";
-      }
+      const countText =
+        ordenadas.length === 1
+          ? "1 reunión asignada"
+          : `${ordenadas.length} reuniones asignadas`;
+      resumen.textContent = countText;
+    } catch (err) {
+      console.error("Error cargando la cartelera:", err);
+      resumen.textContent = "Error al cargar";
+      contenedor.innerHTML =
+        "<p class='empty-msg'>Hubo un error al cargar las asignaciones.</p>";
     }
+  }
 
-    cargarCartelera();
-  </script>
+  document.addEventListener("DOMContentLoaded", () => {
+    initMonthSelect();   // llena el selector Mes / año
+    cargarCartelera();   // carga la hoja actual
+  });
+</script>
 </body>
 </html>
