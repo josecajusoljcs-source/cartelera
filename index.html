@@ -645,7 +645,8 @@
             return a.fecha - b.fecha;
           });
 
-          const filasOrdenadas = [...futurasOHoy, ...pasadas];
+          // Solo mostramos las reuniones de hoy y futuras
+const filasOrdenadas = futurasOHoy;
 
           contenedor.innerHTML = "";
 
