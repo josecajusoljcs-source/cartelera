@@ -366,6 +366,49 @@
     font-size: 0.9rem;
   }
 }
+/* Controles superiores (selector de mes/año) */
+.top-controls {
+  margin-top: 0.9rem;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.top-controls .control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+#month-select {
+  background: rgba(15, 23, 42, 0.9);
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  padding: 0.35rem 0.9rem;
+  color: var(--text);
+  font-size: 0.85rem;
+  outline: none;
+  min-width: 170px;
+}
+
+/* En celular que no quede gigante */
+@media (max-width: 640px) {
+  .top-controls {
+    align-items: stretch;
+  }
+
+  .top-controls .control {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  #month-select {
+    width: 100%;
+  }
+}
   </style>
 </head>
 <body>
