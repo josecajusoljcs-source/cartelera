@@ -445,9 +445,33 @@
   </main>
 
   <script>
-    // URL del CSV de tu hoja publicada
-    const CSV_URL =
-      "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337";
+    // === CONFIGURACIÓN DE HOJAS (V3) ===
+// Acá definís cada mes/año con su hoja de Google Sheets
+const SHEETS = {
+  "2025-12": {
+    label: "Diciembre 2025",
+    year: 2025,
+    url: "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337"
+  },
+
+  // Ejemplos para cuando tengas 2026:
+  // "2026-01": {
+  //   label: "Enero 2026",
+  //   year: 2026,
+  //   url: "URL_DEL_CSV_DE_ENERO_2026"
+  // },
+  // "2026-02": {
+  //   label: "Febrero 2026",
+  //   year: 2026,
+  //   url: "URL_DEL_CSV_DE_FEBRERO_2026"
+  // },
+};
+
+let currentSheetKey = "2025-12";
+
+function getCurrentSheet() {
+  return SHEETS[currentSheetKey];
+}
 
     function parseCSV(text) {
       const rows = text.trim().split(/\r?\n/);
