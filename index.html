@@ -420,8 +420,7 @@
         </div>
       </section>
     </section>
-  </main>
-<script>
+  </main><script>
   /************************************************************
    *  CONFIG (editá SOLO estas URLs)
    ************************************************************/
@@ -432,13 +431,23 @@
     "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=112777132";
 
   /************************************************************
+   *  STORAGE KEYS
+   ************************************************************/
+  const LS_KEYS = {
+    monthKey: "cartelera_monthKey",
+    view: "cartelera_view",
+    bigText: "cartelera_bigText",
+    contrast: "cartelera_contrast",
+  };
+
+  /************************************************************
    *  ESTADO
    ************************************************************/
   let todasLasFilas = [];   // [{ row, fecha, fechaTexto, esPasada, usaImagenes }]
   let mesAnioActual = null; // { year, month }
   let modoVista = "mes";    // "mes" | "semana" | "hoy"
 
-  // Mapa: clave (YYYY-MM-DD|normalize(nombre)|Video) -> waLink
+  // Mapa: clave (YYYY-MM-DD|normalize(nombre)|video) -> waLink
   const waLinkPorClave = {};
 
   /************************************************************
@@ -450,15 +459,13 @@
     let cur = "";
     let inQuotes = false;
 
-    // normalizamos saltos
-    const s = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+    const s = (text || "").replace(/\r\n/g, "\n").replace(/\r/g, "\n");
 
     for (let i = 0; i < s.length; i++) {
       const ch = s[i];
       const next = s[i + 1];
 
       if (ch === '"' && inQuotes && next === '"') {
-        // comilla escapada ""
         cur += '"';
         i++;
         continue;
@@ -486,7 +493,6 @@
       cur += ch;
     }
 
-    // último campo
     if (cur.length || row.length) {
       row.push(cur);
       rows.push(row);
@@ -530,6 +536,13 @@
     return date && date.getFullYear() === year && date.getMonth() === month;
   }
 
+  function ymd(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
+
   // Convierte a Date desde:
   // - "Viernes 5 de diciembre 2025"
   // - "05/01/2026"
@@ -551,7 +564,6 @@
     const limpioNorm = normalizarTexto(limpio);
     const partes = limpioNorm.split(" ").filter(Boolean);
 
-    // día = primer número que aparezca
     let dia = null;
     for (const p of partes) {
       const n = parseInt(p, 10);
@@ -585,18 +597,45 @@
     return limpio.startsWith("domingo") || limpio.startsWith("sabado") || limpio.startsWith("sábado");
   }
 
-  function ymd(date) {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, "0");
-    const d = String(date.getDate()).padStart(2, "0");
-    return `${y}-${m}-${d}`;
-  }
-
   function setErrorUI(msg) {
     const resumen = document.getElementById("count-resumen");
     const contenedor = document.getElementById("assignments");
     resumen.textContent = "Error";
     contenedor.innerHTML = `<p class="empty-msg">${msg}</p>`;
+  }
+
+  /************************************************************
+   *  LOCAL STORAGE (persistencia)
+   ************************************************************/
+  function loadPrefs() {
+    const view = localStorage.getItem(LS_KEYS.view);
+    if (view === "mes" || view === "semana" || view === "hoy") modoVista = view;
+
+    const bigText = localStorage.getItem(LS_KEYS.bigText) === "1";
+    const contrast = localStorage.getItem(LS_KEYS.contrast) === "1";
+
+    document.body.classList.toggle("modo-texto-grande", bigText);
+    document.body.classList.toggle("modo-alto-contraste", contrast);
+
+    const btnTexto = document.getElementById("btn-texto-grande");
+    const btnAlto = document.getElementById("btn-alto-contraste");
+    btnTexto.classList.toggle("active", bigText);
+    btnAlto.classList.toggle("active", contrast);
+
+    // activar tab vista
+    document.querySelectorAll(".view-tab").forEach((btn) => {
+      btn.classList.toggle("active", (btn.dataset.view || "mes") === modoVista);
+    });
+  }
+
+  function saveView(view) {
+    localStorage.setItem(LS_KEYS.view, view);
+  }
+  function saveMonthKey(key) {
+    localStorage.setItem(LS_KEYS.monthKey, key);
+  }
+  function saveToggle(key, enabled) {
+    localStorage.setItem(key, enabled ? "1" : "0");
   }
 
   /************************************************************
@@ -608,28 +647,29 @@
     const selectMes = document.getElementById("monthYearSelect");
 
     try {
-      // 1) Pedimos ambos CSV pero sin romper si Recordatorios falla
+      // cargar preferencias de UI primero
+      loadPrefs();
+
+      // Pedimos ambos CSV (cronograma obligatorio, recordatorios opcional)
       const [schRes, remRes] = await Promise.allSettled([
         fetch(SCHEDULE_CSV_URL),
         fetch(REMINDERS_CSV_URL)
       ]);
 
-      // 2) Cronograma: obligatorio
+      // Cronograma: obligatorio
       if (schRes.status !== "fulfilled" || !schRes.value.ok) {
-        setErrorUI("No se pudo cargar el Cronograma (CSV). Revisá el link del cronograma.");
+        setErrorUI("No se pudo cargar el Cronograma (CSV). Revisá el link / publicación de la hoja.");
         return;
       }
 
       const schText = await schRes.value.text();
       const schData = parseCSV(schText);
 
-      // 3) Recordatorios: opcional (si falla, seguimos igual)
+      // Recordatorios: opcional
       if (remRes.status === "fulfilled" && remRes.value.ok) {
         const remText = await remRes.value.text();
         const remData = parseCSV(remText);
 
-        // Esperado: encabezados con "Fecha objetivo", "Nombre", "Rol", "Link WhatsApp"
-        // pero aunque cambie el orden, intentamos detectar columnas por nombre
         const header = (remData[0] || []).map(h => normalizarTexto(h));
         const idxFecha = header.indexOf("fecha objetivo");
         const idxNombre = header.indexOf("nombre");
@@ -646,7 +686,6 @@
             const rol = r[idxRol] || "";
             const link = r[idxLink] || "";
 
-            // Solo guardamos el link para VIDEO (como pediste)
             if (normalizarTexto(rol) === "video" && link && link.startsWith("http")) {
               const key = `${ymd(soloFecha(fecha))}|${normalizarTexto(nombre)}|video`;
               waLinkPorClave[key] = link;
@@ -655,7 +694,7 @@
         }
       }
 
-      // 4) Validación de cronograma
+      // Validación cronograma
       if (!schData || schData.length < 2) {
         resumen.textContent = "0 reuniones";
         contenedor.innerHTML = "<p class='empty-msg'>Sin asignaciones cargadas.</p>";
@@ -669,7 +708,7 @@
       const hoy = soloFecha(new Date());
       todasLasFilas = [];
 
-      const opcionesMesSet = new Map(); // key "year-month" -> label
+      const opcionesMesSet = new Map();
 
       filas.forEach((row) => {
         const fechaTexto = row[0] || "";
@@ -682,7 +721,7 @@
 
         if (!opcionesMesSet.has(key)) opcionesMesSet.set(key, keyObj.label);
 
-        // Columna I (Imágenes) en cronograma: índice 8 (0-based)
+        // Columna I (Imágenes): índice 8 (0-based)
         const usaImagenes = normalizarTexto(row[8] || "") === "si";
 
         todasLasFilas.push({
@@ -694,10 +733,9 @@
         });
       });
 
-      // Ordenar por fecha
       todasLasFilas.sort((a, b) => a.fecha - b.fecha);
 
-      // Construir select mes/año
+      // Construir select mes/año (ordenado)
       const opcionesOrdenadas = Array.from(opcionesMesSet.entries())
         .map(([key, label]) => {
           const [yearStr, monthStr] = key.split("-");
@@ -713,13 +751,21 @@
         selectMes.appendChild(option);
       });
 
-      // Mes por defecto: el de la próxima reunión futura
-      let mesDefaultKey = opcionesOrdenadas.length ? opcionesOrdenadas[0].key : "";
-      for (const fila of todasLasFilas) {
-        if (!fila.esPasada) {
-          const kObj = obtenerMesAnioKey(fila.fecha);
-          mesDefaultKey = kObj.year + "-" + kObj.month;
-          break;
+      // mes por defecto:
+      // 1) si hay guardado en LS y existe -> usarlo
+      // 2) si no, el de la próxima reunión futura
+      const savedMonthKey = localStorage.getItem(LS_KEYS.monthKey);
+      const existeSaved = savedMonthKey && opcionesOrdenadas.some(o => o.key === savedMonthKey);
+
+      let mesDefaultKey = existeSaved ? savedMonthKey : (opcionesOrdenadas.length ? opcionesOrdenadas[0].key : "");
+
+      if (!existeSaved) {
+        for (const fila of todasLasFilas) {
+          if (!fila.esPasada) {
+            const kObj = obtenerMesAnioKey(fila.fecha);
+            mesDefaultKey = kObj.year + "-" + kObj.month;
+            break;
+          }
         }
       }
 
@@ -727,11 +773,13 @@
         selectMes.value = mesDefaultKey;
         const [yStr, mStr] = mesDefaultKey.split("-");
         mesAnioActual = { year: +yStr, month: +mStr };
+        saveMonthKey(mesDefaultKey);
       }
 
       selectMes.addEventListener("change", () => {
         const [yStr, mStr] = selectMes.value.split("-");
         mesAnioActual = { year: +yStr, month: +mStr };
+        saveMonthKey(selectMes.value);
         renderizar();
       });
 
@@ -741,6 +789,7 @@
           document.querySelectorAll(".view-tab").forEach((b) => b.classList.remove("active"));
           btn.classList.add("active");
           modoVista = btn.dataset.view || "mes";
+          saveView(modoVista);
           renderizar();
         });
       });
@@ -752,17 +801,19 @@
       btnTexto.addEventListener("click", () => {
         const active = document.body.classList.toggle("modo-texto-grande");
         btnTexto.classList.toggle("active", active);
+        saveToggle(LS_KEYS.bigText, active);
       });
 
       btnAlto.addEventListener("click", () => {
         const active = document.body.classList.toggle("modo-alto-contraste");
         btnAlto.classList.toggle("active", active);
+        saveToggle(LS_KEYS.contrast, active);
       });
 
       renderizar();
     } catch (err) {
       console.error(err);
-      setErrorUI("Hubo un error cargando la cartelera. (Probable CSV con comas).");
+      setErrorUI("Hubo un error cargando la cartelera. (Revisá publicación/permisos del CSV).");
     }
   }
 
@@ -787,8 +838,9 @@
 
     // Mes y no pasadas
     let lista = todasLasFilas.filter(
-      (item) => mismoMesAnio(item.fecha, mesAnioActual.year, mesAnioActual.month) &&
-              item.fecha.getTime() >= hoy.getTime()
+      (item) =>
+        mismoMesAnio(item.fecha, mesAnioActual.year, mesAnioActual.month) &&
+        item.fecha.getTime() >= hoy.getTime()
     );
 
     // Vista
@@ -808,7 +860,9 @@
       semanaFin.setDate(hoy.getDate() + 6);
 
       const semanaLista = lista.filter(
-        (item) => item.fecha.getTime() >= hoy.getTime() && item.fecha.getTime() <= semanaFin.getTime()
+        (item) =>
+          item.fecha.getTime() >= hoy.getTime() &&
+          item.fecha.getTime() <= semanaFin.getTime()
       );
 
       if (semanaLista.length) {
@@ -827,7 +881,9 @@
 
     lista.sort((a, b) => a.fecha - b.fecha);
 
-    resumen.textContent = lista.length === 1 ? "1 reunión asignada" : `${lista.length} reuniones asignadas`;
+    resumen.textContent = lista.length === 1
+      ? "1 reunión asignada"
+      : `${lista.length} reuniones asignadas`;
 
     let primeraFutura = true;
     let ultimoTipoDia = null;
@@ -868,6 +924,7 @@
       const esImportante = esDiaImportanteTexto(fechaTexto);
       const esDiaHoy = esHoyDate(item.fecha);
 
+      // izquierda (fecha + badges)
       const fechaDiv = document.createElement("div");
       fechaDiv.className = "assignment-date";
 
@@ -895,11 +952,11 @@
         badgesRow.appendChild(badgeHoy);
       }
 
-      // 🖼️ Badge imágenes SOLO si hay "SI" en columna I
+      // 🖼️ Badge imágenes (usa tu clase .badge-img)
       if (item.usaImagenes) {
         const badgeImg = document.createElement("div");
-        badgeImg.className = "badge";
-        badgeImg.innerHTML = `🖼️ <span>Usa imágenes</span>`;
+        badgeImg.className = "badge badge-img";
+        badgeImg.innerHTML = `<span class="badge-dot"></span><span>Usa imágenes</span>`;
         badgesRow.appendChild(badgeImg);
       }
 
@@ -907,6 +964,7 @@
       fechaDiv.appendChild(daySpan);
       fechaDiv.appendChild(badgesRow);
 
+      // derecha (detalles)
       const detallesDiv = document.createElement("div");
       detallesDiv.className = "assignment-details";
 
@@ -936,15 +994,20 @@
       const wa = waLinkPorClave[keyVideo];
 
       if (wa) {
+        const v = videoGroup.querySelector(".detail-value");
+
+        // espacio prolijo
+        const spacer = document.createTextNode("  ");
+        v.appendChild(spacer);
+
         const a = document.createElement("a");
         a.href = wa;
         a.target = "_blank";
         a.rel = "noopener";
-        a.style.marginLeft = "10px";
         a.style.textDecoration = "none";
         a.style.fontSize = "0.85rem";
         a.textContent = "📩 WhatsApp";
-        videoGroup.querySelector(".detail-value").appendChild(a);
+        v.appendChild(a);
       }
 
       detallesDiv.appendChild(videoGroup);
@@ -962,6 +1025,7 @@
 
   cargarCartelera();
 </script>
+
 
 </body>
 </html>
