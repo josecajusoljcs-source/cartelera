@@ -420,7 +420,8 @@
         </div>
       </section>
     </section>
-  </main><script>
+  </main>
+  <script>
   /************************************************************
    *  CONFIG (editá SOLO estas URLs)
    ************************************************************/
@@ -994,21 +995,22 @@
       const wa = waLinkPorClave[keyVideo];
 
       if (wa) {
-        const v = videoGroup.querySelector(".detail-value");
+  const v = videoGroup.querySelector(".detail-value");
 
-        // espacio prolijo
-        const spacer = document.createTextNode("  ");
-        v.appendChild(spacer);
+  const wrap = document.createElement("div");
+  wrap.className = "wa-wrap";
 
-        const a = document.createElement("a");
-        a.href = wa;
-        a.target = "_blank";
-        a.rel = "noopener";
-        a.style.textDecoration = "none";
-        a.style.fontSize = "0.85rem";
-        a.textContent = "📩 WhatsApp";
-        v.appendChild(a);
-      }
+  const a = document.createElement("a");
+  a.className = "wa-btn";
+  a.href = wa;
+  a.target = "_blank";
+  a.rel = "noopener";
+  a.innerHTML = "📩 Abrir WhatsApp";
+
+  wrap.appendChild(a);
+  v.appendChild(wrap);
+}
+
 
       detallesDiv.appendChild(videoGroup);
       detallesDiv.appendChild(crearGrupo("Mic 1", mic1, "label-mic"));
