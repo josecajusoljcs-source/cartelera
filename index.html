@@ -989,26 +989,8 @@
 
       detallesDiv.appendChild(crearGrupo("Audio", audio, "label-audio"));
 
-      // VIDEO + link WA si existe (solo video)
-      const videoGroup = crearGrupo("Video", video, "label-video");
-      const keyVideo = `${ymd(item.fecha)}|${normalizarTexto(video)}|video`;
-      const wa = waLinkPorClave[keyVideo];
+  detallesDiv.appendChild(crearGrupo("Video", video, "label-video"));
 
-      if (wa) {
-  const v = videoGroup.querySelector(".detail-value");
-
-  const wrap = document.createElement("div");
-  wrap.className = "wa-wrap";
-
-  const a = document.createElement("a");
-  a.className = "wa-btn";
-  a.href = wa;
-  a.target = "_blank";
-  a.rel = "noopener";
-  a.innerHTML = "📩 Abrir WhatsApp";
-
-  wrap.appendChild(a);
-  v.appendChild(wrap);
 }
 
 
