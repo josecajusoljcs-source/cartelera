@@ -4,13 +4,11 @@
   <meta charset="UTF-8" />
   <title>Asignaciones para las reuniones</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <style>
     :root {
       --bg: #0f172a;
       --card-bg: #020617;
       --accent: #38bdf8;
-      --accent-soft: rgba(56, 189, 248, 0.2);
       --accent-strong: #facc15;
       --text: #f9fafb;
       --muted: #9ca3af;
@@ -20,10 +18,7 @@
       --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.85);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    * { box-sizing: border-box; margin: 0; padding: 0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
@@ -34,164 +29,50 @@
         radial-gradient(circle at bottom, rgba(250, 204, 21, 0.18), transparent 55%),
         linear-gradient(135deg, #020617, #020617 40%, #020617);
       color: var(--text);
-      padding: 1.5rem;
+      padding: 1.1rem;
       display: flex;
       justify-content: center;
     }
 
-    .page {
-      width: 100%;
-      max-width: 960px;
-    }
+    .page { width: 100%; max-width: 980px; }
 
-    header {
-      text-align: center;
-      margin-bottom: 1.4rem;
-    }
+    header { text-align: center; margin-bottom: 1.1rem; }
 
     header h1 {
-      font-size: clamp(2.1rem, 5vw, 2.7rem);
-      letter-spacing: 0.03em;
-      font-weight: 700;
-      color: #f9fafb;
+      font-size: clamp(2.0rem, 5vw, 2.6rem);
+      letter-spacing: 0.02em;
+      font-weight: 800;
       text-shadow: 0 0 22px rgba(15, 23, 42, 0.9);
       line-height: 1.15;
     }
 
     .pill-bar {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.55rem;
-      padding: 0.35rem 0.9rem;
+      display: inline-flex; align-items: center; gap: .55rem;
+      padding: .35rem .9rem;
       border-radius: 999px;
       background: rgba(15, 23, 42, 0.9);
       border: 1px solid rgba(148, 163, 184, 0.5);
-      margin-top: 0.7rem;
-      font-size: 0.9rem;
+      margin-top: .65rem;
+      font-size: .95rem;
       color: var(--muted);
     }
-
     .pill-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
+      width: 8px; height: 8px; border-radius: 999px;
       background: #22c55e;
       box-shadow: 0 0 12px rgba(34, 197, 94, 0.9);
     }
 
-    .layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      gap: 0.9rem;
-    }
-
-    /* Barra de controles extra */
-    .controls-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.6rem;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0.35rem;
-    }
-
-    .controls-left,
-    .controls-right {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      align-items: center;
-    }
-
-    .select-wrapper {
-      width: 100%;
-      max-width: 260px;
-    }
-
-    .select-label {
-      font-size: 0.75rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 0.25rem;
-    }
-
-    select {
-      width: 100%;
-      border-radius: 999px;
-      padding: 0.45rem 0.9rem;
-      border: 1px solid rgba(148, 163, 184, 0.7);
-      background: rgba(15, 23, 42, 0.96);
-      color: var(--text);
-      font-size: 0.9rem;
-      outline: none;
-    }
-
-    .toggle-btn {
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.7);
-      background: rgba(15, 23, 42, 0.9);
-      color: var(--muted);
-      font-size: 0.78rem;
-      padding: 0.25rem 0.85rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-    }
-
-    .toggle-btn.active {
-      border-color: var(--accent);
-      color: #e0f2fe;
-      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
-    }
-
-    .toggle-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: rgba(148, 163, 184, 0.7);
-    }
-
-    .toggle-btn.active .toggle-dot {
-      background: var(--accent);
-      box-shadow: 0 0 8px rgba(56, 189, 248, 0.8);
-    }
-
-    .view-tabs {
-      display: inline-flex;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.6);
-      background: rgba(15, 23, 42, 0.9);
-      overflow: hidden;
-    }
-
-    .view-tab {
-      padding: 0.25rem 0.75rem;
-      font-size: 0.78rem;
-      color: var(--muted);
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    .view-tab.active {
-      background: rgba(15, 23, 42, 0.96);
-      color: #e5e7eb;
-    }
-
     .card-shell {
-      background: radial-gradient(circle at top left, rgba(148, 163, 184, 0.1), transparent 55%),
-                  radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.95), #020617);
+      background:
+        radial-gradient(circle at top left, rgba(148, 163, 184, 0.1), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.95), #020617);
       border-radius: var(--radius-xl);
       border: 1px solid rgba(148, 163, 184, 0.35);
-      padding: 1.25rem 1.1rem 1.35rem;
+      padding: 1.05rem 1rem 1.15rem;
       box-shadow: var(--shadow-soft);
       position: relative;
       overflow: hidden;
     }
-
     .card-shell::before {
       content: "";
       position: absolute;
@@ -200,136 +81,89 @@
       opacity: 0.9;
       pointer-events: none;
     }
-
-    .card-shell-inner {
-      position: relative;
-      z-index: 1;
-    }
+    .card-shell-inner { position: relative; z-index: 1; }
 
     .section-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0.6rem;
-      gap: 0.75rem;
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom: .6rem; gap:.75rem;
     }
-
     .section-title h2 {
       font-size: 1rem;
       text-transform: uppercase;
-      letter-spacing: 0.18em;
+      letter-spacing: .18em;
       color: var(--muted);
-      font-weight: 600;
+      font-weight: 700;
     }
-
     .section-title span {
-      font-size: 0.9rem;
+      font-size: .95rem;
       color: var(--muted);
-      padding: 0.15rem 0.9rem;
+      padding: .18rem .9rem;
       border-radius: 999px;
       border: 1px solid rgba(148, 163, 184, 0.6);
       background: rgba(15, 23, 42, 0.95);
       white-space: nowrap;
     }
 
-    .view-message {
-      font-size: 0.85rem;
-      color: var(--muted);
-      margin-bottom: 0.4rem;
-    }
-
     .assignments-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1fr);
+      grid-template-columns: 1fr;
       gap: 1rem;
-      max-height: calc(100vh - 260px);
-      overflow-y: auto;
-      padding-right: 0.35rem;
-    }
-
-    .assignments-grid::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .assignments-grid::-webkit-scrollbar-track {
-      background: rgba(15, 23, 42, 0.7);
-      border-radius: 999px;
-    }
-
-    .assignments-grid::-webkit-scrollbar-thumb {
-      background: rgba(148, 163, 184, 0.9);
-      border-radius: 999px;
     }
 
     .assignment-card {
       background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.99));
       border-radius: var(--radius-md);
       border: 1px solid rgba(148, 163, 184, 0.5);
-      padding: 0.85rem 0.8rem 0.8rem;
+      padding: .9rem .9rem .85rem;
       display: grid;
       grid-template-columns: minmax(0, 1.25fr) minmax(0, 2.1fr);
-      gap: 0.4rem 1.1rem;
+      gap: .5rem 1.1rem;
       position: relative;
     }
 
-    /* tarjeta destacada (próxima reunión) - fija arriba al hacer scroll */
+    /* ✅ Próxima reunión destacada + sticky real */
     .assignment-card.destacada {
-      border-color: rgba(56, 189, 248, 0.9);
-      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
+      border-color: rgba(56, 189, 248, 0.95);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.35);
       position: sticky;
-      top: 0;
-      z-index: 2;
-      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 1));
+      top: .6rem;             /* separadita del borde */
+      z-index: 5;
+      background: rgba(2, 6, 23, .92);
+      backdrop-filter: blur(10px);
     }
 
-    .assignment-date {
-      display: flex;
-      flex-direction: column;
-      gap: 0.15rem;
-      font-size: 0.95rem;
-    }
+    .assignment-date { display:flex; flex-direction:column; gap:.15rem; font-size: 1rem; }
 
     .assignment-label {
-      font-size: 0.78rem;
+      font-size: .78rem;
       text-transform: uppercase;
-      letter-spacing: 0.15em;
+      letter-spacing: .15em;
       color: var(--muted);
+      font-weight: 700;
     }
 
     .assignment-day {
-      font-size: 1.05rem;
-      font-weight: 700;
+      font-size: 1.10rem;
+      font-weight: 900;
       color: #f9fafb;
     }
+    .assignment-day.church-day { color: var(--accent-strong); }
 
-    .assignment-day.church-day {
-      color: var(--accent-strong);
-    }
-
-    .badge-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.3rem;
-      margin-top: 0.25rem;
-    }
+    .badge-row { display:flex; flex-wrap:wrap; gap:.35rem; margin-top: .25rem; }
 
     .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      padding: 0.2rem 0.8rem;
+      display:inline-flex; align-items:center; gap:.35rem;
+      padding: .22rem .85rem;
       border-radius: 999px;
       background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.7);
-      font-size: 0.78rem;
+      border: 1px solid rgba(148, 163, 184, 0.65);
+      font-size: .82rem;
       color: var(--muted);
       width: fit-content;
+      font-weight: 600;
     }
-
     .badge-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
+      width: 9px; height: 9px; border-radius: 999px;
       background: var(--accent);
       box-shadow: 0 0 12px rgba(56, 189, 248, 0.9);
     }
@@ -338,8 +172,8 @@
       border-color: #22c55e;
       color: #bbf7d0;
       background: rgba(22, 163, 74, 0.22);
+      font-weight: 800;
     }
-
     .badge-hoy .badge-dot {
       background: #22c55e;
       box-shadow: 0 0 12px rgba(22, 163, 74, 0.9);
@@ -348,658 +182,267 @@
     .assignment-details {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 0.3rem 0.9rem;
-      font-size: 0.9rem;
+      gap: .35rem .95rem;
+      font-size: 0.95rem;
     }
 
-    .detail-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.05rem;
-    }
-
+    .detail-group { display:flex; flex-direction:column; gap:.05rem; }
     .detail-label {
-      font-size: 0.78rem;
+      font-size: .78rem;
       text-transform: uppercase;
-      letter-spacing: 0.13em;
+      letter-spacing: .13em;
       color: var(--muted);
       position: relative;
       padding-left: 1rem;
+      font-weight: 700;
     }
-
     .detail-label::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 50%;
+      content:"";
+      position:absolute; left:0; top:50%;
       transform: translateY(-50%);
-      width: 7px;
-      height: 7px;
+      width: 7px; height: 7px;
       border-radius: 999px;
       background: var(--muted);
     }
 
-    .detail-label.label-audio::before { background: #38bdf8; }
-    .detail-label.label-video::before { background: #a78bfa; }
-    .detail-label.label-mic::before { background: #4ade80; }
-    .detail-label.label-plataforma::before { background: #facc15; }
-    .detail-label.label-entrada::before { background: #fb923c; }
-    .detail-label.label-auditorio::before { background: #fb7185; }
+    .detail-label.label-audio::before { background:#38bdf8; }
+    .detail-label.label-video::before { background:#a78bfa; }
+    .detail-label.label-mic::before { background:#4ade80; }
+    .detail-label.label-plataforma::before { background:#facc15; }
+    .detail-label.label-entrada::before { background:#fb923c; }
+    .detail-label.label-auditorio::before { background:#fb7185; }
 
     .detail-value {
-      font-size: 0.96rem;
-      color: #e5e7eb;
+      font-size: 1.02rem;
+      color:#e5e7eb;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      font-weight: 650;
     }
 
     .empty-msg {
-      font-size: 0.95rem;
+      font-size: 1rem;
       color: var(--muted);
-      padding-top: 0.5rem;
-    }
-
-    .separator {
-      font-size: 0.8rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-top: 0.6rem;
-      margin-bottom: 0.15rem;
-    }
-
-    /* Modo texto grande */
-    body.modo-texto-grande .assignment-day {
-      font-size: 1.2rem;
-    }
-    body.modo-texto-grande .detail-value {
-      font-size: 1.05rem;
-    }
-    body.modo-texto-grande .detail-label {
-      font-size: 0.8rem;
-    }
-    body.modo-texto-grande .assignment-card {
-      padding: 1rem 0.95rem;
-    }
-
-    /* Modo alto contraste */
-    body.modo-alto-contraste {
-      background: #020617;
-    }
-    body.modo-alto-contraste .card-shell {
-      background: #020617;
-    }
-    body.modo-alto-contraste .assignment-card {
-      background: #020617;
-      border-color: rgba(148, 163, 184, 0.9);
-    }
-    body.modo-alto-contraste .section-title h2,
-    body.modo-alto-contraste .detail-label,
-    body.modo-alto-contraste .assignment-label {
-      color: #e5e7eb;
-    }
-
-    /* Responsivo */
-    @media (max-width: 900px) {
-      body {
-        padding: 1rem 0.7rem 1.2rem;
-      }
+      padding: .8rem .2rem 0;
     }
 
     @media (max-width: 640px) {
-      body {
-        padding: 0.8rem 0.4rem 1.2rem;
-      }
+      body { padding: .8rem .45rem 1.1rem; }
 
-      header h1 {
-        font-size: 1.7rem;
-        line-height: 1.2;
-      }
+      header h1 { font-size: 1.85rem; }
 
-      .card-shell {
-        padding: 0.9rem 0.8rem 1rem;
-      }
+      .assignment-card { grid-template-columns: 1fr; }
+      .assignment-details { grid-template-columns: 1fr; }
 
-      .assignments-grid {
-        max-height: none;
-        overflow-y: visible;
-        padding-right: 0;
-      }
-
-      .assignment-card {
-        grid-template-columns: minmax(0, 1fr);
-        padding: 0.9rem 0.85rem;
-      }
-
-      .assignment-details {
-        grid-template-columns: minmax(0, 1fr);
-        row-gap: 0.35rem;
-      }
-
-      .detail-label {
-        font-size: 0.7rem;
-      }
-
-      .detail-value {
-        font-size: 0.9rem;
-      }
-
-      .controls-bar {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .controls-right {
-        justify-content: flex-start;
-      }
+      .detail-label { font-size: .74rem; }
+      .detail-value { font-size: 1.02rem; }
     }
   </style>
 </head>
-
 <body>
   <main class="page">
     <header>
       <h1>Asignaciones para las reuniones</h1>
-
       <div class="pill-bar">
         <span class="pill-dot"></span>
-        <span>Conectado a hoja de cálculo · Actualización automática</span>
+        <span>Actualización automática</span>
       </div>
     </header>
 
-    <section class="layout">
-      <!-- Barra de controles -->
-      <div class="controls-bar">
-        <div class="controls-left">
-          <div class="select-wrapper">
-            <div class="select-label">Mes / año</div>
-            <select id="monthYearSelect"></select>
-          </div>
+    <section class="card-shell">
+      <div class="card-shell-inner">
+        <div class="section-title">
+          <h2>Próximas reuniones</h2>
+          <span id="count-resumen">Cargando…</span>
         </div>
 
-        <div class="controls-right">
-          <div class="view-tabs" aria-label="Ver">
-            <button class="view-tab active" data-view="mes" id="tab-mes">Todo el mes</button>
-            <button class="view-tab" data-view="semana" id="tab-semana">Esta semana</button>
-            <button class="view-tab" data-view="hoy" id="tab-hoy">Hoy</button>
-          </div>
-
-          <button class="toggle-btn" id="btn-texto-grande">
-            <span class="toggle-dot"></span>
-            Texto grande
-          </button>
-
-          <button class="toggle-btn" id="btn-alto-contraste">
-            <span class="toggle-dot"></span>
-            Alto contraste
-          </button>
-        </div>
+        <div id="assignments" class="assignments-grid"></div>
       </div>
-
-      <section class="card-shell">
-        <div class="card-shell-inner">
-          <div class="section-title">
-            <h2>Próximas reuniones</h2>
-            <span id="count-resumen">Cargando…</span>
-          </div>
-
-          <p id="view-message" class="view-message"></p>
-
-          <div id="assignments" class="assignments-grid"></div>
-        </div>
-      </section>
     </section>
   </main>
 
-  <script>
-    // ⚠️ IMPORTANTE:
-    // PONÉ ACÁ LA MISMA URL CSV QUE TIENE HOY TU CARTELERA (la que ya funciona).
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337";
+<script>
+  // 🔧 PONÉ ACÁ TU CSV PUBLICADO (EL MISMO QUE YA USABAS)
+  const CSV_URL =
+    "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337";
 
-    let todasLasFilas = [];   // [{ row, fecha }]
-    let mesAnioActual = null; // { year, month }
-    let modoVista = "mes";    // "mes" | "semana" | "hoy"
+  function parseCSV(text) {
+    const rows = text.trim().split(/\r?\n/);
+    return rows.map(r => r.split(","));
+  }
 
-    function parseCSV(text) {
-      const rows = text.trim().split(/\r?\n/);
-      return rows.map((row) => row.split(","));
-    }
+  function normalizarTexto(str) {
+    return (str || "")
+      .toString()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/,/g, "")
+      .trim();
+  }
 
-    function normalizarTexto(str) {
-      return (str || "")
-        .toString()
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/,/g, "")
-        .trim();
-    }
+  function parseFechaTexto(fechaTexto) {
+    const limpio = normalizarTexto(fechaTexto);
+    if (!limpio) return null;
 
-    // Convierte distintos formatos a Date:
-    // - "Viernes 5 de diciembre"  (asume año actual)
-    // - "Viernes 5 de diciembre 2026"
-    // - "05/01/2026" o "5/1/2026"
-    function parseFechaTexto(fechaTexto) {
-      if (!fechaTexto) return null;
-      const limpio = fechaTexto.toString().trim();
+    const meses = {
+      enero: 0, febrero: 1, marzo: 2, abril: 3, mayo: 4, junio: 5,
+      julio: 6, agosto: 7, septiembre: 8, setiembre: 8, octubre: 9,
+      noviembre: 10, diciembre: 11
+    };
 
-      // 1) dd/mm/yyyy
-      const matchNum = limpio.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
-      if (matchNum) {
-        const d = parseInt(matchNum[1], 10);
-        const m = parseInt(matchNum[2], 10) - 1;
-        let y = parseInt(matchNum[3], 10);
-        if (y < 100) y += 2000;
-        return new Date(y, m, d);
+    // patrón: "... 2 de enero 2026" (año opcional)
+    const m = limpio.match(/(\d{1,2})\s+de\s+([a-zñ]+)(?:\s+(\d{4}))?$/i);
+    if (!m) return null;
+
+    const dia = parseInt(m[1], 10);
+    const mes = meses[m[2]];
+    if (isNaN(dia) || mes == null) return null;
+
+    const year = m[3] ? parseInt(m[3], 10) : new Date().getFullYear();
+    return new Date(year, mes, dia);
+  }
+
+  function esHoy(fechaTexto) {
+    const f = parseFechaTexto(fechaTexto);
+    if (!f) return false;
+    const hoy = new Date();
+    const a = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate()).getTime();
+    const b = new Date(f.getFullYear(), f.getMonth(), f.getDate()).getTime();
+    return a === b;
+  }
+
+  function esDiaImportante(fechaTexto) {
+    const limpio = normalizarTexto(fechaTexto);
+    return limpio.startsWith("domingo") || limpio.startsWith("sabado") || limpio.startsWith("sábado");
+  }
+
+  async function cargarCartelera() {
+    const resumen = document.getElementById("count-resumen");
+    const contenedor = document.getElementById("assignments");
+
+    try {
+      const res = await fetch(CSV_URL);
+      const text = await res.text();
+      const data = parseCSV(text);
+
+      if (!data || data.length < 2) {
+        resumen.textContent = "0 reuniones";
+        contenedor.innerHTML = "<p class='empty-msg'>Sin asignaciones cargadas.</p>";
+        return;
       }
 
-      // 2) "viernes 5 de diciembre" (con o sin año)
-      const limpioNorm = normalizarTexto(limpio);
-      const partes = limpioNorm.split(" ").filter(Boolean);
-      // buscamos primer número como día
-      let dia = null;
-      for (const p of partes) {
-        const n = parseInt(p, 10);
-        if (!isNaN(n)) {
-          dia = n;
-          break;
-        }
-      }
-      if (dia == null) return null;
+      const filas = data.slice(1).filter(r => r.some(c => c && c.trim() !== ""));
 
-      const meses = {
-        enero: 0, febrero: 1, marzo: 2, abril: 3,
-        mayo: 4, junio: 5, julio: 6, agosto: 7,
-        septiembre: 8, setiembre: 8, octubre: 9,
-        noviembre: 10, diciembre: 11
-      };
+      // ✅ ocultar pasadas
+      const hoy = new Date();
+      const hoySolo = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate()).getTime();
 
-      let mes = null;
-      let year = null;
-
-      partes.forEach((p, idx) => {
-        if (meses[p] != null) mes = meses[p];
-        // último token número puede ser año
-        const n = parseInt(p, 10);
-        if (!isNaN(n) && idx === partes.length - 1 && n > 1900) {
-          year = n;
-        }
+      const futuras = [];
+      filas.forEach(row => {
+        const fechaTexto = row[0] || "";
+        const f = parseFechaTexto(fechaTexto);
+        if (!f) return; // si no parsea, la ignoramos para evitar lío
+        const solo = new Date(f.getFullYear(), f.getMonth(), f.getDate()).getTime();
+        if (solo >= hoySolo) futuras.push({ row, fecha: solo, fechaTexto });
       });
 
-      if (mes == null) return null;
-      if (!year) {
-        const hoy = new Date();
-        year = hoy.getFullYear();
-      }
-
-      return new Date(year, mes, dia);
-    }
-
-    function esHoyDate(fecha) {
-      const hoy = new Date();
-      const soloHoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
-      const soloFecha = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
-      return soloFecha.getTime() === soloHoy.getTime();
-    }
-
-    // Marca domingos y sábados (para color amarillo del título)
-    function esDiaImportanteTexto(fechaTexto) {
-      const limpio = normalizarTexto(fechaTexto);
-      return (
-        limpio.startsWith("domingo") ||
-        limpio.startsWith("sabado") ||
-        limpio.startsWith("sábado")
-      );
-    }
-
-    function obtenerMesAnioKey(date) {
-      const meses = [
-        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-        "Julio", "Agosto", "Septiembre", "Octubre",
-        "Noviembre", "Diciembre"
-      ];
-      return {
-        label: meses[date.getMonth()] + " " + date.getFullYear(),
-        month: date.getMonth(),
-        year: date.getFullYear(),
-      };
-    }
-
-    function mismoMesAnio(date, year, month) {
-      return (
-        date &&
-        date.getFullYear() === year &&
-        date.getMonth() === month
-      );
-    }
-
-    function soloFecha(date) {
-      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    }
-
-    async function cargarCartelera() {
-      const resumen = document.getElementById("count-resumen");
-      const contenedor = document.getElementById("assignments");
-      const selectMes = document.getElementById("monthYearSelect");
-
-      try {
-        const res = await fetch(CSV_URL);
-        const text = await res.text();
-        const data = parseCSV(text);
-
-        if (!data || data.length < 2) {
-          resumen.textContent = "0 reuniones";
-          contenedor.innerHTML = "<p class='empty-msg'>Sin asignaciones cargadas.</p>";
-          return;
-        }
-
-        const filas = data
-          .slice(1)
-          .filter((row) => row.some((cell) => cell && cell.trim() !== ""));
-
-        const hoy = soloFecha(new Date());
-        todasLasFilas = [];
-
-        const opcionesMesSet = new Map(); // key "year-month" -> label
-
-        filas.forEach((row) => {
-          const fechaTexto = row[0] || "";
-          const fecha = parseFechaTexto(fechaTexto);
-          if (!fecha) return;
-
-          const dSolo = soloFecha(fecha);
-          const keyObj = obtenerMesAnioKey(fecha);
-          const key = keyObj.year + "-" + keyObj.month;
-
-          if (!opcionesMesSet.has(key)) {
-            opcionesMesSet.set(key, keyObj.label);
-          }
-
-          todasLasFilas.push({
-            row,
-            fecha: dSolo,
-            fechaTexto,
-            esPasada: dSolo.getTime() < hoy.getTime(),
-          });
-        });
-
-        // Ordenar por fecha
-        todasLasFilas.sort((a, b) => a.fecha - b.fecha);
-
-        // Construir select de mes/año (ordenado)
-        const opcionesOrdenadas = Array.from(opcionesMesSet.entries())
-          .map(([key, label]) => {
-            const [yearStr, monthStr] = key.split("-");
-            return {
-              key,
-              label,
-              year: parseInt(yearStr, 10),
-              month: parseInt(monthStr, 10),
-            };
-          })
-          .sort((a, b) => (a.year - b.year) || (a.month - b.month));
-
-        selectMes.innerHTML = "";
-        opcionesOrdenadas.forEach((opt) => {
-          const option = document.createElement("option");
-          option.value = opt.key;
-          option.textContent = opt.label;
-          selectMes.appendChild(option);
-        });
-
-        // Mes por defecto: el de la próxima reunión futura
-        let mesDefaultKey = opcionesOrdenadas.length ? opcionesOrdenadas[0].key : "";
-        for (const fila of todasLasFilas) {
-          if (!fila.esPasada) {
-            const kObj = obtenerMesAnioKey(fila.fecha);
-            mesDefaultKey = kObj.year + "-" + kObj.month;
-            break;
-          }
-        }
-
-        if (mesDefaultKey) {
-          selectMes.value = mesDefaultKey;
-          const [yStr, mStr] = mesDefaultKey.split("-");
-          mesAnioActual = { year: parseInt(yStr, 10), month: parseInt(mStr, 10) };
-        }
-
-        selectMes.addEventListener("change", () => {
-          const [yStr, mStr] = selectMes.value.split("-");
-          mesAnioActual = { year: parseInt(yStr, 10), month: parseInt(mStr, 10) };
-          renderizar();
-        });
-
-        // Listeners de vista
-        document.querySelectorAll(".view-tab").forEach((btn) => {
-          btn.addEventListener("click", () => {
-            document.querySelectorAll(".view-tab").forEach((b) => b.classList.remove("active"));
-            btn.classList.add("active");
-            modoVista = btn.dataset.view || "mes";
-            renderizar();
-          });
-        });
-
-        // Toggles accesibilidad
-        const btnTexto = document.getElementById("btn-texto-grande");
-        const btnAlto = document.getElementById("btn-alto-contraste");
-
-        btnTexto.addEventListener("click", () => {
-          const active = document.body.classList.toggle("modo-texto-grande");
-          btnTexto.classList.toggle("active", active);
-        });
-
-        btnAlto.addEventListener("click", () => {
-          const active = document.body.classList.toggle("modo-alto-contraste");
-          btnAlto.classList.toggle("active", active);
-        });
-
-        renderizar();
-      } catch (err) {
-        console.error("Error cargando la cartelera:", err);
-        document.getElementById("count-resumen").textContent = "Error al cargar";
-        document.getElementById("assignments").innerHTML =
-          "<p class='empty-msg'>Hubo un error al cargar las asignaciones.</p>";
-      }
-    }
-
-    function renderizar() {
-      const resumen = document.getElementById("count-resumen");
-      const contenedor = document.getElementById("assignments");
-      const msgVista = document.getElementById("view-message");
+      futuras.sort((a,b) => a.fecha - b.fecha);
 
       contenedor.innerHTML = "";
-      msgVista.textContent = "";
 
-      if (!todasLasFilas.length || !mesAnioActual) {
+      if (futuras.length === 0) {
         resumen.textContent = "0 reuniones";
-        contenedor.innerHTML = "<p class='empty-msg'>Sin asignaciones para mostrar.</p>";
+        contenedor.innerHTML = "<p class='empty-msg'>No hay reuniones futuras cargadas.</p>";
         return;
       }
 
-      const hoy = soloFecha(new Date());
+      resumen.textContent = futuras.length === 1 ? "1 reunión" : `${futuras.length} reuniones`;
 
-      // 1) Filtrar por mes/año y quitar pasadas
-      let lista = todasLasFilas.filter(
-        (item) =>
-          mismoMesAnio(item.fecha, mesAnioActual.year, mesAnioActual.month) &&
-          item.fecha.getTime() >= hoy.getTime()
-      );
-
-      // 2) Aplicar modo de vista
-      if (modoVista === "hoy") {
-        const hoyLista = lista.filter((item) => esHoyDate(item.fecha));
-        if (hoyLista.length) {
-          lista = hoyLista;
-          msgVista.textContent = "Mostrando la reunión de hoy.";
-        } else if (lista.length) {
-          lista = [lista[0]];
-          msgVista.textContent =
-            "Hoy no hay reunión. Se muestra la próxima reunión de este mes.";
-        } else {
-          msgVista.textContent = "Hoy no hay reunión programada en este mes.";
-        }
-      } else if (modoVista === "semana") {
-        const semanaFin = new Date(hoy);
-        semanaFin.setDate(hoy.getDate() + 6);
-
-        const semanaLista = lista.filter(
-          (item) =>
-            item.fecha.getTime() >= hoy.getTime() &&
-            item.fecha.getTime() <= semanaFin.getTime()
-        );
-
-        if (semanaLista.length) {
-          lista = semanaLista;
-          msgVista.textContent = "Reuniones de esta semana.";
-        } else {
-          msgVista.textContent = "No hay reuniones esta semana en este mes.";
-          // dejamos lista vacía; abajo se mostrará mensaje
-        }
-      } else {
-        // modo "mes"
-        msgVista.textContent = "";
-      }
-
-      if (!lista.length) {
-        resumen.textContent = "0 reuniones";
-        contenedor.innerHTML = "<p class='empty-msg'>Sin asignaciones futuras para este mes.</p>";
-        return;
-      }
-
-      // 3) Orden por fecha
-      lista.sort((a, b) => a.fecha - b.fecha);
-
-      const total = lista.length;
-      resumen.textContent = total === 1 ? "1 reunión asignada" : total + " reuniones asignadas";
-
-      // 4) Render, agregando separadores Viernes / Domingo y destacando primera reunión
-      let primeraFutura = true;
-      let ultimoTipoDia = null; // "viernes" | "domingo" | otro
-
-      lista.forEach((item) => {
+      futuras.forEach((item, index) => {
         const row = item.row;
+
         const fechaTexto = row[0] || "";
         const video = row[1] || "";
         const audio = row[2] || "";
-        const mic1 = row[3] || "";
-        const mic2 = row[4] || "";
+        const mic1  = row[3] || "";
+        const mic2  = row[4] || "";
         const plataforma = row[5] || "";
-        const acomodadorEntrada = row[6] || "";
-        const acomodadorAuditorio = row[7] || "";
-
-        // tipo de día para separador
-        const norm = normalizarTexto(fechaTexto);
-        let tipoDia = null;
-        if (norm.startsWith("viernes")) tipoDia = "viernes";
-        else if (norm.startsWith("domingo")) tipoDia = "domingo";
-
-        if (tipoDia && tipoDia !== ultimoTipoDia) {
-          const sep = document.createElement("div");
-          sep.className = "separator";
-          sep.textContent =
-            tipoDia === "viernes" ? "REUNIONES DE VIERNES" : "REUNIONES DE DOMINGO";
-          contenedor.appendChild(sep);
-          ultimoTipoDia = tipoDia;
-        }
+        const entrada = row[6] || "";
+        const auditorio = row[7] || "";
 
         const card = document.createElement("article");
         card.className = "assignment-card";
+        if (index === 0) card.classList.add("destacada");
 
-        const esPrimeraFutura = primeraFutura;
-        if (esPrimeraFutura) {
-          card.classList.add("destacada");
-          primeraFutura = false;
-        }
-
-        const esImportante = esDiaImportanteTexto(fechaTexto);
-        const esDiaHoy = esHoyDate(item.fecha);
-
-        // columna izquierda: fecha + badges
         const fechaDiv = document.createElement("div");
         fechaDiv.className = "assignment-date";
 
-        const labelSpan = document.createElement("span");
-        labelSpan.className = "assignment-label";
-        labelSpan.textContent = esPrimeraFutura ? "Próxima reunión" : "Reunión";
+        const label = document.createElement("span");
+        label.className = "assignment-label";
+        label.textContent = (index === 0) ? "Próxima reunión" : "Reunión";
 
-        const daySpan = document.createElement("span");
-        daySpan.className = "assignment-day";
-        if (esImportante) {
-          daySpan.classList.add("church-day");
-        }
-        daySpan.textContent = fechaTexto;
+        const day = document.createElement("span");
+        day.className = "assignment-day";
+        if (esDiaImportante(fechaTexto)) day.classList.add("church-day");
+        day.textContent = fechaTexto;
 
-        const badgesRow = document.createElement("div");
-        badgesRow.className = "badge-row";
+        const badges = document.createElement("div");
+        badges.className = "badge-row";
 
         const badgeTipo = document.createElement("div");
         badgeTipo.className = "badge";
-        const dotTipo = document.createElement("span");
-        dotTipo.className = "badge-dot";
-        const txtTipo = document.createElement("span");
-        txtTipo.textContent = esImportante ? "Reunión principal" : "Reunión de entre semana";
-        badgeTipo.appendChild(dotTipo);
-        badgeTipo.appendChild(txtTipo);
-        badgesRow.appendChild(badgeTipo);
+        badgeTipo.innerHTML = `<span class="badge-dot"></span><span>${
+          esDiaImportante(fechaTexto) ? "Reunión principal" : "Reunión de entre semana"
+        }</span>`;
+        badges.appendChild(badgeTipo);
 
-        if (esDiaHoy) {
-          const badgeHoy = document.createElement("div");
-          badgeHoy.className = "badge badge-hoy";
-          const dotHoy = document.createElement("span");
-          dotHoy.className = "badge-dot";
-          const txtHoy = document.createElement("span");
-          txtHoy.textContent = "HOY TE TOCA";
-          badgeHoy.appendChild(dotHoy);
-          badgeHoy.appendChild(txtHoy);
-          badgesRow.appendChild(badgeHoy);
+        if (esHoy(fechaTexto)) {
+          const hoyBadge = document.createElement("div");
+          hoyBadge.className = "badge badge-hoy";
+          hoyBadge.innerHTML = `<span class="badge-dot"></span><span>HOY TE TOCA</span>`;
+          badges.appendChild(hoyBadge);
         }
 
-        fechaDiv.appendChild(labelSpan);
-        fechaDiv.appendChild(daySpan);
-        fechaDiv.appendChild(badgesRow);
+        fechaDiv.appendChild(label);
+        fechaDiv.appendChild(day);
+        fechaDiv.appendChild(badges);
 
-        // columna derecha: detalles
-        const detallesDiv = document.createElement("div");
-        detallesDiv.className = "assignment-details";
+        const detalles = document.createElement("div");
+        detalles.className = "assignment-details";
 
-        function crearGrupo(label, value, extraClass) {
-          const group = document.createElement("div");
-          group.className = "detail-group";
-
-          const l = document.createElement("div");
-          l.className = "detail-label";
-          if (extraClass) l.classList.add(extraClass);
-          l.textContent = label;
-
-          const v = document.createElement("div");
-          v.className = "detail-value";
-          v.textContent = value || "-";
-
-          group.appendChild(l);
-          group.appendChild(v);
-          return group;
+        function grupo(label, value, cls) {
+          const g = document.createElement("div");
+          g.className = "detail-group";
+          g.innerHTML = `
+            <div class="detail-label ${cls || ""}">${label}</div>
+            <div class="detail-value">${(value && value.trim()) ? value : "-"}</div>
+          `;
+          return g;
         }
 
-        detallesDiv.appendChild(crearGrupo("Audio", audio, "label-audio"));
-        detallesDiv.appendChild(crearGrupo("Video", video, "label-video"));
-        detallesDiv.appendChild(crearGrupo("Mic 1", mic1, "label-mic"));
-        detallesDiv.appendChild(crearGrupo("Mic 2", mic2, "label-mic"));
-        detallesDiv.appendChild(crearGrupo("Plataforma", plataforma, "label-plataforma"));
-        detallesDiv.appendChild(
-          crearGrupo("Acomodador entrada", acomodadorEntrada, "label-entrada")
-        );
-        detallesDiv.appendChild(
-          crearGrupo("Acomodador auditorio", acomodadorAuditorio, "label-auditorio")
-        );
+        detalles.appendChild(grupo("Audio", audio, "label-audio"));
+        detalles.appendChild(grupo("Video", video, "label-video"));
+        detalles.appendChild(grupo("Mic 1", mic1, "label-mic"));
+        detalles.appendChild(grupo("Mic 2", mic2, "label-mic"));
+        detalles.appendChild(grupo("Plataforma", plataforma, "label-plataforma"));
+        detalles.appendChild(grupo("Acomodador entrada", entrada, "label-entrada"));
+        detalles.appendChild(grupo("Acomodador auditorio", auditorio, "label-auditorio"));
 
         card.appendChild(fechaDiv);
-        card.appendChild(detallesDiv);
+        card.appendChild(detalles);
         contenedor.appendChild(card);
       });
-    }
 
-    cargarCartelera();
-  </script>
+    } catch (e) {
+      console.error(e);
+      resumen.textContent = "Error";
+      contenedor.innerHTML = "<p class='empty-msg'>Hubo un error al cargar.</p>";
+    }
+  }
+
+  cargarCartelera();
+</script>
 </body>
 </html>
