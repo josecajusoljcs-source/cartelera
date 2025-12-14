@@ -20,12 +20,7 @@
       --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.85);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
 
     body {
       min-height: 100vh;
@@ -39,15 +34,9 @@
       justify-content: center;
     }
 
-    .page {
-      width: 100%;
-      max-width: 960px;
-    }
+    .page { width: 100%; max-width: 960px; }
 
-    header {
-      text-align: center;
-      margin-bottom: 1.4rem;
-    }
+    header { text-align: center; margin-bottom: 1.4rem; }
 
     header h1 {
       font-size: clamp(2.1rem, 5vw, 2.7rem);
@@ -72,20 +61,12 @@
     }
 
     .pill-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: #22c55e;
-      box-shadow: 0 0 12px rgba(34, 197, 94, 0.9);
+      width: 8px; height: 8px; border-radius: 999px;
+      background: #22c55e; box-shadow: 0 0 12px rgba(34, 197, 94, 0.9);
     }
 
-    .layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      gap: 0.9rem;
-    }
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.9rem; }
 
-    /* Barra de controles extra */
     .controls-bar {
       display: flex;
       flex-wrap: wrap;
@@ -95,18 +76,9 @@
       margin-bottom: 0.35rem;
     }
 
-    .controls-left,
-    .controls-right {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      align-items: center;
-    }
+    .controls-left, .controls-right { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
 
-    .select-wrapper {
-      width: 100%;
-      max-width: 260px;
-    }
+    .select-wrapper { width: 100%; max-width: 260px; }
 
     .select-label {
       font-size: 0.75rem;
@@ -146,17 +118,8 @@
       box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
     }
 
-    .toggle-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: rgba(148, 163, 184, 0.7);
-    }
-
-    .toggle-btn.active .toggle-dot {
-      background: var(--accent);
-      box-shadow: 0 0 8px rgba(56, 189, 248, 0.8);
-    }
+    .toggle-dot { width: 7px; height: 7px; border-radius: 999px; background: rgba(148, 163, 184, 0.7); }
+    .toggle-btn.active .toggle-dot { background: var(--accent); box-shadow: 0 0 8px rgba(56, 189, 248, 0.8); }
 
     .view-tabs {
       display: inline-flex;
@@ -176,10 +139,7 @@
       white-space: nowrap;
     }
 
-    .view-tab.active {
-      background: rgba(15, 23, 42, 0.96);
-      color: #e5e7eb;
-    }
+    .view-tab.active { background: rgba(15, 23, 42, 0.96); color: #e5e7eb; }
 
     .card-shell {
       background: radial-gradient(circle at top left, rgba(148, 163, 184, 0.1), transparent 55%),
@@ -201,10 +161,7 @@
       pointer-events: none;
     }
 
-    .card-shell-inner {
-      position: relative;
-      z-index: 1;
-    }
+    .card-shell-inner { position: relative; z-index: 1; }
 
     .section-title {
       display: flex;
@@ -232,11 +189,7 @@
       white-space: nowrap;
     }
 
-    .view-message {
-      font-size: 0.85rem;
-      color: var(--muted);
-      margin-bottom: 0.4rem;
-    }
+    .view-message { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.4rem; }
 
     .assignments-grid {
       display: grid;
@@ -247,19 +200,9 @@
       padding-right: 0.35rem;
     }
 
-    .assignments-grid::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .assignments-grid::-webkit-scrollbar-track {
-      background: rgba(15, 23, 42, 0.7);
-      border-radius: 999px;
-    }
-
-    .assignments-grid::-webkit-scrollbar-thumb {
-      background: rgba(148, 163, 184, 0.9);
-      border-radius: 999px;
-    }
+    .assignments-grid::-webkit-scrollbar { width: 6px; }
+    .assignments-grid::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.7); border-radius: 999px; }
+    .assignments-grid::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.9); border-radius: 999px; }
 
     .assignment-card {
       background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.99));
@@ -272,7 +215,6 @@
       position: relative;
     }
 
-    /* tarjeta destacada (próxima reunión) - fija arriba al hacer scroll */
     .assignment-card.destacada {
       border-color: rgba(56, 189, 248, 0.9);
       box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
@@ -282,36 +224,12 @@
       background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 1));
     }
 
-    .assignment-date {
-      display: flex;
-      flex-direction: column;
-      gap: 0.15rem;
-      font-size: 0.95rem;
-    }
+    .assignment-date { display: flex; flex-direction: column; gap: 0.15rem; font-size: 0.95rem; }
+    .assignment-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); }
+    .assignment-day { font-size: 1.05rem; font-weight: 700; color: #f9fafb; }
+    .assignment-day.church-day { color: var(--accent-strong); }
 
-    .assignment-label {
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      color: var(--muted);
-    }
-
-    .assignment-day {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #f9fafb;
-    }
-
-    .assignment-day.church-day {
-      color: var(--accent-strong);
-    }
-
-    .badge-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.3rem;
-      margin-top: 0.25rem;
-    }
+    .badge-row { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.25rem; }
 
     .badge {
       display: inline-flex;
@@ -327,9 +245,7 @@
     }
 
     .badge-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
+      width: 8px; height: 8px; border-radius: 999px;
       background: var(--accent);
       box-shadow: 0 0 12px rgba(56, 189, 248, 0.9);
     }
@@ -340,10 +256,15 @@
       background: rgba(22, 163, 74, 0.22);
     }
 
-    .badge-hoy .badge-dot {
-      background: #22c55e;
-      box-shadow: 0 0 12px rgba(22, 163, 74, 0.9);
+    .badge-hoy .badge-dot { background: #22c55e; box-shadow: 0 0 12px rgba(22, 163, 74, 0.9); }
+
+    .badge-img {
+      border-color: rgba(250, 204, 21, 0.85);
+      color: #fde68a;
+      background: rgba(250, 204, 21, 0.12);
     }
+
+    .badge-img .badge-dot { background: #facc15; box-shadow: 0 0 12px rgba(250, 204, 21, 0.7); }
 
     .assignment-details {
       display: grid;
@@ -352,11 +273,7 @@
       font-size: 0.9rem;
     }
 
-    .detail-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.05rem;
-    }
+    .detail-group { display: flex; flex-direction: column; gap: 0.05rem; }
 
     .detail-label {
       font-size: 0.78rem;
@@ -394,11 +311,31 @@
       text-overflow: ellipsis;
     }
 
-    .empty-msg {
-      font-size: 0.95rem;
-      color: var(--muted);
-      padding-top: 0.5rem;
+    /* Botón WhatsApp (solo Video) */
+    .wa-wrap { margin-top: 0.35rem; }
+    .wa-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: 999px;
+      border: 1px solid rgba(34, 197, 94, 0.6);
+      background: rgba(34, 197, 94, 0.12);
+      color: #bbf7d0;
+      text-decoration: none;
+      font-size: 0.82rem;
+      cursor: pointer;
+      width: fit-content;
     }
+    .wa-btn:hover { background: rgba(34, 197, 94, 0.18); }
+
+    .wa-muted {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+    }
+
+    .empty-msg { font-size: 0.95rem; color: var(--muted); padding-top: 0.5rem; }
 
     .separator {
       font-size: 0.8rem;
@@ -409,90 +346,31 @@
       margin-bottom: 0.15rem;
     }
 
-    /* Modo texto grande */
-    body.modo-texto-grande .assignment-day {
-      font-size: 1.2rem;
-    }
-    body.modo-texto-grande .detail-value {
-      font-size: 1.05rem;
-    }
-    body.modo-texto-grande .detail-label {
-      font-size: 0.8rem;
-    }
-    body.modo-texto-grande .assignment-card {
-      padding: 1rem 0.95rem;
-    }
+    body.modo-texto-grande .assignment-day { font-size: 1.2rem; }
+    body.modo-texto-grande .detail-value { font-size: 1.05rem; }
+    body.modo-texto-grande .detail-label { font-size: 0.8rem; }
+    body.modo-texto-grande .assignment-card { padding: 1rem 0.95rem; }
 
-    /* Modo alto contraste */
-    body.modo-alto-contraste {
-      background: #020617;
-    }
-    body.modo-alto-contraste .card-shell {
-      background: #020617;
-    }
-    body.modo-alto-contraste .assignment-card {
-      background: #020617;
-      border-color: rgba(148, 163, 184, 0.9);
-    }
+    body.modo-alto-contraste { background: #020617; }
+    body.modo-alto-contraste .card-shell { background: #020617; }
+    body.modo-alto-contraste .assignment-card { background: #020617; border-color: rgba(148, 163, 184, 0.9); }
     body.modo-alto-contraste .section-title h2,
     body.modo-alto-contraste .detail-label,
-    body.modo-alto-contraste .assignment-label {
-      color: #e5e7eb;
-    }
+    body.modo-alto-contraste .assignment-label { color: #e5e7eb; }
 
-    /* Responsivo */
-    @media (max-width: 900px) {
-      body {
-        padding: 1rem 0.7rem 1.2rem;
-      }
-    }
+    @media (max-width: 900px) { body { padding: 1rem 0.7rem 1.2rem; } }
 
     @media (max-width: 640px) {
-      body {
-        padding: 0.8rem 0.4rem 1.2rem;
-      }
-
-      header h1 {
-        font-size: 1.7rem;
-        line-height: 1.2;
-      }
-
-      .card-shell {
-        padding: 0.9rem 0.8rem 1rem;
-      }
-
-      .assignments-grid {
-        max-height: none;
-        overflow-y: visible;
-        padding-right: 0;
-      }
-
-      .assignment-card {
-        grid-template-columns: minmax(0, 1fr);
-        padding: 0.9rem 0.85rem;
-      }
-
-      .assignment-details {
-        grid-template-columns: minmax(0, 1fr);
-        row-gap: 0.35rem;
-      }
-
-      .detail-label {
-        font-size: 0.7rem;
-      }
-
-      .detail-value {
-        font-size: 0.9rem;
-      }
-
-      .controls-bar {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .controls-right {
-        justify-content: flex-start;
-      }
+      body { padding: 0.8rem 0.4rem 1.2rem; }
+      header h1 { font-size: 1.7rem; line-height: 1.2; }
+      .card-shell { padding: 0.9rem 0.8rem 1rem; }
+      .assignments-grid { max-height: none; overflow-y: visible; padding-right: 0; }
+      .assignment-card { grid-template-columns: minmax(0, 1fr); padding: 0.9rem 0.85rem; }
+      .assignment-details { grid-template-columns: minmax(0, 1fr); row-gap: 0.35rem; }
+      .detail-label { font-size: 0.7rem; }
+      .detail-value { font-size: 0.9rem; }
+      .controls-bar { flex-direction: column; align-items: stretch; }
+      .controls-right { justify-content: flex-start; }
     }
   </style>
 </head>
@@ -509,7 +387,6 @@
     </header>
 
     <section class="layout">
-      <!-- Barra de controles -->
       <div class="controls-bar">
         <div class="controls-left">
           <div class="select-wrapper">
@@ -525,15 +402,8 @@
             <button class="view-tab" data-view="hoy" id="tab-hoy">Hoy</button>
           </div>
 
-          <button class="toggle-btn" id="btn-texto-grande">
-            <span class="toggle-dot"></span>
-            Texto grande
-          </button>
-
-          <button class="toggle-btn" id="btn-alto-contraste">
-            <span class="toggle-dot"></span>
-            Alto contraste
-          </button>
+          <button class="toggle-btn" id="btn-texto-grande"><span class="toggle-dot"></span>Texto grande</button>
+          <button class="toggle-btn" id="btn-alto-contraste"><span class="toggle-dot"></span>Alto contraste</button>
         </div>
       </div>
 
@@ -553,17 +423,75 @@
   </main>
 
   <script>
-    // ⚠️ IMPORTANTE:
-    // PONÉ ACÁ LA MISMA URL CSV QUE TIENE HOY TU CARTELERA (la que ya funciona).
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337";
+    /*****************************************************************
+     * CONFIG (editá SOLO estas URLs)
+     *****************************************************************/
 
-    let todasLasFilas = [];   // [{ row, fecha }]
-    let mesAnioActual = null; // { year, month }
-    let modoVista = "mes";    // "mes" | "semana" | "hoy"
+    // Cronograma (la hoja que ya estabas usando)
+    const SCHEDULE_CSV_URL =
+      "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337";
 
+    // Recordatorios (hoja generada por Apps Script)
+    // 👉 Cambiá el gid por el de tu pestaña "Recordatorios"
+    const REMINDERS_CSV_URL =
+      "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=TU_GID_DE_RECORDATORIOS";
+
+    /*****************************************************************
+     * Estado
+     *****************************************************************/
+    let todasLasFilas = [];       // [{ row, fecha, fechaTexto, esPasada, usaImagenes }]
+    let mesAnioActual = null;     // { year, month }
+    let modoVista = "mes";        // "mes" | "semana" | "hoy"
+    let waLinkPorFechaVideo = {}; // key: YYYY-MM-DD|normalize(nombre)|Video -> link
+
+    /*****************************************************************
+     * CSV parser robusto (maneja comillas, comas dentro del texto, etc.)
+     *****************************************************************/
     function parseCSV(text) {
-      const rows = text.trim().split(/\r?\n/);
-      return rows.map((row) => row.split(","));
+      const rows = [];
+      let row = [];
+      let cur = "";
+      let inQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        const next = text[i + 1];
+
+        if (c === '"' && inQuotes && next === '"') {
+          cur += '"';
+          i++;
+          continue;
+        }
+
+        if (c === '"') {
+          inQuotes = !inQuotes;
+          continue;
+        }
+
+        if (c === "," && !inQuotes) {
+          row.push(cur);
+          cur = "";
+          continue;
+        }
+
+        if ((c === "\n" || c === "\r") && !inQuotes) {
+          if (c === "\r" && next === "\n") i++;
+          row.push(cur);
+          rows.push(row);
+          row = [];
+          cur = "";
+          continue;
+        }
+
+        cur += c;
+      }
+
+      if (cur.length || row.length) {
+        row.push(cur);
+        rows.push(row);
+      }
+
+      return rows.filter(r => r.some(cell => (cell || "").trim() !== ""));
     }
 
     function normalizarTexto(str) {
@@ -576,15 +504,14 @@
         .trim();
     }
 
-    // Convierte distintos formatos a Date:
-    // - "Viernes 5 de diciembre"  (asume año actual)
-    // - "Viernes 5 de diciembre 2026"
-    // - "05/01/2026" o "5/1/2026"
+    // Convierte a Date desde:
+    // - "Viernes 5 de diciembre 2025"
+    // - "05/01/2026"
     function parseFechaTexto(fechaTexto) {
       if (!fechaTexto) return null;
       const limpio = fechaTexto.toString().trim();
 
-      // 1) dd/mm/yyyy
+      // dd/mm/yyyy
       const matchNum = limpio.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
       if (matchNum) {
         const d = parseInt(matchNum[1], 10);
@@ -594,17 +521,14 @@
         return new Date(y, m, d);
       }
 
-      // 2) "viernes 5 de diciembre" (con o sin año)
+      // "viernes 5 de diciembre 2025" (con o sin año)
       const limpioNorm = normalizarTexto(limpio);
       const partes = limpioNorm.split(" ").filter(Boolean);
-      // buscamos primer número como día
+
       let dia = null;
       for (const p of partes) {
         const n = parseInt(p, 10);
-        if (!isNaN(n)) {
-          dia = n;
-          break;
-        }
+        if (!isNaN(n)) { dia = n; break; }
       }
       if (dia == null) return null;
 
@@ -620,71 +544,99 @@
 
       partes.forEach((p, idx) => {
         if (meses[p] != null) mes = meses[p];
-        // último token número puede ser año
         const n = parseInt(p, 10);
-        if (!isNaN(n) && idx === partes.length - 1 && n > 1900) {
-          year = n;
-        }
+        if (!isNaN(n) && idx === partes.length - 1 && n > 1900) year = n;
       });
 
       if (mes == null) return null;
-      if (!year) {
-        const hoy = new Date();
-        year = hoy.getFullYear();
-      }
+      if (!year) year = new Date().getFullYear();
 
       return new Date(year, mes, dia);
-    }
-
-    function esHoyDate(fecha) {
-      const hoy = new Date();
-      const soloHoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
-      const soloFecha = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
-      return soloFecha.getTime() === soloHoy.getTime();
-    }
-
-    // Marca domingos y sábados (para color amarillo del título)
-    function esDiaImportanteTexto(fechaTexto) {
-      const limpio = normalizarTexto(fechaTexto);
-      return (
-        limpio.startsWith("domingo") ||
-        limpio.startsWith("sabado") ||
-        limpio.startsWith("sábado")
-      );
-    }
-
-    function obtenerMesAnioKey(date) {
-      const meses = [
-        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-        "Julio", "Agosto", "Septiembre", "Octubre",
-        "Noviembre", "Diciembre"
-      ];
-      return {
-        label: meses[date.getMonth()] + " " + date.getFullYear(),
-        month: date.getMonth(),
-        year: date.getFullYear(),
-      };
-    }
-
-    function mismoMesAnio(date, year, month) {
-      return (
-        date &&
-        date.getFullYear() === year &&
-        date.getMonth() === month
-      );
     }
 
     function soloFecha(date) {
       return new Date(date.getFullYear(), date.getMonth(), date.getDate());
     }
 
+    function esHoyDate(fecha) {
+      const hoy = soloFecha(new Date());
+      const soloF = soloFecha(fecha);
+      return soloF.getTime() === hoy.getTime();
+    }
+
+    function esDiaImportanteTexto(fechaTexto) {
+      const limpio = normalizarTexto(fechaTexto);
+      return limpio.startsWith("domingo") || limpio.startsWith("sabado") || limpio.startsWith("sábado");
+    }
+
+    function obtenerMesAnioKey(date) {
+      const meses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+      return { label: meses[date.getMonth()] + " " + date.getFullYear(), month: date.getMonth(), year: date.getFullYear() };
+    }
+
+    function mismoMesAnio(date, year, month) {
+      return date && date.getFullYear() === year && date.getMonth() === month;
+    }
+
+    function ymd(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    /*****************************************************************
+     * Carga de Recordatorios (para sacar el link WhatsApp del VIDEO)
+     * Columnas esperadas en Recordatorios:
+     * A Fecha objetivo | B Nombre | C Rol | D Teléfono | E Mensaje | F Link WhatsApp ...
+     *****************************************************************/
+    async function cargarRecordatorios() {
+      waLinkPorFechaVideo = {};
+      try {
+        const res = await fetch(REMINDERS_CSV_URL);
+        const text = await res.text();
+        const data = parseCSV(text);
+        if (!data || data.length < 2) return;
+
+        // header
+        const rows = data.slice(1);
+
+        rows.forEach(r => {
+          const fechaTxt = (r[0] || "").trim();
+          const nombre = (r[1] || "").trim();
+          const rol = (r[2] || "").trim();
+          const link = (r[5] || "").trim(); // Link WhatsApp
+
+          if (!fechaTxt || !nombre || !rol || !link) return;
+
+          // parse fecha objetivo desde texto largo (domingo 14 de diciembre 2025)
+          const fecha = parseFechaTexto(fechaTxt);
+          if (!fecha) return;
+
+          const key = `${ymd(soloFecha(fecha))}|${normalizarTexto(nombre)}|${normalizarTexto(rol)}`;
+          waLinkPorFechaVideo[key] = link;
+        });
+      } catch (e) {
+        console.warn("No se pudieron cargar Recordatorios (WhatsApp). Revisá REMINDERS_CSV_URL/gid.", e);
+      }
+    }
+
+    /*****************************************************************
+     * Carga del Cronograma
+     * Espera columnas:
+     * A Fecha | B Video | C Audio | D Mic1 | E Mic2 | F Plataforma | G AcomEntrada | H AcomAuditorio | I Imágenes
+     *****************************************************************/
     async function cargarCartelera() {
       const resumen = document.getElementById("count-resumen");
       const contenedor = document.getElementById("assignments");
       const selectMes = document.getElementById("monthYearSelect");
 
       try {
-        const res = await fetch(CSV_URL);
+        // 1) cargamos recordatorios primero (para tener WA links listos)
+        await cargarRecordatorios();
+
+        // 2) cargamos cronograma
+        const res = await fetch(SCHEDULE_CSV_URL);
         const text = await res.text();
         const data = parseCSV(text);
 
@@ -694,61 +646,46 @@
           return;
         }
 
-        const filas = data
-          .slice(1)
-          .filter((row) => row.some((cell) => cell && cell.trim() !== ""));
-
+        const filas = data.slice(1).filter(row => row.some(cell => cell && cell.trim() !== ""));
         const hoy = soloFecha(new Date());
         todasLasFilas = [];
 
-        const opcionesMesSet = new Map(); // key "year-month" -> label
+        const opcionesMesSet = new Map();
 
-        filas.forEach((row) => {
+        filas.forEach(row => {
           const fechaTexto = row[0] || "";
           const fecha = parseFechaTexto(fechaTexto);
           if (!fecha) return;
 
           const dSolo = soloFecha(fecha);
-          const keyObj = obtenerMesAnioKey(fecha);
+          const keyObj = obtenerMesAnioKey(dSolo);
           const key = keyObj.year + "-" + keyObj.month;
 
-          if (!opcionesMesSet.has(key)) {
-            opcionesMesSet.set(key, keyObj.label);
-          }
+          if (!opcionesMesSet.has(key)) opcionesMesSet.set(key, keyObj.label);
 
-          todasLasFilas.push({
-            row,
-            fecha: dSolo,
-            fechaTexto,
-            esPasada: dSolo.getTime() < hoy.getTime(),
-          });
+          const imagenesRaw = (row[8] || "").toString().trim(); // Columna I
+          const usaImagenes = normalizarTexto(imagenesRaw) === "si";
+
+          todasLasFilas.push({ row, fecha: dSolo, fechaTexto, esPasada: dSolo.getTime() < hoy.getTime(), usaImagenes });
         });
 
-        // Ordenar por fecha
         todasLasFilas.sort((a, b) => a.fecha - b.fecha);
 
-        // Construir select de mes/año (ordenado)
         const opcionesOrdenadas = Array.from(opcionesMesSet.entries())
           .map(([key, label]) => {
             const [yearStr, monthStr] = key.split("-");
-            return {
-              key,
-              label,
-              year: parseInt(yearStr, 10),
-              month: parseInt(monthStr, 10),
-            };
+            return { key, label, year: parseInt(yearStr, 10), month: parseInt(monthStr, 10) };
           })
           .sort((a, b) => (a.year - b.year) || (a.month - b.month));
 
         selectMes.innerHTML = "";
-        opcionesOrdenadas.forEach((opt) => {
+        opcionesOrdenadas.forEach(opt => {
           const option = document.createElement("option");
           option.value = opt.key;
           option.textContent = opt.label;
           selectMes.appendChild(option);
         });
 
-        // Mes por defecto: el de la próxima reunión futura
         let mesDefaultKey = opcionesOrdenadas.length ? opcionesOrdenadas[0].key : "";
         for (const fila of todasLasFilas) {
           if (!fila.esPasada) {
@@ -770,17 +707,15 @@
           renderizar();
         });
 
-        // Listeners de vista
-        document.querySelectorAll(".view-tab").forEach((btn) => {
+        document.querySelectorAll(".view-tab").forEach(btn => {
           btn.addEventListener("click", () => {
-            document.querySelectorAll(".view-tab").forEach((b) => b.classList.remove("active"));
+            document.querySelectorAll(".view-tab").forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
             modoVista = btn.dataset.view || "mes";
             renderizar();
           });
         });
 
-        // Toggles accesibilidad
         const btnTexto = document.getElementById("btn-texto-grande");
         const btnAlto = document.getElementById("btn-alto-contraste");
 
@@ -819,23 +754,18 @@
 
       const hoy = soloFecha(new Date());
 
-      // 1) Filtrar por mes/año y quitar pasadas
       let lista = todasLasFilas.filter(
-        (item) =>
-          mismoMesAnio(item.fecha, mesAnioActual.year, mesAnioActual.month) &&
-          item.fecha.getTime() >= hoy.getTime()
+        item => mismoMesAnio(item.fecha, mesAnioActual.year, mesAnioActual.month) && item.fecha.getTime() >= hoy.getTime()
       );
 
-      // 2) Aplicar modo de vista
       if (modoVista === "hoy") {
-        const hoyLista = lista.filter((item) => esHoyDate(item.fecha));
+        const hoyLista = lista.filter(item => esHoyDate(item.fecha));
         if (hoyLista.length) {
           lista = hoyLista;
           msgVista.textContent = "Mostrando la reunión de hoy.";
         } else if (lista.length) {
           lista = [lista[0]];
-          msgVista.textContent =
-            "Hoy no hay reunión. Se muestra la próxima reunión de este mes.";
+          msgVista.textContent = "Hoy no hay reunión. Se muestra la próxima reunión de este mes.";
         } else {
           msgVista.textContent = "Hoy no hay reunión programada en este mes.";
         }
@@ -843,22 +773,13 @@
         const semanaFin = new Date(hoy);
         semanaFin.setDate(hoy.getDate() + 6);
 
-        const semanaLista = lista.filter(
-          (item) =>
-            item.fecha.getTime() >= hoy.getTime() &&
-            item.fecha.getTime() <= semanaFin.getTime()
-        );
-
+        const semanaLista = lista.filter(item => item.fecha.getTime() >= hoy.getTime() && item.fecha.getTime() <= semanaFin.getTime());
         if (semanaLista.length) {
           lista = semanaLista;
           msgVista.textContent = "Reuniones de esta semana.";
         } else {
           msgVista.textContent = "No hay reuniones esta semana en este mes.";
-          // dejamos lista vacía; abajo se mostrará mensaje
         }
-      } else {
-        // modo "mes"
-        msgVista.textContent = "";
       }
 
       if (!lista.length) {
@@ -867,18 +788,17 @@
         return;
       }
 
-      // 3) Orden por fecha
       lista.sort((a, b) => a.fecha - b.fecha);
 
       const total = lista.length;
       resumen.textContent = total === 1 ? "1 reunión asignada" : total + " reuniones asignadas";
 
-      // 4) Render, agregando separadores Viernes / Domingo y destacando primera reunión
       let primeraFutura = true;
-      let ultimoTipoDia = null; // "viernes" | "domingo" | otro
+      let ultimoTipoDia = null;
 
-      lista.forEach((item) => {
+      lista.forEach(item => {
         const row = item.row;
+
         const fechaTexto = row[0] || "";
         const video = row[1] || "";
         const audio = row[2] || "";
@@ -888,7 +808,6 @@
         const acomodadorEntrada = row[6] || "";
         const acomodadorAuditorio = row[7] || "";
 
-        // tipo de día para separador
         const norm = normalizarTexto(fechaTexto);
         let tipoDia = null;
         if (norm.startsWith("viernes")) tipoDia = "viernes";
@@ -897,8 +816,7 @@
         if (tipoDia && tipoDia !== ultimoTipoDia) {
           const sep = document.createElement("div");
           sep.className = "separator";
-          sep.textContent =
-            tipoDia === "viernes" ? "REUNIONES DE VIERNES" : "REUNIONES DE DOMINGO";
+          sep.textContent = tipoDia === "viernes" ? "REUNIONES DE VIERNES" : "REUNIONES DE DOMINGO";
           contenedor.appendChild(sep);
           ultimoTipoDia = tipoDia;
         }
@@ -915,7 +833,6 @@
         const esImportante = esDiaImportanteTexto(fechaTexto);
         const esDiaHoy = esHoyDate(item.fecha);
 
-        // columna izquierda: fecha + badges
         const fechaDiv = document.createElement("div");
         fechaDiv.className = "assignment-date";
 
@@ -925,9 +842,7 @@
 
         const daySpan = document.createElement("span");
         daySpan.className = "assignment-day";
-        if (esImportante) {
-          daySpan.classList.add("church-day");
-        }
+        if (esImportante) daySpan.classList.add("church-day");
         daySpan.textContent = fechaTexto;
 
         const badgesRow = document.createElement("div");
@@ -955,11 +870,52 @@
           badgesRow.appendChild(badgeHoy);
         }
 
+        if (item.usaImagenes) {
+          const badgeImg = document.createElement("div");
+          badgeImg.className = "badge badge-img";
+          const dotImg = document.createElement("span");
+          dotImg.className = "badge-dot";
+          const txtImg = document.createElement("span");
+          txtImg.textContent = "🖼️ Usa imágenes";
+          badgeImg.appendChild(dotImg);
+          badgeImg.appendChild(txtImg);
+          badgesRow.appendChild(badgeImg);
+        }
+
         fechaDiv.appendChild(labelSpan);
         fechaDiv.appendChild(daySpan);
         fechaDiv.appendChild(badgesRow);
 
-        // columna derecha: detalles
+        // Botón WhatsApp SOLO para Video
+        const waWrap = document.createElement("div");
+        waWrap.className = "wa-wrap";
+
+        const keyWa = `${ymd(item.fecha)}|${normalizarTexto(video)}|${normalizarTexto("Video")}`;
+        const waLink = waLinkPorFechaVideo[keyWa];
+
+        if (video && waLink) {
+          const waBtn = document.createElement("a");
+          waBtn.className = "wa-btn";
+          waBtn.href = waLink;
+          waBtn.target = "_blank";
+          waBtn.rel = "noopener noreferrer";
+          waBtn.textContent = "📲 WhatsApp (Video)";
+          waWrap.appendChild(waBtn);
+
+          const hint = document.createElement("div");
+          hint.className = "wa-muted";
+          hint.textContent = "Abre el mensaje listo del 🤖 Bot Cartelera Reuniones.";
+          waWrap.appendChild(hint);
+
+          fechaDiv.appendChild(waWrap);
+        } else if (video) {
+          const hint = document.createElement("div");
+          hint.className = "wa-muted";
+          hint.textContent = "WhatsApp (Video): generá Recordatorios para que aparezca el link.";
+          waWrap.appendChild(hint);
+          fechaDiv.appendChild(waWrap);
+        }
+
         const detallesDiv = document.createElement("div");
         detallesDiv.className = "assignment-details";
 
@@ -986,12 +942,8 @@
         detallesDiv.appendChild(crearGrupo("Mic 1", mic1, "label-mic"));
         detallesDiv.appendChild(crearGrupo("Mic 2", mic2, "label-mic"));
         detallesDiv.appendChild(crearGrupo("Plataforma", plataforma, "label-plataforma"));
-        detallesDiv.appendChild(
-          crearGrupo("Acomodador entrada", acomodadorEntrada, "label-entrada")
-        );
-        detallesDiv.appendChild(
-          crearGrupo("Acomodador auditorio", acomodadorAuditorio, "label-auditorio")
-        );
+        detallesDiv.appendChild(crearGrupo("Acomodador entrada", acomodadorEntrada, "label-entrada"));
+        detallesDiv.appendChild(crearGrupo("Acomodador auditorio", acomodadorAuditorio, "label-auditorio"));
 
         card.appendChild(fechaDiv);
         card.appendChild(detallesDiv);
