@@ -421,538 +421,547 @@
       </section>
     </section>
   </main>
+<script>
+  /************************************************************
+   *  CONFIG (editá SOLO estas URLs)
+   ************************************************************/
+  const SCHEDULE_CSV_URL =
+    "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337";
 
-  <script>
-    /*****************************************************************
-     * CONFIG (editá SOLO estas URLs)
-     *****************************************************************/
+  const REMINDERS_CSV_URL =
+    "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=112777132";
 
-    // Cronograma (la hoja que ya estabas usando)
-    const SCHEDULE_CSV_URL =
-      "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337";
+  /************************************************************
+   *  ESTADO
+   ************************************************************/
+  let todasLasFilas = [];   // [{ row, fecha, fechaTexto, esPasada, usaImagenes }]
+  let mesAnioActual = null; // { year, month }
+  let modoVista = "mes";    // "mes" | "semana" | "hoy"
 
-    // Recordatorios (hoja generada por Apps Script)
-    // 👉 Cambiá el gid por el de tu pestaña "Recordatorios"
-    const REMINDERS_CSV_URL =
-      const REMINDERS_CSV_URL =
-  "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=112777132";
+  // Mapa: clave (YYYY-MM-DD|normalize(nombre)|Video) -> waLink
+  const waLinkPorClave = {};
 
-    /*****************************************************************
-     * Estado
-     *****************************************************************/
-    let todasLasFilas = [];       // [{ row, fecha, fechaTexto, esPasada, usaImagenes }]
-    let mesAnioActual = null;     // { year, month }
-    let modoVista = "mes";        // "mes" | "semana" | "hoy"
-    let waLinkPorFechaVideo = {}; // key: YYYY-MM-DD|normalize(nombre)|Video -> link
+  /************************************************************
+   *  CSV PARSER ROBUSTO (maneja comillas + comas dentro)
+   ************************************************************/
+  function parseCSV(text) {
+    const rows = [];
+    let row = [];
+    let cur = "";
+    let inQuotes = false;
 
-    /*****************************************************************
-     * CSV parser robusto (maneja comillas, comas dentro del texto, etc.)
-     *****************************************************************/
-    function parseCSV(text) {
-      const rows = [];
-      let row = [];
-      let cur = "";
-      let inQuotes = false;
+    // normalizamos saltos
+    const s = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
 
-      for (let i = 0; i < text.length; i++) {
-        const c = text[i];
-        const next = text[i + 1];
+    for (let i = 0; i < s.length; i++) {
+      const ch = s[i];
+      const next = s[i + 1];
 
-        if (c === '"' && inQuotes && next === '"') {
-          cur += '"';
-          i++;
-          continue;
-        }
-
-        if (c === '"') {
-          inQuotes = !inQuotes;
-          continue;
-        }
-
-        if (c === "," && !inQuotes) {
-          row.push(cur);
-          cur = "";
-          continue;
-        }
-
-        if ((c === "\n" || c === "\r") && !inQuotes) {
-          if (c === "\r" && next === "\n") i++;
-          row.push(cur);
-          rows.push(row);
-          row = [];
-          cur = "";
-          continue;
-        }
-
-        cur += c;
+      if (ch === '"' && inQuotes && next === '"') {
+        // comilla escapada ""
+        cur += '"';
+        i++;
+        continue;
       }
 
-      if (cur.length || row.length) {
+      if (ch === '"') {
+        inQuotes = !inQuotes;
+        continue;
+      }
+
+      if (ch === "," && !inQuotes) {
+        row.push(cur);
+        cur = "";
+        continue;
+      }
+
+      if (ch === "\n" && !inQuotes) {
         row.push(cur);
         rows.push(row);
+        row = [];
+        cur = "";
+        continue;
       }
 
-      return rows.filter(r => r.some(cell => (cell || "").trim() !== ""));
+      cur += ch;
     }
 
-    function normalizarTexto(str) {
-      return (str || "")
-        .toString()
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/,/g, "")
-        .trim();
+    // último campo
+    if (cur.length || row.length) {
+      row.push(cur);
+      rows.push(row);
     }
 
-    // Convierte a Date desde:
-    // - "Viernes 5 de diciembre 2025"
-    // - "05/01/2026"
-    function parseFechaTexto(fechaTexto) {
-      if (!fechaTexto) return null;
-      const limpio = fechaTexto.toString().trim();
+    return rows;
+  }
 
-      // dd/mm/yyyy
-      const matchNum = limpio.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
-      if (matchNum) {
-        const d = parseInt(matchNum[1], 10);
-        const m = parseInt(matchNum[2], 10) - 1;
-        let y = parseInt(matchNum[3], 10);
-        if (y < 100) y += 2000;
-        return new Date(y, m, d);
+  function normalizarTexto(str) {
+    return (str || "")
+      .toString()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim();
+  }
+
+  function soloFecha(date) {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  }
+
+  function esHoyDate(fecha) {
+    const hoy = soloFecha(new Date());
+    const f = soloFecha(fecha);
+    return f.getTime() === hoy.getTime();
+  }
+
+  function obtenerMesAnioKey(date) {
+    const meses = [
+      "Enero","Febrero","Marzo","Abril","Mayo","Junio",
+      "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
+    ];
+    return {
+      label: meses[date.getMonth()] + " " + date.getFullYear(),
+      month: date.getMonth(),
+      year: date.getFullYear(),
+    };
+  }
+
+  function mismoMesAnio(date, year, month) {
+    return date && date.getFullYear() === year && date.getMonth() === month;
+  }
+
+  // Convierte a Date desde:
+  // - "Viernes 5 de diciembre 2025"
+  // - "05/01/2026"
+  function parseFechaTexto(fechaTexto) {
+    if (!fechaTexto) return null;
+    const limpio = fechaTexto.toString().trim();
+
+    // 1) dd/mm/yyyy
+    const matchNum = limpio.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+    if (matchNum) {
+      const d = parseInt(matchNum[1], 10);
+      const m = parseInt(matchNum[2], 10) - 1;
+      let y = parseInt(matchNum[3], 10);
+      if (y < 100) y += 2000;
+      return new Date(y, m, d);
+    }
+
+    // 2) "viernes 5 de diciembre 2025" (con o sin año)
+    const limpioNorm = normalizarTexto(limpio);
+    const partes = limpioNorm.split(" ").filter(Boolean);
+
+    // día = primer número que aparezca
+    let dia = null;
+    for (const p of partes) {
+      const n = parseInt(p, 10);
+      if (!isNaN(n)) { dia = n; break; }
+    }
+    if (dia == null) return null;
+
+    const meses = {
+      enero:0, febrero:1, marzo:2, abril:3, mayo:4, junio:5,
+      julio:6, agosto:7, septiembre:8, setiembre:8, octubre:9,
+      noviembre:10, diciembre:11
+    };
+
+    let mes = null;
+    let year = null;
+
+    partes.forEach((p, idx) => {
+      if (meses[p] != null) mes = meses[p];
+      const n = parseInt(p, 10);
+      if (!isNaN(n) && idx === partes.length - 1 && n > 1900) year = n;
+    });
+
+    if (mes == null) return null;
+    if (!year) year = new Date().getFullYear();
+
+    return new Date(year, mes, dia);
+  }
+
+  function esDiaImportanteTexto(fechaTexto) {
+    const limpio = normalizarTexto(fechaTexto);
+    return limpio.startsWith("domingo") || limpio.startsWith("sabado") || limpio.startsWith("sábado");
+  }
+
+  function ymd(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
+
+  function setErrorUI(msg) {
+    const resumen = document.getElementById("count-resumen");
+    const contenedor = document.getElementById("assignments");
+    resumen.textContent = "Error";
+    contenedor.innerHTML = `<p class="empty-msg">${msg}</p>`;
+  }
+
+  /************************************************************
+   *  CARGA
+   ************************************************************/
+  async function cargarCartelera() {
+    const resumen = document.getElementById("count-resumen");
+    const contenedor = document.getElementById("assignments");
+    const selectMes = document.getElementById("monthYearSelect");
+
+    try {
+      // 1) Pedimos ambos CSV pero sin romper si Recordatorios falla
+      const [schRes, remRes] = await Promise.allSettled([
+        fetch(SCHEDULE_CSV_URL),
+        fetch(REMINDERS_CSV_URL)
+      ]);
+
+      // 2) Cronograma: obligatorio
+      if (schRes.status !== "fulfilled" || !schRes.value.ok) {
+        setErrorUI("No se pudo cargar el Cronograma (CSV). Revisá el link del cronograma.");
+        return;
       }
 
-      // "viernes 5 de diciembre 2025" (con o sin año)
-      const limpioNorm = normalizarTexto(limpio);
-      const partes = limpioNorm.split(" ").filter(Boolean);
+      const schText = await schRes.value.text();
+      const schData = parseCSV(schText);
 
-      let dia = null;
-      for (const p of partes) {
-        const n = parseInt(p, 10);
-        if (!isNaN(n)) { dia = n; break; }
+      // 3) Recordatorios: opcional (si falla, seguimos igual)
+      if (remRes.status === "fulfilled" && remRes.value.ok) {
+        const remText = await remRes.value.text();
+        const remData = parseCSV(remText);
+
+        // Esperado: encabezados con "Fecha objetivo", "Nombre", "Rol", "Link WhatsApp"
+        // pero aunque cambie el orden, intentamos detectar columnas por nombre
+        const header = (remData[0] || []).map(h => normalizarTexto(h));
+        const idxFecha = header.indexOf("fecha objetivo");
+        const idxNombre = header.indexOf("nombre");
+        const idxRol = header.indexOf("rol");
+        const idxLink = header.indexOf("link whatsapp");
+
+        if (idxFecha >= 0 && idxNombre >= 0 && idxRol >= 0 && idxLink >= 0) {
+          remData.slice(1).forEach(r => {
+            const fechaTxt = r[idxFecha] || "";
+            const fecha = parseFechaTexto(fechaTxt);
+            if (!fecha) return;
+
+            const nombre = r[idxNombre] || "";
+            const rol = r[idxRol] || "";
+            const link = r[idxLink] || "";
+
+            // Solo guardamos el link para VIDEO (como pediste)
+            if (normalizarTexto(rol) === "video" && link && link.startsWith("http")) {
+              const key = `${ymd(soloFecha(fecha))}|${normalizarTexto(nombre)}|video`;
+              waLinkPorClave[key] = link;
+            }
+          });
+        }
       }
-      if (dia == null) return null;
 
-      const meses = {
-        enero: 0, febrero: 1, marzo: 2, abril: 3,
-        mayo: 4, junio: 5, julio: 6, agosto: 7,
-        septiembre: 8, setiembre: 8, octubre: 9,
-        noviembre: 10, diciembre: 11
-      };
+      // 4) Validación de cronograma
+      if (!schData || schData.length < 2) {
+        resumen.textContent = "0 reuniones";
+        contenedor.innerHTML = "<p class='empty-msg'>Sin asignaciones cargadas.</p>";
+        return;
+      }
 
-      let mes = null;
-      let year = null;
+      const filas = schData
+        .slice(1)
+        .filter((row) => row.some((cell) => cell && cell.trim() !== ""));
 
-      partes.forEach((p, idx) => {
-        if (meses[p] != null) mes = meses[p];
-        const n = parseInt(p, 10);
-        if (!isNaN(n) && idx === partes.length - 1 && n > 1900) year = n;
+      const hoy = soloFecha(new Date());
+      todasLasFilas = [];
+
+      const opcionesMesSet = new Map(); // key "year-month" -> label
+
+      filas.forEach((row) => {
+        const fechaTexto = row[0] || "";
+        const fecha = parseFechaTexto(fechaTexto);
+        if (!fecha) return;
+
+        const dSolo = soloFecha(fecha);
+        const keyObj = obtenerMesAnioKey(dSolo);
+        const key = keyObj.year + "-" + keyObj.month;
+
+        if (!opcionesMesSet.has(key)) opcionesMesSet.set(key, keyObj.label);
+
+        // Columna I (Imágenes) en cronograma: índice 8 (0-based)
+        const usaImagenes = normalizarTexto(row[8] || "") === "si";
+
+        todasLasFilas.push({
+          row,
+          fecha: dSolo,
+          fechaTexto,
+          esPasada: dSolo.getTime() < hoy.getTime(),
+          usaImagenes
+        });
       });
 
-      if (mes == null) return null;
-      if (!year) year = new Date().getFullYear();
+      // Ordenar por fecha
+      todasLasFilas.sort((a, b) => a.fecha - b.fecha);
 
-      return new Date(year, mes, dia);
-    }
+      // Construir select mes/año
+      const opcionesOrdenadas = Array.from(opcionesMesSet.entries())
+        .map(([key, label]) => {
+          const [yearStr, monthStr] = key.split("-");
+          return { key, label, year: +yearStr, month: +monthStr };
+        })
+        .sort((a, b) => (a.year - b.year) || (a.month - b.month));
 
-    function soloFecha(date) {
-      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    }
+      selectMes.innerHTML = "";
+      opcionesOrdenadas.forEach((opt) => {
+        const option = document.createElement("option");
+        option.value = opt.key;
+        option.textContent = opt.label;
+        selectMes.appendChild(option);
+      });
 
-    function esHoyDate(fecha) {
-      const hoy = soloFecha(new Date());
-      const soloF = soloFecha(fecha);
-      return soloF.getTime() === hoy.getTime();
-    }
-
-    function esDiaImportanteTexto(fechaTexto) {
-      const limpio = normalizarTexto(fechaTexto);
-      return limpio.startsWith("domingo") || limpio.startsWith("sabado") || limpio.startsWith("sábado");
-    }
-
-    function obtenerMesAnioKey(date) {
-      const meses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-      return { label: meses[date.getMonth()] + " " + date.getFullYear(), month: date.getMonth(), year: date.getFullYear() };
-    }
-
-    function mismoMesAnio(date, year, month) {
-      return date && date.getFullYear() === year && date.getMonth() === month;
-    }
-
-    function ymd(date) {
-      const y = date.getFullYear();
-      const m = String(date.getMonth() + 1).padStart(2, "0");
-      const d = String(date.getDate()).padStart(2, "0");
-      return `${y}-${m}-${d}`;
-    }
-
-    /*****************************************************************
-     * Carga de Recordatorios (para sacar el link WhatsApp del VIDEO)
-     * Columnas esperadas en Recordatorios:
-     * A Fecha objetivo | B Nombre | C Rol | D Teléfono | E Mensaje | F Link WhatsApp ...
-     *****************************************************************/
-    async function cargarRecordatorios() {
-      waLinkPorFechaVideo = {};
-      try {
-        const res = await fetch(REMINDERS_CSV_URL);
-        const text = await res.text();
-        const data = parseCSV(text);
-        if (!data || data.length < 2) return;
-
-        // header
-        const rows = data.slice(1);
-
-        rows.forEach(r => {
-          const fechaTxt = (r[0] || "").trim();
-          const nombre = (r[1] || "").trim();
-          const rol = (r[2] || "").trim();
-          const link = (r[5] || "").trim(); // Link WhatsApp
-
-          if (!fechaTxt || !nombre || !rol || !link) return;
-
-          // parse fecha objetivo desde texto largo (domingo 14 de diciembre 2025)
-          const fecha = parseFechaTexto(fechaTxt);
-          if (!fecha) return;
-
-          const key = `${ymd(soloFecha(fecha))}|${normalizarTexto(nombre)}|${normalizarTexto(rol)}`;
-          waLinkPorFechaVideo[key] = link;
-        });
-      } catch (e) {
-        console.warn("No se pudieron cargar Recordatorios (WhatsApp). Revisá REMINDERS_CSV_URL/gid.", e);
+      // Mes por defecto: el de la próxima reunión futura
+      let mesDefaultKey = opcionesOrdenadas.length ? opcionesOrdenadas[0].key : "";
+      for (const fila of todasLasFilas) {
+        if (!fila.esPasada) {
+          const kObj = obtenerMesAnioKey(fila.fecha);
+          mesDefaultKey = kObj.year + "-" + kObj.month;
+          break;
+        }
       }
-    }
 
-    /*****************************************************************
-     * Carga del Cronograma
-     * Espera columnas:
-     * A Fecha | B Video | C Audio | D Mic1 | E Mic2 | F Plataforma | G AcomEntrada | H AcomAuditorio | I Imágenes
-     *****************************************************************/
-    async function cargarCartelera() {
-      const resumen = document.getElementById("count-resumen");
-      const contenedor = document.getElementById("assignments");
-      const selectMes = document.getElementById("monthYearSelect");
+      if (mesDefaultKey) {
+        selectMes.value = mesDefaultKey;
+        const [yStr, mStr] = mesDefaultKey.split("-");
+        mesAnioActual = { year: +yStr, month: +mStr };
+      }
 
-      try {
-        // 1) cargamos recordatorios primero (para tener WA links listos)
-        await cargarRecordatorios();
+      selectMes.addEventListener("change", () => {
+        const [yStr, mStr] = selectMes.value.split("-");
+        mesAnioActual = { year: +yStr, month: +mStr };
+        renderizar();
+      });
 
-        // 2) cargamos cronograma
-        const res = await fetch(SCHEDULE_CSV_URL);
-        const text = await res.text();
-        const data = parseCSV(text);
-
-        if (!data || data.length < 2) {
-          resumen.textContent = "0 reuniones";
-          contenedor.innerHTML = "<p class='empty-msg'>Sin asignaciones cargadas.</p>";
-          return;
-        }
-
-        const filas = data.slice(1).filter(row => row.some(cell => cell && cell.trim() !== ""));
-        const hoy = soloFecha(new Date());
-        todasLasFilas = [];
-
-        const opcionesMesSet = new Map();
-
-        filas.forEach(row => {
-          const fechaTexto = row[0] || "";
-          const fecha = parseFechaTexto(fechaTexto);
-          if (!fecha) return;
-
-          const dSolo = soloFecha(fecha);
-          const keyObj = obtenerMesAnioKey(dSolo);
-          const key = keyObj.year + "-" + keyObj.month;
-
-          if (!opcionesMesSet.has(key)) opcionesMesSet.set(key, keyObj.label);
-
-          const imagenesRaw = (row[8] || "").toString().trim(); // Columna I
-          const usaImagenes = normalizarTexto(imagenesRaw) === "si";
-
-          todasLasFilas.push({ row, fecha: dSolo, fechaTexto, esPasada: dSolo.getTime() < hoy.getTime(), usaImagenes });
-        });
-
-        todasLasFilas.sort((a, b) => a.fecha - b.fecha);
-
-        const opcionesOrdenadas = Array.from(opcionesMesSet.entries())
-          .map(([key, label]) => {
-            const [yearStr, monthStr] = key.split("-");
-            return { key, label, year: parseInt(yearStr, 10), month: parseInt(monthStr, 10) };
-          })
-          .sort((a, b) => (a.year - b.year) || (a.month - b.month));
-
-        selectMes.innerHTML = "";
-        opcionesOrdenadas.forEach(opt => {
-          const option = document.createElement("option");
-          option.value = opt.key;
-          option.textContent = opt.label;
-          selectMes.appendChild(option);
-        });
-
-        let mesDefaultKey = opcionesOrdenadas.length ? opcionesOrdenadas[0].key : "";
-        for (const fila of todasLasFilas) {
-          if (!fila.esPasada) {
-            const kObj = obtenerMesAnioKey(fila.fecha);
-            mesDefaultKey = kObj.year + "-" + kObj.month;
-            break;
-          }
-        }
-
-        if (mesDefaultKey) {
-          selectMes.value = mesDefaultKey;
-          const [yStr, mStr] = mesDefaultKey.split("-");
-          mesAnioActual = { year: parseInt(yStr, 10), month: parseInt(mStr, 10) };
-        }
-
-        selectMes.addEventListener("change", () => {
-          const [yStr, mStr] = selectMes.value.split("-");
-          mesAnioActual = { year: parseInt(yStr, 10), month: parseInt(mStr, 10) };
+      // Tabs vista
+      document.querySelectorAll(".view-tab").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".view-tab").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          modoVista = btn.dataset.view || "mes";
           renderizar();
         });
+      });
 
-        document.querySelectorAll(".view-tab").forEach(btn => {
-          btn.addEventListener("click", () => {
-            document.querySelectorAll(".view-tab").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-            modoVista = btn.dataset.view || "mes";
-            renderizar();
-          });
-        });
+      // Toggles
+      const btnTexto = document.getElementById("btn-texto-grande");
+      const btnAlto = document.getElementById("btn-alto-contraste");
 
-        const btnTexto = document.getElementById("btn-texto-grande");
-        const btnAlto = document.getElementById("btn-alto-contraste");
+      btnTexto.addEventListener("click", () => {
+        const active = document.body.classList.toggle("modo-texto-grande");
+        btnTexto.classList.toggle("active", active);
+      });
 
-        btnTexto.addEventListener("click", () => {
-          const active = document.body.classList.toggle("modo-texto-grande");
-          btnTexto.classList.toggle("active", active);
-        });
+      btnAlto.addEventListener("click", () => {
+        const active = document.body.classList.toggle("modo-alto-contraste");
+        btnAlto.classList.toggle("active", active);
+      });
 
-        btnAlto.addEventListener("click", () => {
-          const active = document.body.classList.toggle("modo-alto-contraste");
-          btnAlto.classList.toggle("active", active);
-        });
+      renderizar();
+    } catch (err) {
+      console.error(err);
+      setErrorUI("Hubo un error cargando la cartelera. (Probable CSV con comas).");
+    }
+  }
 
-        renderizar();
-      } catch (err) {
-        console.error("Error cargando la cartelera:", err);
-        document.getElementById("count-resumen").textContent = "Error al cargar";
-        document.getElementById("assignments").innerHTML =
-          "<p class='empty-msg'>Hubo un error al cargar las asignaciones.</p>";
-      }
+  /************************************************************
+   *  RENDER
+   ************************************************************/
+  function renderizar() {
+    const resumen = document.getElementById("count-resumen");
+    const contenedor = document.getElementById("assignments");
+    const msgVista = document.getElementById("view-message");
+
+    contenedor.innerHTML = "";
+    msgVista.textContent = "";
+
+    if (!todasLasFilas.length || !mesAnioActual) {
+      resumen.textContent = "0 reuniones";
+      contenedor.innerHTML = "<p class='empty-msg'>Sin asignaciones para mostrar.</p>";
+      return;
     }
 
-    function renderizar() {
-      const resumen = document.getElementById("count-resumen");
-      const contenedor = document.getElementById("assignments");
-      const msgVista = document.getElementById("view-message");
+    const hoy = soloFecha(new Date());
 
-      contenedor.innerHTML = "";
-      msgVista.textContent = "";
+    // Mes y no pasadas
+    let lista = todasLasFilas.filter(
+      (item) => mismoMesAnio(item.fecha, mesAnioActual.year, mesAnioActual.month) &&
+              item.fecha.getTime() >= hoy.getTime()
+    );
 
-      if (!todasLasFilas.length || !mesAnioActual) {
-        resumen.textContent = "0 reuniones";
-        contenedor.innerHTML = "<p class='empty-msg'>Sin asignaciones para mostrar.</p>";
-        return;
+    // Vista
+    if (modoVista === "hoy") {
+      const hoyLista = lista.filter((item) => esHoyDate(item.fecha));
+      if (hoyLista.length) {
+        lista = hoyLista;
+        msgVista.textContent = "Mostrando la reunión de hoy.";
+      } else if (lista.length) {
+        lista = [lista[0]];
+        msgVista.textContent = "Hoy no hay reunión. Se muestra la próxima reunión de este mes.";
+      } else {
+        msgVista.textContent = "Hoy no hay reunión programada en este mes.";
       }
+    } else if (modoVista === "semana") {
+      const semanaFin = new Date(hoy);
+      semanaFin.setDate(hoy.getDate() + 6);
 
-      const hoy = soloFecha(new Date());
-
-      let lista = todasLasFilas.filter(
-        item => mismoMesAnio(item.fecha, mesAnioActual.year, mesAnioActual.month) && item.fecha.getTime() >= hoy.getTime()
+      const semanaLista = lista.filter(
+        (item) => item.fecha.getTime() >= hoy.getTime() && item.fecha.getTime() <= semanaFin.getTime()
       );
 
-      if (modoVista === "hoy") {
-        const hoyLista = lista.filter(item => esHoyDate(item.fecha));
-        if (hoyLista.length) {
-          lista = hoyLista;
-          msgVista.textContent = "Mostrando la reunión de hoy.";
-        } else if (lista.length) {
-          lista = [lista[0]];
-          msgVista.textContent = "Hoy no hay reunión. Se muestra la próxima reunión de este mes.";
-        } else {
-          msgVista.textContent = "Hoy no hay reunión programada en este mes.";
-        }
-      } else if (modoVista === "semana") {
-        const semanaFin = new Date(hoy);
-        semanaFin.setDate(hoy.getDate() + 6);
-
-        const semanaLista = lista.filter(item => item.fecha.getTime() >= hoy.getTime() && item.fecha.getTime() <= semanaFin.getTime());
-        if (semanaLista.length) {
-          lista = semanaLista;
-          msgVista.textContent = "Reuniones de esta semana.";
-        } else {
-          msgVista.textContent = "No hay reuniones esta semana en este mes.";
-        }
+      if (semanaLista.length) {
+        lista = semanaLista;
+        msgVista.textContent = "Reuniones de esta semana.";
+      } else {
+        msgVista.textContent = "No hay reuniones esta semana en este mes.";
       }
-
-      if (!lista.length) {
-        resumen.textContent = "0 reuniones";
-        contenedor.innerHTML = "<p class='empty-msg'>Sin asignaciones futuras para este mes.</p>";
-        return;
-      }
-
-      lista.sort((a, b) => a.fecha - b.fecha);
-
-      const total = lista.length;
-      resumen.textContent = total === 1 ? "1 reunión asignada" : total + " reuniones asignadas";
-
-      let primeraFutura = true;
-      let ultimoTipoDia = null;
-
-      lista.forEach(item => {
-        const row = item.row;
-
-        const fechaTexto = row[0] || "";
-        const video = row[1] || "";
-        const audio = row[2] || "";
-        const mic1 = row[3] || "";
-        const mic2 = row[4] || "";
-        const plataforma = row[5] || "";
-        const acomodadorEntrada = row[6] || "";
-        const acomodadorAuditorio = row[7] || "";
-
-        const norm = normalizarTexto(fechaTexto);
-        let tipoDia = null;
-        if (norm.startsWith("viernes")) tipoDia = "viernes";
-        else if (norm.startsWith("domingo")) tipoDia = "domingo";
-
-        if (tipoDia && tipoDia !== ultimoTipoDia) {
-          const sep = document.createElement("div");
-          sep.className = "separator";
-          sep.textContent = tipoDia === "viernes" ? "REUNIONES DE VIERNES" : "REUNIONES DE DOMINGO";
-          contenedor.appendChild(sep);
-          ultimoTipoDia = tipoDia;
-        }
-
-        const card = document.createElement("article");
-        card.className = "assignment-card";
-
-        const esPrimeraFutura = primeraFutura;
-        if (esPrimeraFutura) {
-          card.classList.add("destacada");
-          primeraFutura = false;
-        }
-
-        const esImportante = esDiaImportanteTexto(fechaTexto);
-        const esDiaHoy = esHoyDate(item.fecha);
-
-        const fechaDiv = document.createElement("div");
-        fechaDiv.className = "assignment-date";
-
-        const labelSpan = document.createElement("span");
-        labelSpan.className = "assignment-label";
-        labelSpan.textContent = esPrimeraFutura ? "Próxima reunión" : "Reunión";
-
-        const daySpan = document.createElement("span");
-        daySpan.className = "assignment-day";
-        if (esImportante) daySpan.classList.add("church-day");
-        daySpan.textContent = fechaTexto;
-
-        const badgesRow = document.createElement("div");
-        badgesRow.className = "badge-row";
-
-        const badgeTipo = document.createElement("div");
-        badgeTipo.className = "badge";
-        const dotTipo = document.createElement("span");
-        dotTipo.className = "badge-dot";
-        const txtTipo = document.createElement("span");
-        txtTipo.textContent = esImportante ? "Reunión principal" : "Reunión de entre semana";
-        badgeTipo.appendChild(dotTipo);
-        badgeTipo.appendChild(txtTipo);
-        badgesRow.appendChild(badgeTipo);
-
-        if (esDiaHoy) {
-          const badgeHoy = document.createElement("div");
-          badgeHoy.className = "badge badge-hoy";
-          const dotHoy = document.createElement("span");
-          dotHoy.className = "badge-dot";
-          const txtHoy = document.createElement("span");
-          txtHoy.textContent = "HOY TE TOCA";
-          badgeHoy.appendChild(dotHoy);
-          badgeHoy.appendChild(txtHoy);
-          badgesRow.appendChild(badgeHoy);
-        }
-
-        if (item.usaImagenes) {
-          const badgeImg = document.createElement("div");
-          badgeImg.className = "badge badge-img";
-          const dotImg = document.createElement("span");
-          dotImg.className = "badge-dot";
-          const txtImg = document.createElement("span");
-          txtImg.textContent = "🖼️ Usa imágenes";
-          badgeImg.appendChild(dotImg);
-          badgeImg.appendChild(txtImg);
-          badgesRow.appendChild(badgeImg);
-        }
-
-        fechaDiv.appendChild(labelSpan);
-        fechaDiv.appendChild(daySpan);
-        fechaDiv.appendChild(badgesRow);
-
-        // Botón WhatsApp SOLO para Video
-        const waWrap = document.createElement("div");
-        waWrap.className = "wa-wrap";
-
-        const keyWa = `${ymd(item.fecha)}|${normalizarTexto(video)}|${normalizarTexto("Video")}`;
-        const waLink = waLinkPorFechaVideo[keyWa];
-
-        if (video && waLink) {
-          const waBtn = document.createElement("a");
-          waBtn.className = "wa-btn";
-          waBtn.href = waLink;
-          waBtn.target = "_blank";
-          waBtn.rel = "noopener noreferrer";
-          waBtn.textContent = "📲 WhatsApp (Video)";
-          waWrap.appendChild(waBtn);
-
-          const hint = document.createElement("div");
-          hint.className = "wa-muted";
-          hint.textContent = "Abre el mensaje listo del 🤖 Bot Cartelera Reuniones.";
-          waWrap.appendChild(hint);
-
-          fechaDiv.appendChild(waWrap);
-        } else if (video) {
-          const hint = document.createElement("div");
-          hint.className = "wa-muted";
-          hint.textContent = "WhatsApp (Video): generá Recordatorios para que aparezca el link.";
-          waWrap.appendChild(hint);
-          fechaDiv.appendChild(waWrap);
-        }
-
-        const detallesDiv = document.createElement("div");
-        detallesDiv.className = "assignment-details";
-
-        function crearGrupo(label, value, extraClass) {
-          const group = document.createElement("div");
-          group.className = "detail-group";
-
-          const l = document.createElement("div");
-          l.className = "detail-label";
-          if (extraClass) l.classList.add(extraClass);
-          l.textContent = label;
-
-          const v = document.createElement("div");
-          v.className = "detail-value";
-          v.textContent = value || "-";
-
-          group.appendChild(l);
-          group.appendChild(v);
-          return group;
-        }
-
-        detallesDiv.appendChild(crearGrupo("Audio", audio, "label-audio"));
-        detallesDiv.appendChild(crearGrupo("Video", video, "label-video"));
-        detallesDiv.appendChild(crearGrupo("Mic 1", mic1, "label-mic"));
-        detallesDiv.appendChild(crearGrupo("Mic 2", mic2, "label-mic"));
-        detallesDiv.appendChild(crearGrupo("Plataforma", plataforma, "label-plataforma"));
-        detallesDiv.appendChild(crearGrupo("Acomodador entrada", acomodadorEntrada, "label-entrada"));
-        detallesDiv.appendChild(crearGrupo("Acomodador auditorio", acomodadorAuditorio, "label-auditorio"));
-
-        card.appendChild(fechaDiv);
-        card.appendChild(detallesDiv);
-        contenedor.appendChild(card);
-      });
     }
 
-    cargarCartelera();
-  </script>
+    if (!lista.length) {
+      resumen.textContent = "0 reuniones";
+      contenedor.innerHTML = "<p class='empty-msg'>Sin asignaciones futuras para este mes.</p>";
+      return;
+    }
+
+    lista.sort((a, b) => a.fecha - b.fecha);
+
+    resumen.textContent = lista.length === 1 ? "1 reunión asignada" : `${lista.length} reuniones asignadas`;
+
+    let primeraFutura = true;
+    let ultimoTipoDia = null;
+
+    lista.forEach((item) => {
+      const row = item.row;
+      const fechaTexto = row[0] || "";
+      const video = row[1] || "";
+      const audio = row[2] || "";
+      const mic1 = row[3] || "";
+      const mic2 = row[4] || "";
+      const plataforma = row[5] || "";
+      const acomodadorEntrada = row[6] || "";
+      const acomodadorAuditorio = row[7] || "";
+
+      const norm = normalizarTexto(fechaTexto);
+      let tipoDia = null;
+      if (norm.startsWith("viernes")) tipoDia = "viernes";
+      else if (norm.startsWith("domingo")) tipoDia = "domingo";
+
+      if (tipoDia && tipoDia !== ultimoTipoDia) {
+        const sep = document.createElement("div");
+        sep.className = "separator";
+        sep.textContent = tipoDia === "viernes" ? "REUNIONES DE VIERNES" : "REUNIONES DE DOMINGO";
+        contenedor.appendChild(sep);
+        ultimoTipoDia = tipoDia;
+      }
+
+      const card = document.createElement("article");
+      card.className = "assignment-card";
+
+      const esPrimera = primeraFutura;
+      if (esPrimera) {
+        card.classList.add("destacada");
+        primeraFutura = false;
+      }
+
+      const esImportante = esDiaImportanteTexto(fechaTexto);
+      const esDiaHoy = esHoyDate(item.fecha);
+
+      const fechaDiv = document.createElement("div");
+      fechaDiv.className = "assignment-date";
+
+      const labelSpan = document.createElement("span");
+      labelSpan.className = "assignment-label";
+      labelSpan.textContent = esPrimera ? "Próxima reunión" : "Reunión";
+
+      const daySpan = document.createElement("span");
+      daySpan.className = "assignment-day";
+      if (esImportante) daySpan.classList.add("church-day");
+      daySpan.textContent = fechaTexto;
+
+      const badgesRow = document.createElement("div");
+      badgesRow.className = "badge-row";
+
+      const badgeTipo = document.createElement("div");
+      badgeTipo.className = "badge";
+      badgeTipo.innerHTML = `<span class="badge-dot"></span><span>${esImportante ? "Reunión principal" : "Reunión de entre semana"}</span>`;
+      badgesRow.appendChild(badgeTipo);
+
+      if (esDiaHoy) {
+        const badgeHoy = document.createElement("div");
+        badgeHoy.className = "badge badge-hoy";
+        badgeHoy.innerHTML = `<span class="badge-dot"></span><span>HOY TE TOCA</span>`;
+        badgesRow.appendChild(badgeHoy);
+      }
+
+      // 🖼️ Badge imágenes SOLO si hay "SI" en columna I
+      if (item.usaImagenes) {
+        const badgeImg = document.createElement("div");
+        badgeImg.className = "badge";
+        badgeImg.innerHTML = `🖼️ <span>Usa imágenes</span>`;
+        badgesRow.appendChild(badgeImg);
+      }
+
+      fechaDiv.appendChild(labelSpan);
+      fechaDiv.appendChild(daySpan);
+      fechaDiv.appendChild(badgesRow);
+
+      const detallesDiv = document.createElement("div");
+      detallesDiv.className = "assignment-details";
+
+      function crearGrupo(label, value, extraClass) {
+        const group = document.createElement("div");
+        group.className = "detail-group";
+
+        const l = document.createElement("div");
+        l.className = "detail-label";
+        if (extraClass) l.classList.add(extraClass);
+        l.textContent = label;
+
+        const v = document.createElement("div");
+        v.className = "detail-value";
+        v.textContent = value || "-";
+
+        group.appendChild(l);
+        group.appendChild(v);
+        return group;
+      }
+
+      detallesDiv.appendChild(crearGrupo("Audio", audio, "label-audio"));
+
+      // VIDEO + link WA si existe (solo video)
+      const videoGroup = crearGrupo("Video", video, "label-video");
+      const keyVideo = `${ymd(item.fecha)}|${normalizarTexto(video)}|video`;
+      const wa = waLinkPorClave[keyVideo];
+
+      if (wa) {
+        const a = document.createElement("a");
+        a.href = wa;
+        a.target = "_blank";
+        a.rel = "noopener";
+        a.style.marginLeft = "10px";
+        a.style.textDecoration = "none";
+        a.style.fontSize = "0.85rem";
+        a.textContent = "📩 WhatsApp";
+        videoGroup.querySelector(".detail-value").appendChild(a);
+      }
+
+      detallesDiv.appendChild(videoGroup);
+      detallesDiv.appendChild(crearGrupo("Mic 1", mic1, "label-mic"));
+      detallesDiv.appendChild(crearGrupo("Mic 2", mic2, "label-mic"));
+      detallesDiv.appendChild(crearGrupo("Plataforma", plataforma, "label-plataforma"));
+      detallesDiv.appendChild(crearGrupo("Acomodador entrada", acomodadorEntrada, "label-entrada"));
+      detallesDiv.appendChild(crearGrupo("Acomodador auditorio", acomodadorAuditorio, "label-auditorio"));
+
+      card.appendChild(fechaDiv);
+      card.appendChild(detallesDiv);
+      contenedor.appendChild(card);
+    });
+  }
+
+  cargarCartelera();
+</script>
+
 </body>
 </html>
