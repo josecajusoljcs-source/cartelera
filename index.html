@@ -258,14 +258,6 @@
 
     .badge-hoy .badge-dot { background: #22c55e; box-shadow: 0 0 12px rgba(22, 163, 74, 0.9); }
 
-    .badge-img {
-      border-color: rgba(250, 204, 21, 0.85);
-      color: #fde68a;
-      background: rgba(250, 204, 21, 0.12);
-    }
-
-    .badge-img .badge-dot { background: #facc15; box-shadow: 0 0 12px rgba(250, 204, 21, 0.7); }
-
     .assignment-details {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -309,30 +301,6 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-    }
-
-    /* Botón WhatsApp (solo Video) */
-    .wa-wrap { margin-top: 0.35rem; }
-    .wa-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.35rem 0.85rem;
-      border-radius: 999px;
-      border: 1px solid rgba(34, 197, 94, 0.6);
-      background: rgba(34, 197, 94, 0.12);
-      color: #bbf7d0;
-      text-decoration: none;
-      font-size: 0.82rem;
-      cursor: pointer;
-      width: fit-content;
-    }
-    .wa-btn:hover { background: rgba(34, 197, 94, 0.18); }
-
-    .wa-muted {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-top: 0.2rem;
     }
 
     .empty-msg { font-size: 0.95rem; color: var(--muted); padding-top: 0.5rem; }
@@ -421,6 +389,7 @@
       </section>
     </section>
   </main>
+
   <script>
   /************************************************************
    * CONFIG (editá SOLO esta URL)
@@ -578,6 +547,43 @@
   }
 
   /************************************************************
+   * ✅ NUEVO: Auto-salto al próximo mes con reuniones
+   ************************************************************/
+  function cambiarAlSiguienteMesConReuniones() {
+    const selectMes = document.getElementById("monthYearSelect");
+    if (!selectMes || !mesAnioActual || !todasLasFilas.length) return false;
+
+    const hoy = soloFecha(new Date());
+
+    // meses disponibles desde el selector
+    const opciones = Array.from(selectMes.options).map(o => {
+      const [yStr, mStr] = o.value.split("-");
+      return { key: o.value, year: +yStr, month: +mStr };
+    }).sort((a, b) => (a.year - b.year) || (a.month - b.month));
+
+    // posición del mes actual en el selector
+    const actualKey = mesAnioActual.year + "-" + mesAnioActual.month;
+    const idxActual = opciones.findIndex(o => o.key === actualKey);
+
+    // buscar hacia adelante el primer mes que tenga reuniones futuras
+    for (let i = Math.max(0, idxActual); i < opciones.length; i++) {
+      const opt = opciones[i];
+      const tiene = todasLasFilas.some(item =>
+        mismoMesAnio(item.fecha, opt.year, opt.month) &&
+        item.fecha.getTime() >= hoy.getTime()
+      );
+      if (tiene) {
+        // setear mes actual + selector
+        mesAnioActual = { year: opt.year, month: opt.month };
+        selectMes.value = opt.key;
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /************************************************************
    * CARGA
    ************************************************************/
   async function cargarCartelera() {
@@ -596,7 +602,6 @@
 
       const text = await res.text();
 
-      // Si Google devuelve HTML (login/permiso), lo detectamos
       if (text.includes("<html") || text.includes("<!DOCTYPE")) {
         setErrorUI("Google devolvió una página HTML (permiso). Publicá la hoja o dejala 'Cualquiera con el enlace'.");
         return;
@@ -616,7 +621,6 @@
 
       const hoy = soloFecha(new Date());
       todasLasFilas = [];
-
       const opcionesMesSet = new Map();
 
       filas.forEach((row) => {
@@ -630,7 +634,6 @@
 
         if (!opcionesMesSet.has(key)) opcionesMesSet.set(key, keyObj.label);
 
-        // Columna I (índice 8) = "SI" / "NO"
         const usaImagenes = normalizarTexto(row[8] || "") === "si";
 
         todasLasFilas.push({
@@ -733,6 +736,18 @@
                item.fecha.getTime() >= hoy.getTime()
     );
 
+    // ✅ si el mes actual quedó vacío, saltamos al siguiente mes con reuniones
+    if (!lista.length) {
+      const cambio = cambiarAlSiguienteMesConReuniones();
+      if (cambio) {
+        // reintentar render con el nuevo mes
+        lista = todasLasFilas.filter(
+          (item) => mismoMesAnio(item.fecha, mesAnioActual.year, mesAnioActual.month) &&
+                   item.fecha.getTime() >= hoy.getTime()
+        );
+      }
+    }
+
     if (modoVista === "hoy") {
       const hoyLista = lista.filter((item) => esHoyDate(item.fecha));
       if (hoyLista.length) {
@@ -759,7 +774,7 @@
 
     if (!lista.length) {
       resumen.textContent = "0 reuniones";
-      contenedor.innerHTML = "<p class='empty-msg'>Sin asignaciones futuras para este mes.</p>";
+      contenedor.innerHTML = "<p class='empty-msg'>Sin asignaciones futuras (ni en meses siguientes).</p>";
       return;
     }
 
@@ -879,9 +894,6 @@
   }
 
   window.addEventListener("DOMContentLoaded", cargarCartelera);
-</script>
-
-
-
+  </script>
 </body>
 </html>
