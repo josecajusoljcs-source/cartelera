@@ -20,7 +20,6 @@
       --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.85);
     }
 
-    /* ... Mantenemos todo tu CSS original igual ... */
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
 
     body {
@@ -295,24 +294,49 @@
     .detail-label.label-auditorio::before { background: #fb7185; }
 
     .detail-value {
-      font-size: 1.05rem; /* Agrandamos un poco el nombre */
+      font-size: 0.96rem;
       color: #e5e7eb;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      font-weight: 500;
     }
 
-    /* Estilo para los iconos en los labels */
-    .icon-inline { font-size: 1.1rem; margin-right: 4px; vertical-align: middle; }
+    .empty-msg { font-size: 0.95rem; color: var(--muted); padding-top: 0.5rem; }
 
-    /* Mantenemos tus modos de texto y contraste ... */
+    .separator {
+      font-size: 0.8rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 0.6rem;
+      margin-bottom: 0.15rem;
+    }
+
     body.modo-texto-grande .assignment-day { font-size: 1.2rem; }
-    body.modo-texto-grande .detail-value { font-size: 1.2rem; }
-    body.modo-texto-grande .detail-label { font-size: 0.85rem; }
+    body.modo-texto-grande .detail-value { font-size: 1.05rem; }
+    body.modo-texto-grande .detail-label { font-size: 0.8rem; }
+    body.modo-texto-grande .assignment-card { padding: 1rem 0.95rem; }
+
+    body.modo-alto-contraste { background: #020617; }
+    body.modo-alto-contraste .card-shell { background: #020617; }
+    body.modo-alto-contraste .assignment-card { background: #020617; border-color: rgba(148, 163, 184, 0.9); }
+    body.modo-alto-contraste .section-title h2,
+    body.modo-alto-contraste .detail-label,
+    body.modo-alto-contraste .assignment-label { color: #e5e7eb; }
+
+    @media (max-width: 900px) { body { padding: 1rem 0.7rem 1.2rem; } }
 
     @media (max-width: 640px) {
-      .assignment-details { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      body { padding: 0.8rem 0.4rem 1.2rem; }
+      header h1 { font-size: 1.7rem; line-height: 1.2; }
+      .card-shell { padding: 0.9rem 0.8rem 1rem; }
+      .assignments-grid { max-height: none; overflow-y: visible; padding-right: 0; }
+      .assignment-card { grid-template-columns: minmax(0, 1fr); padding: 0.9rem 0.85rem; }
+      .assignment-details { grid-template-columns: minmax(0, 1fr); row-gap: 0.35rem; }
+      .detail-label { font-size: 0.7rem; }
+      .detail-value { font-size: 0.9rem; }
+      .controls-bar { flex-direction: column; align-items: stretch; }
+      .controls-right { justify-content: flex-start; }
     }
   </style>
 </head>
@@ -321,6 +345,7 @@
   <main class="page">
     <header>
       <h1>Asignaciones para las reuniones</h1>
+
       <div class="pill-bar">
         <span class="pill-dot"></span>
         <span>Conectado a hoja de cálculo · Actualización automática</span>
@@ -335,12 +360,14 @@
             <select id="monthYearSelect"></select>
           </div>
         </div>
+
         <div class="controls-right">
-          <div class="view-tabs">
-            <button class="view-tab active" data-view="mes">Todo el mes</button>
-            <button class="view-tab" data-view="semana">Esta semana</button>
-            <button class="view-tab" data-view="hoy">Hoy</button>
+          <div class="view-tabs" aria-label="Ver">
+            <button class="view-tab active" data-view="mes" id="tab-mes">Todo el mes</button>
+            <button class="view-tab" data-view="semana" id="tab-semana">Esta semana</button>
+            <button class="view-tab" data-view="hoy" id="tab-hoy">Hoy</button>
           </div>
+
           <button class="toggle-btn" id="btn-texto-grande"><span class="toggle-dot"></span>Texto grande</button>
           <button class="toggle-btn" id="btn-alto-contraste"><span class="toggle-dot"></span>Alto contraste</button>
         </div>
@@ -352,7 +379,9 @@
             <h2>Próximas reuniones</h2>
             <span id="count-resumen">Cargando…</span>
           </div>
+
           <p id="view-message" class="view-message"></p>
+
           <div id="assignments" class="assignments-grid"></div>
         </div>
       </section>
@@ -360,128 +389,530 @@
   </main>
 
   <script>
-  const CSV_URL = "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337";
+  /************************************************************
+   * CONFIG (editá SOLO esta URL)
+   ************************************************************/
+  const CSV_URL =
+    "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337";
 
-  let todasLasFilas = [];
-  let mesAnioActual = null;
-  let modoVista = "mes";
+  /************************************************************
+   * ESTADO
+   ************************************************************/
+  let todasLasFilas = [];   // [{ row, fecha, fechaTexto, esPasada, usaImagenes }]
+  let mesAnioActual = null; // { year, month }
+  let modoVista = "mes";    // "mes" | "semana" | "hoy"
 
+  /************************************************************
+   * HELPERS
+   ************************************************************/
+  function setErrorUI(msg) {
+    const resumen = document.getElementById("count-resumen");
+    const contenedor = document.getElementById("assignments");
+    const msgVista = document.getElementById("view-message");
+    if (msgVista) msgVista.textContent = "";
+    resumen.textContent = "Error";
+    contenedor.innerHTML = `<p class="empty-msg">${msg}</p>`;
+  }
+
+  // CSV parser robusto (comillas + comas dentro)
   function parseCSV(text) {
     const rows = [];
     let row = [];
     let cur = "";
     let inQuotes = false;
+
     const s = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+
     for (let i = 0; i < s.length; i++) {
       const ch = s[i];
-      if (ch === '"' && inQuotes && s[i+1] === '"') { cur += '"'; i++; continue; }
-      if (ch === '"') { inQuotes = !inQuotes; continue; }
-      if (ch === "," && !inQuotes) { row.push(cur); cur = ""; continue; }
-      if (ch === "\n" && !inQuotes) { row.push(cur); rows.push(row); row = []; cur = ""; continue; }
+      const next = s[i + 1];
+
+      if (ch === '"' && inQuotes && next === '"') {
+        cur += '"';
+        i++;
+        continue;
+      }
+      if (ch === '"') {
+        inQuotes = !inQuotes;
+        continue;
+      }
+      if (ch === "," && !inQuotes) {
+        row.push(cur);
+        cur = "";
+        continue;
+      }
+      if (ch === "\n" && !inQuotes) {
+        row.push(cur);
+        rows.push(row);
+        row = [];
+        cur = "";
+        continue;
+      }
       cur += ch;
     }
-    if (cur.length || row.length) { row.push(cur); rows.push(row); }
+
+    if (cur.length || row.length) {
+      row.push(cur);
+      rows.push(row);
+    }
     return rows;
   }
 
-  function parseFechaTexto(t) {
-    if(!t) return null;
-    const m = t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-    if(m) return new Date(m[3], m[2]-1, m[1]);
-    const meses = {enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,setiembre:8,octubre:9,noviembre:10,diciembre:11};
-    const p = t.toLowerCase().match(/(\d{1,2})\s+de\s+([a-z]+)/);
-    if(p) return new Date(new Date().getFullYear(), meses[p[2]], p[1]);
-    return null;
+  function normalizarTexto(str) {
+    return (str || "")
+      .toString()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim();
   }
 
-  async function iniciar() {
-    const res = await fetch(CSV_URL);
-    const csv = await res.text();
-    const data = parseCSV(csv);
-    todasLasFilas = data.slice(1).filter(r => r[0]).map(r => ({
-      fecha: parseFechaTexto(r[0]),
-      texto: r[0],
-      video: r[1], audio: r[2], mic1: r[3], mic2: r[4], plat: r[5], ent: r[6], aud: r[7]
-    }));
+  function soloFecha(date) {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  }
 
-    // Cargar meses en el select
-    const mesesSet = new Set();
-    todasLasFilas.forEach(f => {
-      if(f.fecha) mesesSet.add(`${f.fecha.getFullYear()}-${f.fecha.getMonth()}`);
-    });
-    const select = document.getElementById("monthYearSelect");
-    mesesSet.forEach(m => {
-      const opt = document.createElement("option");
-      opt.value = m;
-      const [y, mIndex] = m.split("-");
-      const nombresMeses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-      opt.textContent = `${nombresMeses[mIndex]} ${y}`;
-      select.appendChild(opt);
-    });
+  function esHoyDate(fecha) {
+    const hoy = soloFecha(new Date());
+    const f = soloFecha(fecha);
+    return f.getTime() === hoy.getTime();
+  }
 
-    const hoy = new Date();
-    select.value = `${hoy.getFullYear()}-${hoy.getMonth()}`;
-    mesAnioActual = {y: hoy.getFullYear(), m: hoy.getMonth()};
+  function obtenerMesAnioKey(date) {
+    const meses = [
+      "Enero","Febrero","Marzo","Abril","Mayo","Junio",
+      "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
+    ];
+    return {
+      label: meses[date.getMonth()] + " " + date.getFullYear(),
+      month: date.getMonth(),
+      year: date.getFullYear(),
+    };
+  }
 
-    select.onchange = () => {
-      const [y, m] = select.value.split("-");
-      mesAnioActual = {y: +y, m: +m};
-      renderizar();
+  function mismoMesAnio(date, year, month) {
+    return date && date.getFullYear() === year && date.getMonth() === month;
+  }
+
+  function parseFechaTexto(fechaTexto) {
+    if (!fechaTexto) return null;
+    const limpio = fechaTexto.toString().trim();
+
+    // dd/mm/yyyy
+    const matchNum = limpio.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+    if (matchNum) {
+      const d = parseInt(matchNum[1], 10);
+      const m = parseInt(matchNum[2], 10) - 1;
+      let y = parseInt(matchNum[3], 10);
+      if (y < 100) y += 2000;
+      return new Date(y, m, d);
     }
 
-    renderizar();
+    // "domingo 14 de diciembre 2025" (con o sin año)
+    const limpioNorm = normalizarTexto(limpio);
+    const partes = limpioNorm.split(" ").filter(Boolean);
+
+    let dia = null;
+    for (const p of partes) {
+      const n = parseInt(p, 10);
+      if (!isNaN(n)) { dia = n; break; }
+    }
+    if (dia == null) return null;
+
+    const meses = {
+      enero:0, febrero:1, marzo:2, abril:3, mayo:4, junio:5,
+      julio:6, agosto:7, septiembre:8, setiembre:8, octubre:9,
+      noviembre:10, diciembre:11
+    };
+
+    let mes = null;
+    let year = null;
+
+    partes.forEach((p, idx) => {
+      if (meses[p] != null) mes = meses[p];
+      const n = parseInt(p, 10);
+      if (!isNaN(n) && idx === partes.length - 1 && n > 1900) year = n;
+    });
+
+    if (mes == null) return null;
+    if (!year) year = new Date().getFullYear();
+
+    return new Date(year, mes, dia);
   }
 
-  function renderizar() {
+  function esDiaImportanteTexto(fechaTexto) {
+    const limpio = normalizarTexto(fechaTexto);
+    return limpio.startsWith("domingo") || limpio.startsWith("sabado") || limpio.startsWith("sábado");
+  }
+
+  /************************************************************
+   * ✅ NUEVO: Obtener la próxima reunión (global)
+   ************************************************************/
+  function obtenerProximaReunion() {
+    const hoy = soloFecha(new Date());
+    return todasLasFilas.find(item => item.fecha.getTime() >= hoy.getTime()) || null;
+  }
+
+  /************************************************************
+   * ✅ NUEVO: Setear el selector/mes al mes de la próxima reunión
+   ************************************************************/
+  function setMesAProximaReunion() {
+    const proxima = obtenerProximaReunion();
+    if (!proxima) return false;
+
+    const kObj = obtenerMesAnioKey(proxima.fecha);
+    mesAnioActual = { year: kObj.year, month: kObj.month };
+
+    const selectMes = document.getElementById("monthYearSelect");
+    if (selectMes) selectMes.value = kObj.year + "-" + kObj.month;
+    return true;
+  }
+
+  /************************************************************
+   * ✅ NUEVO: Auto-salto al siguiente mes con reuniones futuras
+   ************************************************************/
+  function cambiarAlSiguienteMesConReuniones() {
+    const selectMes = document.getElementById("monthYearSelect");
+    if (!selectMes || !mesAnioActual || !todasLasFilas.length) return false;
+
+    const hoy = soloFecha(new Date());
+
+    const opciones = Array.from(selectMes.options)
+      .map(o => {
+        const [yStr, mStr] = o.value.split("-");
+        return { key: o.value, year: +yStr, month: +mStr };
+      })
+      .sort((a, b) => (a.year - b.year) || (a.month - b.month));
+
+    const actualKey = mesAnioActual.year + "-" + mesAnioActual.month;
+    const idxActual = opciones.findIndex(o => o.key === actualKey);
+
+    for (let i = Math.max(0, idxActual); i < opciones.length; i++) {
+      const opt = opciones[i];
+      const tiene = todasLasFilas.some(item =>
+        mismoMesAnio(item.fecha, opt.year, opt.month) &&
+        item.fecha.getTime() >= hoy.getTime()
+      );
+      if (tiene) {
+        mesAnioActual = { year: opt.year, month: opt.month };
+        selectMes.value = opt.key;
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /************************************************************
+   * CARGA
+   ************************************************************/
+  async function cargarCartelera() {
+    const resumen = document.getElementById("count-resumen");
     const contenedor = document.getElementById("assignments");
+    const selectMes = document.getElementById("monthYearSelect");
+    resumen.textContent = "Cargando…";
     contenedor.innerHTML = "";
-    const hoy = new Date();
-    hoy.setHours(0,0,0,0);
 
-    const filtradas = todasLasFilas.filter(f => 
-      f.fecha && f.fecha.getFullYear() === mesAnioActual.y && f.fecha.getMonth() === mesAnioActual.m
-    ).sort((a,b) => a.fecha - b.fecha);
+    try {
+      const res = await fetch(CSV_URL, { cache: "no-store" });
+      if (!res.ok) {
+        setErrorUI("No se pudo cargar el CSV. Revisá permisos/publicación de la hoja.");
+        return;
+      }
 
-    document.getElementById("count-resumen").textContent = `${filtradas.length} reuniones`;
+      const text = await res.text();
 
-    filtradas.forEach(f => {
-      const card = document.createElement("div");
+      if (text.includes("<html") || text.includes("<!DOCTYPE")) {
+        setErrorUI("Google devolvió una página HTML (permiso). Publicá la hoja o dejala 'Cualquiera con el enlace'.");
+        return;
+      }
+
+      const data = parseCSV(text);
+
+      if (!data || data.length < 2) {
+        resumen.textContent = "0 reuniones";
+        contenedor.innerHTML = "<p class='empty-msg'>Sin asignaciones cargadas.</p>";
+        return;
+      }
+
+      const filas = data
+        .slice(1)
+        .filter((row) => row.some((cell) => cell && cell.trim() !== ""));
+
+      const hoy = soloFecha(new Date());
+      todasLasFilas = [];
+      const opcionesMesSet = new Map();
+
+      filas.forEach((row) => {
+        const fechaTexto = row[0] || "";
+        const fecha = parseFechaTexto(fechaTexto);
+        if (!fecha) return;
+
+        const dSolo = soloFecha(fecha);
+        const keyObj = obtenerMesAnioKey(dSolo);
+        const key = keyObj.year + "-" + keyObj.month;
+
+        if (!opcionesMesSet.has(key)) opcionesMesSet.set(key, keyObj.label);
+
+        const usaImagenes = normalizarTexto(row[8] || "") === "si";
+
+        todasLasFilas.push({
+          row,
+          fecha: dSolo,
+          fechaTexto,
+          esPasada: dSolo.getTime() < hoy.getTime(),
+          usaImagenes
+        });
+      });
+
+      todasLasFilas.sort((a, b) => a.fecha - b.fecha);
+
+      const opcionesOrdenadas = Array.from(opcionesMesSet.entries())
+        .map(([key, label]) => {
+          const [yearStr, monthStr] = key.split("-");
+          return { key, label, year: +yearStr, month: +monthStr };
+        })
+        .sort((a, b) => (a.year - b.year) || (a.month - b.month));
+
+      selectMes.innerHTML = "";
+
+      // ✅ NUEVO: opción "Próxima reunión" arriba del todo
+      const optProxima = document.createElement("option");
+      optProxima.value = "__PROXIMA__";
+      optProxima.textContent = "✅ Próxima reunión";
+      selectMes.appendChild(optProxima);
+
+      opcionesOrdenadas.forEach((opt) => {
+        const option = document.createElement("option");
+        option.value = opt.key;
+        option.textContent = opt.label;
+        selectMes.appendChild(option);
+      });
+
+      // ✅ Default: siempre arrancar en "Próxima reunión"
+      selectMes.value = "__PROXIMA__";
+      setMesAProximaReunion();
+
+      selectMes.onchange = () => {
+        if (selectMes.value === "__PROXIMA__") {
+          setMesAProximaReunion();
+          renderizar();
+          return;
+        }
+        const [yStr, mStr] = selectMes.value.split("-");
+        mesAnioActual = { year: +yStr, month: +mStr };
+        renderizar();
+      };
+
+      document.querySelectorAll(".view-tab").forEach((btn) => {
+        btn.onclick = () => {
+          document.querySelectorAll(".view-tab").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          modoVista = btn.dataset.view || "mes";
+          renderizar();
+        };
+      });
+
+      const btnTexto = document.getElementById("btn-texto-grande");
+      const btnAlto = document.getElementById("btn-alto-contraste");
+
+      btnTexto.onclick = () => {
+        const active = document.body.classList.toggle("modo-texto-grande");
+        btnTexto.classList.toggle("active", active);
+      };
+
+      btnAlto.onclick = () => {
+        const active = document.body.classList.toggle("modo-alto-contraste");
+        btnAlto.classList.toggle("active", active);
+      };
+
+      renderizar();
+    } catch (err) {
+      console.error(err);
+      setErrorUI("Se rompió el script al cargar. (Probable error de JS o CSV no accesible).");
+    }
+  }
+
+  /************************************************************
+   * RENDER
+   ************************************************************/
+  function renderizar() {
+    const resumen = document.getElementById("count-resumen");
+    const contenedor = document.getElementById("assignments");
+    const msgVista = document.getElementById("view-message");
+
+    contenedor.innerHTML = "";
+    msgVista.textContent = "";
+
+    if (!todasLasFilas.length || !mesAnioActual) {
+      resumen.textContent = "0 reuniones";
+      contenedor.innerHTML = "<p class='empty-msg'>Sin asignaciones para mostrar.</p>";
+      return;
+    }
+
+    const hoy = soloFecha(new Date());
+
+    let lista = todasLasFilas.filter(
+      (item) => mismoMesAnio(item.fecha, mesAnioActual.year, mesAnioActual.month) &&
+               item.fecha.getTime() >= hoy.getTime()
+    );
+
+    // ✅ AUTO-SALTO (para la gente que nunca toca nada):
+    // si el mes actual quedó vacío, saltamos al próximo mes que tenga reuniones futuras.
+    if (!lista.length) {
+      const cambio = cambiarAlSiguienteMesConReuniones();
+      if (cambio) {
+        lista = todasLasFilas.filter(
+          (item) => mismoMesAnio(item.fecha, mesAnioActual.year, mesAnioActual.month) &&
+                   item.fecha.getTime() >= hoy.getTime()
+        );
+      }
+    }
+
+    if (modoVista === "hoy") {
+      const hoyLista = lista.filter((item) => esHoyDate(item.fecha));
+      if (hoyLista.length) {
+        lista = hoyLista;
+        msgVista.textContent = "Mostrando la reunión de hoy.";
+      } else if (lista.length) {
+        lista = [lista[0]];
+        msgVista.textContent = "Hoy no hay reunión. Se muestra la próxima reunión de este mes.";
+      } else {
+        msgVista.textContent = "Hoy no hay reunión programada en este mes.";
+      }
+    } else if (modoVista === "semana") {
+      const semanaFin = new Date(hoy);
+      semanaFin.setDate(hoy.getDate() + 6);
+      const semanaLista = lista.filter((item) => item.fecha <= semanaFin);
+
+      if (semanaLista.length) {
+        lista = semanaLista;
+        msgVista.textContent = "Reuniones de esta semana.";
+      } else {
+        msgVista.textContent = "No hay reuniones esta semana en este mes.";
+      }
+    }
+
+    if (!lista.length) {
+      resumen.textContent = "0 reuniones";
+      contenedor.innerHTML = "<p class='empty-msg'>Sin asignaciones futuras (ni en meses siguientes).</p>";
+      return;
+    }
+
+    lista.sort((a, b) => a.fecha - b.fecha);
+
+    resumen.textContent = lista.length === 1 ? "1 reunión asignada" : `${lista.length} reuniones asignadas`;
+
+    let primeraFutura = true;
+    let ultimoTipoDia = null;
+
+    lista.forEach((item) => {
+      const row = item.row;
+      const fechaTexto = row[0] || "";
+      const video = row[1] || "";
+      const audio = row[2] || "";
+      const mic1 = row[3] || "";
+      const mic2 = row[4] || "";
+      const plataforma = row[5] || "";
+      const acomodadorEntrada = row[6] || "";
+      const acomodadorAuditorio = row[7] || "";
+
+      const norm = normalizarTexto(fechaTexto);
+      let tipoDia = null;
+      if (norm.startsWith("viernes")) tipoDia = "viernes";
+      else if (norm.startsWith("domingo")) tipoDia = "domingo";
+
+      if (tipoDia && tipoDia !== ultimoTipoDia) {
+        const sep = document.createElement("div");
+        sep.className = "separator";
+        sep.textContent = tipoDia === "viernes" ? "REUNIONES DE VIERNES" : "REUNIONES DE DOMINGO";
+        contenedor.appendChild(sep);
+        ultimoTipoDia = tipoDia;
+      }
+
+      const card = document.createElement("article");
       card.className = "assignment-card";
-      if(f.fecha.getTime() === hoy.getTime()) card.classList.add("destacada");
 
-      card.innerHTML = `
-        <div class="assignment-date">
-          <span class="assignment-label">Reunión</span>
-          <span class="assignment-day ${f.texto.toLowerCase().includes("domingo")?'church-day':''}">${f.texto}</span>
-        </div>
-        <div class="assignment-details">
-          ${crearDetalle("🎧 Audio", f.audio, "label-audio")}
-          ${crearDetalle("📺 Video", f.video, "label-video")}
-          ${crearDetalle("🎤 Mic 1", f.mic1, "label-mic")}
-          ${crearDetalle("🎤 Mic 2", f.mic2, "label-mic")}
-          ${crearDetalle("🛡️ Plataforma", f.plat, "label-plataforma")}
-          ${crearDetalle("🚪 Entrada", f.ent, "label-entrada")}
-          ${crearDetalle("👥 Auditorio", f.aud, "label-auditorio")}
-        </div>
-      `;
+      if (primeraFutura) {
+        card.classList.add("destacada");
+        primeraFutura = false;
+      }
+
+      const esImportante = esDiaImportanteTexto(fechaTexto);
+      const esDiaHoy = esHoyDate(item.fecha);
+
+      const fechaDiv = document.createElement("div");
+      fechaDiv.className = "assignment-date";
+
+      const labelSpan = document.createElement("span");
+      labelSpan.className = "assignment-label";
+      labelSpan.textContent = card.classList.contains("destacada") ? "Próxima reunión" : "Reunión";
+
+      const daySpan = document.createElement("span");
+      daySpan.className = "assignment-day";
+      if (esImportante) daySpan.classList.add("church-day");
+      daySpan.textContent = fechaTexto;
+
+      const badgesRow = document.createElement("div");
+      badgesRow.className = "badge-row";
+
+      const badgeTipo = document.createElement("div");
+      badgeTipo.className = "badge";
+      badgeTipo.innerHTML = `<span class="badge-dot"></span><span>${esImportante ? "Reunión principal" : "Reunión de entre semana"}</span>`;
+      badgesRow.appendChild(badgeTipo);
+
+      if (esDiaHoy) {
+        const badgeHoy = document.createElement("div");
+        badgeHoy.className = "badge badge-hoy";
+        badgeHoy.innerHTML = `<span class="badge-dot"></span><span>HOY TE TOCA</span>`;
+        badgesRow.appendChild(badgeHoy);
+      }
+
+      if (item.usaImagenes) {
+        const badgeImg = document.createElement("div");
+        badgeImg.className = "badge";
+        badgeImg.innerHTML = `🖼️ <span>Usa imágenes</span>`;
+        badgesRow.appendChild(badgeImg);
+      }
+
+      fechaDiv.appendChild(labelSpan);
+      fechaDiv.appendChild(daySpan);
+      fechaDiv.appendChild(badgesRow);
+
+      const detallesDiv = document.createElement("div");
+      detallesDiv.className = "assignment-details";
+
+      function crearGrupo(label, value, extraClass) {
+        const group = document.createElement("div");
+        group.className = "detail-group";
+
+        const l = document.createElement("div");
+        l.className = "detail-label";
+        if (extraClass) l.classList.add(extraClass);
+        l.textContent = label;
+
+        const v = document.createElement("div");
+        v.className = "detail-value";
+        v.textContent = value || "-";
+
+        group.appendChild(l);
+        group.appendChild(v);
+        return group;
+      }
+
+      detallesDiv.appendChild(crearGrupo("Audio", audio, "label-audio"));
+      detallesDiv.appendChild(crearGrupo("Video", video, "label-video"));
+      detallesDiv.appendChild(crearGrupo("Mic 1", mic1, "label-mic"));
+      detallesDiv.appendChild(crearGrupo("Mic 2", mic2, "label-mic"));
+      detallesDiv.appendChild(crearGrupo("Plataforma", plataforma, "label-plataforma"));
+      detallesDiv.appendChild(crearGrupo("Acomodador entrada", acomodadorEntrada, "label-entrada"));
+      detallesDiv.appendChild(crearGrupo("Acomodador auditorio", acomodadorAuditorio, "label-auditorio"));
+
+      card.appendChild(fechaDiv);
+      card.appendChild(detallesDiv);
       contenedor.appendChild(card);
     });
   }
 
-  function crearDetalle(label, valor, clase) {
-    if(!valor || valor === "-") return "";
-    return `
-      <div class="detail-group">
-        <div class="detail-label ${clase}">${label}</div>
-        <div class="detail-value">${valor}</div>
-      </div>
-    `;
-  }
-
-  document.getElementById("btn-texto-grande").onclick = () => document.body.classList.toggle("modo-texto-grande");
-  document.getElementById("btn-alto-contraste").onclick = () => document.body.classList.toggle("modo-alto-contraste");
-
-  iniciar();
+  window.addEventListener("DOMContentLoaded", cargarCartelera);
   </script>
 </body>
 </html>
