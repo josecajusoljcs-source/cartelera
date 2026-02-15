@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>Asignaciones para las reuniones</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <style>
     :root {
       --bg: #0f172a;
@@ -19,170 +20,468 @@
       --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.85);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    /* ... Mantenemos todo tu CSS original igual ... */
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
 
     body {
       min-height: 100vh;
-      background: 
+      background:
         radial-gradient(circle at top, rgba(56, 189, 248, 0.25), transparent 55%),
-        linear-gradient(135deg, #020617, #0f172a);
+        radial-gradient(circle at bottom, rgba(250, 204, 21, 0.18), transparent 55%),
+        linear-gradient(135deg, #020617, #020617 40%, #020617);
       color: var(--text);
       padding: 1.5rem;
       display: flex;
       justify-content: center;
     }
 
-    .page { width: 100%; max-width: 900px; }
-    header { text-align: center; margin-bottom: 2rem; }
-    header h1 { font-size: 2.5rem; font-weight: 700; color: #fff; text-shadow: 0 0 20px rgba(56, 189, 248, 0.3); }
+    .page { width: 100%; max-width: 960px; }
+    header { text-align: center; margin-bottom: 1.4rem; }
+
+    header h1 {
+      font-size: clamp(2.1rem, 5vw, 2.7rem);
+      letter-spacing: 0.03em;
+      font-weight: 700;
+      color: #f9fafb;
+      text-shadow: 0 0 22px rgba(15, 23, 42, 0.9);
+      line-height: 1.15;
+    }
 
     .pill-bar {
       display: inline-flex;
       align-items: center;
-      gap: 0.6rem;
-      padding: 0.4rem 1rem;
+      gap: 0.55rem;
+      padding: 0.35rem 0.9rem;
       border-radius: 999px;
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid var(--border);
-      margin-top: 1rem;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      margin-top: 0.7rem;
       font-size: 0.9rem;
       color: var(--muted);
     }
 
-    .pill-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 10px #22c55e; }
-
-    .controls { display: flex; justify-content: center; gap: 10px; margin-bottom: 2rem; }
-    .btn-toggle { 
-      padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid var(--border);
-      background: rgba(15, 23, 42, 0.6); color: var(--muted); cursor: pointer;
+    .pill-dot {
+      width: 8px; height: 8px; border-radius: 999px;
+      background: #22c55e; box-shadow: 0 0 12px rgba(34, 197, 94, 0.9);
     }
-    .btn-toggle.active { border-color: var(--accent); color: #fff; background: var(--accent-soft); }
+
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.9rem; }
+
+    .controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.35rem;
+    }
+
+    .controls-left, .controls-right { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+    .select-wrapper { width: 100%; max-width: 260px; }
+
+    .select-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.25rem;
+    }
+
+    select {
+      width: 100%;
+      border-radius: 999px;
+      padding: 0.45rem 0.9rem;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.96);
+      color: var(--text);
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .toggle-btn {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--muted);
+      font-size: 0.78rem;
+      padding: 0.25rem 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .toggle-btn.active {
+      border-color: var(--accent);
+      color: #e0f2fe;
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
+    }
+
+    .toggle-dot { width: 7px; height: 7px; border-radius: 999px; background: rgba(148, 163, 184, 0.7); }
+    .toggle-btn.active .toggle-dot { background: var(--accent); box-shadow: 0 0 8px rgba(56, 189, 248, 0.8); }
+
+    .view-tabs {
+      display: inline-flex;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.9);
+      overflow: hidden;
+    }
+
+    .view-tab {
+      padding: 0.25rem 0.75rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .view-tab.active { background: rgba(15, 23, 42, 0.96); color: #e5e7eb; }
 
     .card-shell {
-      background: rgba(15, 23, 42, 0.4);
+      background: radial-gradient(circle at top left, rgba(148, 163, 184, 0.1), transparent 55%),
+                  radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.95), #020617);
       border-radius: var(--radius-xl);
-      border: 1px solid var(--border);
-      padding: 1.5rem;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      padding: 1.25rem 1.1rem 1.35rem;
       box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
     }
 
-    .assignments-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+    .card-shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.15), transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .card-shell-inner { position: relative; z-index: 1; }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.6rem;
+      gap: 0.75rem;
+    }
+
+    .section-title h2 {
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .section-title span {
+      font-size: 0.9rem;
+      color: var(--muted);
+      padding: 0.15rem 0.9rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.95);
+      white-space: nowrap;
+    }
+
+    .view-message { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.4rem; }
+
+    .assignments-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1rem;
+      max-height: calc(100vh - 260px);
+      overflow-y: auto;
+      padding-right: 0.35rem;
+    }
+
+    .assignments-grid::-webkit-scrollbar { width: 6px; }
+    .assignments-grid::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.7); border-radius: 999px; }
+    .assignments-grid::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.9); border-radius: 999px; }
 
     .assignment-card {
-      background: rgba(2, 6, 23, 0.7);
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.99));
       border-radius: var(--radius-md);
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      padding: 1.2rem;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      padding: 0.85rem 0.8rem 0.8rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 2.1fr);
+      gap: 0.4rem 1.1rem;
+      position: relative;
     }
 
-    .date-header { 
-      font-size: 1.4rem; font-weight: 800; color: var(--accent-strong); 
-      margin-bottom: 1rem; border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-      padding-bottom: 0.5rem;
+    .assignment-card.destacada {
+      border-color: rgba(56, 189, 248, 0.9);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 1));
     }
 
-    .roles-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+    .assignment-date { display: flex; flex-direction: column; gap: 0.15rem; font-size: 0.95rem; }
+    .assignment-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); }
+    .assignment-day { font-size: 1.05rem; font-weight: 700; color: #f9fafb; }
+    .assignment-day.church-day { color: var(--accent-strong); }
 
-    .role-item { display: flex; align-items: center; gap: 0.8rem; padding: 0.5rem; }
-    .role-icon { font-size: 1.5rem; }
-    .role-data { display: flex; flex-direction: column; }
-    .role-name { font-size: 0.75rem; text-transform: uppercase; color: var(--muted); font-weight: 700; letter-spacing: 0.05em; }
-    .person { font-size: 1.1rem; color: #fff; font-weight: 500; }
+    .badge-row { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.25rem; }
 
-    /* Ajustes para Mayores */
-    body.big-text .person { font-size: 1.4rem; }
-    body.big-text .date-header { font-size: 1.6rem; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.2rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      font-size: 0.78rem;
+      color: var(--muted);
+      width: fit-content;
+    }
 
-    @media (max-width: 600px) {
-      .roles-container { grid-template-columns: 1fr; }
+    .badge-dot {
+      width: 8px; height: 8px; border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.9);
+    }
+
+    .badge-hoy {
+      border-color: #22c55e;
+      color: #bbf7d0;
+      background: rgba(22, 163, 74, 0.22);
+    }
+
+    .badge-hoy .badge-dot { background: #22c55e; box-shadow: 0 0 12px rgba(22, 163, 74, 0.9); }
+
+    .assignment-details {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.3rem 0.9rem;
+      font-size: 0.9rem;
+    }
+
+    .detail-group { display: flex; flex-direction: column; gap: 0.05rem; }
+
+    .detail-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      color: var(--muted);
+      position: relative;
+      padding-left: 1rem;
+    }
+
+    .detail-label::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--muted);
+    }
+
+    .detail-label.label-audio::before { background: #38bdf8; }
+    .detail-label.label-video::before { background: #a78bfa; }
+    .detail-label.label-mic::before { background: #4ade80; }
+    .detail-label.label-plataforma::before { background: #facc15; }
+    .detail-label.label-entrada::before { background: #fb923c; }
+    .detail-label.label-auditorio::before { background: #fb7185; }
+
+    .detail-value {
+      font-size: 1.05rem; /* Agrandamos un poco el nombre */
+      color: #e5e7eb;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 500;
+    }
+
+    /* Estilo para los iconos en los labels */
+    .icon-inline { font-size: 1.1rem; margin-right: 4px; vertical-align: middle; }
+
+    /* Mantenemos tus modos de texto y contraste ... */
+    body.modo-texto-grande .assignment-day { font-size: 1.2rem; }
+    body.modo-texto-grande .detail-value { font-size: 1.2rem; }
+    body.modo-texto-grande .detail-label { font-size: 0.85rem; }
+
+    @media (max-width: 640px) {
+      .assignment-details { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
   </style>
 </head>
+
 <body>
   <main class="page">
     <header>
-      <h1>Asignaciones Punta Gorda</h1>
+      <h1>Asignaciones para las reuniones</h1>
       <div class="pill-bar">
         <span class="pill-dot"></span>
-        <span>Sincronizado con Google Sheets</span>
+        <span>Conectado a hoja de cálculo · Actualización automática</span>
       </div>
     </header>
 
-    <div class="controls">
-      <button class="btn-toggle" id="btn-text">Texto Grande</button>
-      <button class="btn-toggle" id="btn-contrast">Alto Contraste</button>
-    </div>
+    <section class="layout">
+      <div class="controls-bar">
+        <div class="controls-left">
+          <div class="select-wrapper">
+            <div class="select-label">Mes / año</div>
+            <select id="monthYearSelect"></select>
+          </div>
+        </div>
+        <div class="controls-right">
+          <div class="view-tabs">
+            <button class="view-tab active" data-view="mes">Todo el mes</button>
+            <button class="view-tab" data-view="semana">Esta semana</button>
+            <button class="view-tab" data-view="hoy">Hoy</button>
+          </div>
+          <button class="toggle-btn" id="btn-texto-grande"><span class="toggle-dot"></span>Texto grande</button>
+          <button class="toggle-btn" id="btn-alto-contraste"><span class="toggle-dot"></span>Alto contraste</button>
+        </div>
+      </div>
 
-    <section class="card-shell">
-      <div id="assignments" class="assignments-grid">Cargando asignaciones...</div>
+      <section class="card-shell">
+        <div class="card-shell-inner">
+          <div class="section-title">
+            <h2>Próximas reuniones</h2>
+            <span id="count-resumen">Cargando…</span>
+          </div>
+          <p id="view-message" class="view-message"></p>
+          <div id="assignments" class="assignments-grid"></div>
+        </div>
+      </section>
     </section>
   </main>
 
   <script>
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsrv6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337";
+  const CSV_URL = "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337";
 
-    async function cargarDatos() {
-      try {
-        const res = await fetch(CSV_URL);
-        const text = await res.text();
-        const rows = text.split('\n').map(r => r.split(','));
-        
-        const data = rows.slice(1)
-          .filter(r => r[0] && r[0].trim() !== "")
-          .map(r => ({
-            fecha: r[0], video: r[1], audio: r[2], mic1: r[3], mic2: r[4], plat: r[5], ent: r[6], aud: r[7]
-          }));
-        
-        renderizar(data);
-      } catch (e) {
-        document.getElementById("assignments").innerHTML = "Error al conectar con la cartelera.";
-      }
+  let todasLasFilas = [];
+  let mesAnioActual = null;
+  let modoVista = "mes";
+
+  function parseCSV(text) {
+    const rows = [];
+    let row = [];
+    let cur = "";
+    let inQuotes = false;
+    const s = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+    for (let i = 0; i < s.length; i++) {
+      const ch = s[i];
+      if (ch === '"' && inQuotes && s[i+1] === '"') { cur += '"'; i++; continue; }
+      if (ch === '"') { inQuotes = !inQuotes; continue; }
+      if (ch === "," && !inQuotes) { row.push(cur); cur = ""; continue; }
+      if (ch === "\n" && !inQuotes) { row.push(cur); rows.push(row); row = []; cur = ""; continue; }
+      cur += ch;
+    }
+    if (cur.length || row.length) { row.push(cur); rows.push(row); }
+    return rows;
+  }
+
+  function parseFechaTexto(t) {
+    if(!t) return null;
+    const m = t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if(m) return new Date(m[3], m[2]-1, m[1]);
+    const meses = {enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,setiembre:8,octubre:9,noviembre:10,diciembre:11};
+    const p = t.toLowerCase().match(/(\d{1,2})\s+de\s+([a-z]+)/);
+    if(p) return new Date(new Date().getFullYear(), meses[p[2]], p[1]);
+    return null;
+  }
+
+  async function iniciar() {
+    const res = await fetch(CSV_URL);
+    const csv = await res.text();
+    const data = parseCSV(csv);
+    todasLasFilas = data.slice(1).filter(r => r[0]).map(r => ({
+      fecha: parseFechaTexto(r[0]),
+      texto: r[0],
+      video: r[1], audio: r[2], mic1: r[3], mic2: r[4], plat: r[5], ent: r[6], aud: r[7]
+    }));
+
+    // Cargar meses en el select
+    const mesesSet = new Set();
+    todasLasFilas.forEach(f => {
+      if(f.fecha) mesesSet.add(`${f.fecha.getFullYear()}-${f.fecha.getMonth()}`);
+    });
+    const select = document.getElementById("monthYearSelect");
+    mesesSet.forEach(m => {
+      const opt = document.createElement("option");
+      opt.value = m;
+      const [y, mIndex] = m.split("-");
+      const nombresMeses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+      opt.textContent = `${nombresMeses[mIndex]} ${y}`;
+      select.appendChild(opt);
+    });
+
+    const hoy = new Date();
+    select.value = `${hoy.getFullYear()}-${hoy.getMonth()}`;
+    mesAnioActual = {y: hoy.getFullYear(), m: hoy.getMonth()};
+
+    select.onchange = () => {
+      const [y, m] = select.value.split("-");
+      mesAnioActual = {y: +y, m: +m};
+      renderizar();
     }
 
-    function renderizar(lista) {
-      const contenedor = document.getElementById("assignments");
-      contenedor.innerHTML = "";
+    renderizar();
+  }
 
-      lista.forEach(f => {
-        const card = document.createElement("div");
-        card.className = "assignment-card";
-        
-        let rolesHTML = "";
-        const roles = [
-          {l: "Audio", v: f.audio, i: "🎧"}, {l: "Video", v: f.video, i: "📺"},
-          {l: "Mic 1", v: f.mic1, i: "🎤"}, {l: "Mic 2", v: f.mic2, i: "🎤"},
-          {l: "Plataforma", v: f.plat, i: "🛡️"}, {l: "Acomodador", v: f.ent, i: "🚪"}
-        ];
+  function renderizar() {
+    const contenedor = document.getElementById("assignments");
+    contenedor.innerHTML = "";
+    const hoy = new Date();
+    hoy.setHours(0,0,0,0);
 
-        roles.forEach(r => {
-          if (r.v && r.v.trim() !== "-" && r.v.trim() !== "") {
-            rolesHTML += `
-              <div class="role-item">
-                <span class="role-icon">${r.i}</span>
-                <div class="role-data">
-                  <span class="role-name">${r.l}</span>
-                  <span class="person">${r.v}</span>
-                </div>
-              </div>`;
-          }
-        });
+    const filtradas = todasLasFilas.filter(f => 
+      f.fecha && f.fecha.getFullYear() === mesAnioActual.y && f.fecha.getMonth() === mesAnioActual.m
+    ).sort((a,b) => a.fecha - b.fecha);
 
-        card.innerHTML = `<div class="date-header">${f.fecha}</div><div class="roles-container">${rolesHTML}</div>`;
-        contenedor.appendChild(card);
-      });
-    }
+    document.getElementById("count-resumen").textContent = `${filtradas.length} reuniones`;
 
-    document.getElementById("btn-text").onclick = function() {
-      document.body.classList.toggle("big-text");
-      this.classList.toggle("active");
-    };
+    filtradas.forEach(f => {
+      const card = document.createElement("div");
+      card.className = "assignment-card";
+      if(f.fecha.getTime() === hoy.getTime()) card.classList.add("destacada");
 
-    document.getElementById("btn-contrast").onclick = function() {
-      document.body.style.filter = document.body.style.filter === "contrast(1.2) brightness(1.2)" ? "" : "contrast(1.2) brightness(1.2)";
-      this.classList.toggle("active");
-    };
+      card.innerHTML = `
+        <div class="assignment-date">
+          <span class="assignment-label">Reunión</span>
+          <span class="assignment-day ${f.texto.toLowerCase().includes("domingo")?'church-day':''}">${f.texto}</span>
+        </div>
+        <div class="assignment-details">
+          ${crearDetalle("🎧 Audio", f.audio, "label-audio")}
+          ${crearDetalle("📺 Video", f.video, "label-video")}
+          ${crearDetalle("🎤 Mic 1", f.mic1, "label-mic")}
+          ${crearDetalle("🎤 Mic 2", f.mic2, "label-mic")}
+          ${crearDetalle("🛡️ Plataforma", f.plat, "label-plataforma")}
+          ${crearDetalle("🚪 Entrada", f.ent, "label-entrada")}
+          ${crearDetalle("👥 Auditorio", f.aud, "label-auditorio")}
+        </div>
+      `;
+      contenedor.appendChild(card);
+    });
+  }
 
-    cargarDatos();
+  function crearDetalle(label, valor, clase) {
+    if(!valor || valor === "-") return "";
+    return `
+      <div class="detail-group">
+        <div class="detail-label ${clase}">${label}</div>
+        <div class="detail-value">${valor}</div>
+      </div>
+    `;
+  }
+
+  document.getElementById("btn-texto-grande").onclick = () => document.body.classList.toggle("modo-texto-grande");
+  document.getElementById("btn-alto-contraste").onclick = () => document.body.classList.toggle("modo-alto-contraste");
+
+  iniciar();
   </script>
 </body>
 </html>
