@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Asignaciones - Punta Gorda</title>
+  <title>Asignaciones para las reuniones</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
@@ -10,209 +10,269 @@
       --bg: #0f172a;
       --card-bg: #020617;
       --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.2);
       --accent-strong: #facc15;
-      --whatsapp: #25D366;
+      --whatsapp: #25D366; /* Color oficial WhatsApp */
       --text: #f9fafb;
       --muted: #9ca3af;
       --border: rgba(148, 163, 184, 0.4);
       --radius-xl: 20px;
       --radius-md: 14px;
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.85);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
 
     body {
       min-height: 100vh;
-      background: radial-gradient(circle at top, rgba(56, 189, 248, 0.15), transparent 50%), #020617;
+      background:
+        radial-gradient(circle at top, rgba(56, 189, 248, 0.25), transparent 55%),
+        radial-gradient(circle at bottom, rgba(250, 204, 21, 0.18), transparent 55%),
+        linear-gradient(135deg, #020617, #020617 40%, #020617);
       color: var(--text);
-      padding: 1rem;
+      padding: 1.5rem;
       display: flex;
       justify-content: center;
     }
 
-    .page { width: 100%; max-width: 800px; }
-    header { text-align: center; margin-bottom: 1.5rem; }
-    header h1 { font-size: 1.8rem; margin-bottom: 0.5rem; color: #fff; }
+    .page { width: 100%; max-width: 960px; }
+    header { text-align: center; margin-bottom: 1.4rem; }
 
-    /* Botones de Control Superiores */
+    header h1 {
+      font-size: clamp(2.1rem, 5vw, 2.7rem);
+      letter-spacing: 0.03em;
+      font-weight: 700;
+      color: #f9fafb;
+      text-shadow: 0 0 22px rgba(15, 23, 42, 0.9);
+      line-height: 1.15;
+    }
+
+    .pill-bar {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      margin-top: 0.7rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .pill-dot {
+      width: 8px; height: 8px; border-radius: 999px;
+      background: #22c55e; box-shadow: 0 0 12px rgba(34, 197, 94, 0.9);
+    }
+
     .controls-bar {
       display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-      background: rgba(15, 23, 42, 0.6);
-      padding: 1rem;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.35rem;
     }
 
-    .view-tabs { display: flex; gap: 0.5rem; width: 100%; }
-    .view-tab { 
-      flex: 1; padding: 0.6rem; border-radius: 99px; border: 1px solid var(--border);
-      background: transparent; color: var(--muted); cursor: pointer; font-weight: 600;
-    }
-    .view-tab.active { background: var(--accent); color: #000; border-color: var(--accent); }
+    .controls-right { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+    .select-wrapper { width: 100%; max-width: 260px; }
 
-    /* Tarjetas de Asignación */
-    .assignments-grid { display: flex; flex-direction: column; gap: 1.2rem; }
-    
-    .assignment-card {
-      background: #0f172a;
+    select {
+      width: 100%;
+      border-radius: 999px;
+      padding: 0.45rem 0.9rem;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.96);
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+
+    .toggle-btn {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--muted);
+      font-size: 0.78rem;
+      padding: 0.25rem 0.85rem;
+      cursor: pointer;
+    }
+
+    .view-tabs {
+      display: inline-flex;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.9);
+      overflow: hidden;
+    }
+
+    .view-tab { padding: 0.25rem 0.75rem; font-size: 0.78rem; color: var(--muted); border: none; background: transparent; cursor: pointer; }
+    .view-tab.active { background: rgba(56, 189, 248, 0.2); color: #fff; }
+
+    .card-shell {
+      background: radial-gradient(circle at top left, rgba(148, 163, 184, 0.1), transparent 55%),
+                  radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.95), #020617);
       border-radius: var(--radius-xl);
-      border: 2px solid var(--border);
-      padding: 1.2rem;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      padding: 1.25rem 1.1rem;
+      box-shadow: var(--shadow-soft);
     }
 
-    .assignment-card.destacada { border-color: var(--accent-strong); background: #1e293b; }
+    .assignments-grid { display: flex; flex-direction: column; gap: 1rem; }
 
-    .header-card { margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
-    .day-text { font-size: 1.3rem; font-weight: 800; color: var(--accent-strong); text-transform: capitalize; }
+    .assignment-card {
+      background: rgba(15, 23, 42, 0.8);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      padding: 1rem;
+    }
 
-    /* Grilla de Roles */
+    .assignment-day { font-size: 1.2rem; font-weight: 700; color: var(--accent-strong); margin-bottom: 0.5rem; }
+
+    /* Estilo para las filas de roles con Iconos y Botón WA */
     .role-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.8rem 0;
+      padding: 0.6rem 0;
       border-bottom: 1px solid rgba(148, 163, 184, 0.1);
     }
 
-    .role-info { display: flex; align-items: center; gap: 0.8rem; flex: 1; }
-    .role-icon { font-size: 1.5rem; min-width: 30px; }
-    .role-name-box { display: flex; flex-direction: column; }
-    .role-label { font-size: 0.75rem; text-transform: uppercase; color: var(--muted); font-weight: 700; }
-    .person-name { font-size: 1.1rem; font-weight: 600; color: #fff; }
+    .role-info { display: flex; align-items: center; gap: 0.8rem; }
+    .role-icon { font-size: 1.4rem; }
+    .role-text-group { display: flex; flex-direction: column; }
+    .role-label { font-size: 0.7rem; text-transform: uppercase; color: var(--muted); font-weight: bold; }
+    .person-name { font-size: 1rem; color: #fff; }
 
-    /* Botón WhatsApp */
     .btn-wa {
       background: var(--whatsapp);
       color: white;
       text-decoration: none;
-      padding: 0.6rem 1rem;
+      padding: 0.4rem 0.8rem;
       border-radius: 50px;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      font-size: 0.8rem;
       font-weight: bold;
-      font-size: 0.9rem;
-      transition: transform 0.2s;
     }
-    .btn-wa:active { transform: scale(0.95); }
 
-    /* Modos Especiales */
-    body.modo-texto-grande .person-name { font-size: 1.4rem; }
-    body.modo-texto-grande .day-text { font-size: 1.6rem; }
-    
-    body.modo-alto-contraste { background: #000; }
-    body.modo-alto-contraste .assignment-card { background: #000; border: 2px solid #fff; }
-    body.modo-alto-contraste .person-name { color: #fff; }
+    body.modo-texto-grande .person-name { font-size: 1.2rem; }
+    body.modo-texto-grande .assignment-day { font-size: 1.4rem; }
 
-    @media (max-width: 500px) {
+    @media (max-width: 600px) {
       .role-row { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
-      .btn-wa { width: 100%; justify-content: center; }
+      .btn-wa { width: 100%; text-align: center; }
     }
   </style>
 </head>
+
 <body>
   <main class="page">
     <header>
-      <h1>Asignaciones Punta Gorda</h1>
-      <div id="btn-controles" style="display:flex; gap:10px; justify-content:center; margin-top:10px;">
-        <button class="view-tab" id="btn-texto-grande">Agrandar Letra</button>
-        <button class="view-tab" id="btn-alto-contraste">Modo Noche+</button>
+      <h1>Asignaciones para las reuniones</h1>
+      <div class="pill-bar">
+        <span class="pill-dot"></span>
+        <span>Conectado a hoja de cálculo · Punta Gorda</span>
       </div>
     </header>
 
     <div class="controls-bar">
-      <div class="view-tabs">
-        <button class="view-tab active" data-view="mes">Mes</button>
-        <button class="view-tab" data-view="semana">Semana</button>
-        <button class="view-tab" data-view="hoy">Hoy</button>
+      <div class="select-wrapper">
+        <select id="monthYearSelect"></select>
       </div>
-      <select id="monthYearSelect" style="width:100%; padding:10px; border-radius:10px; background:#0f172a; color:white; border:1px solid var(--border);"></select>
+      <div class="controls-right">
+        <div class="view-tabs">
+          <button class="view-tab active" data-view="mes">Todo el mes</button>
+          <button class="view-tab" data-view="hoy">Hoy</button>
+        </div>
+        <button class="toggle-btn" id="btn-texto-grande">Texto grande</button>
+        <button class="toggle-btn" id="btn-alto-contraste">Alto contraste</button>
+      </div>
     </div>
 
-    <div id="assignments" class="assignments-grid"></div>
+    <section class="card-shell">
+      <div id="assignments" class="assignments-grid"></div>
+    </section>
   </main>
 
   <script>
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337";
-    const CONTACTS_URL = "https://docs.google.com/spreadsheets/d/1-ElfjMal3ULaiREBVqcjSZL_kBk_DOp5mzY-DnNcSkQ/export?format=csv&gid=0";
+  const CSV_URL = "https://docs.google.com/spreadsheets/d/1v0ZUvpB5vE0_e8QL7ZdxXJOsvr6RTrIjBZcjRjdh44E/export?format=csv&gid=96081337";
+  const CONTACTS_URL = "https://docs.google.com/spreadsheets/d/1-ElfjMal3ULaiREBVqcjSZL_kBk_DOp5mzY-DnNcSkQ/export?format=csv&gid=0";
 
-    let todasLasFilas = [];
-    let contactos = {};
+  let todasLasFilas = [];
+  let contactos = {};
 
-    async function cargarDatos() {
-      const res = await fetch(CSV_URL);
-      const csvText = await res.text();
-      const rows = csvText.split('\n').map(r => r.split(','));
-      
+  async function iniciar() {
+    try {
+      // Cargar Contactos
       const resC = await fetch(CONTACTS_URL);
       const csvC = await resC.text();
-      csvC.split('\n').forEach(r => {
-        const [nombre, tel] = r.split(',');
-        if(nombre) contactos[nombre.trim().toLowerCase()] = tel ? tel.replace(/\D/g,'') : '';
+      csvC.split('\n').slice(1).forEach(r => {
+        const cols = r.split(',');
+        if(cols[0]) contactos[cols[0].trim().toLowerCase()] = cols[1] ? cols[1].replace(/\D/g,'') : '';
       });
 
-      todasLasFilas = rows.slice(1).map(r => ({
-        fechaStr: r[0],
-        video: r[1], audio: r[2], mic1: r[3], mic2: r[4], plat: r[5], ent: r[6], aud: r[7]
-      })).filter(f => f.fechaStr);
-      
+      // Cargar Cronograma
+      const res = await fetch(CSV_URL);
+      const text = await res.text();
+      const data = text.split('\n').map(r => r.split(','));
+
+      todasLasFilas = data.slice(1).filter(r => r[0]).map(r => ({
+        fecha: r[0], video: r[1], audio: r[2], mic1: r[3], mic2: r[4], plat: r[5], ent: r[6], aud: r[7]
+      }));
+
       renderizar();
-    }
+    } catch (e) { console.error(e); }
+  }
 
-    function buildWA(nombre, rol, fecha) {
-      const tel = contactos[nombre.toLowerCase().trim()] || '';
-      if(!tel) return null;
-      const msg = `Hola ${nombre} 😊. Te recordamos tu asignación de *${rol}* para la reunión del ${fecha}. ¡Gracias! 🤖`;
-      return `https://wa.me/${tel}?text=${encodeURIComponent(msg)}`;
-    }
+  function buildWA(nombre, rol, fecha) {
+    const tel = contactos[nombre.toLowerCase().trim()];
+    if(!tel) return null;
+    const msg = `Hola ${nombre} 😊. Te recordamos tu asignación de *${rol}* para la reunión del ${fecha}. ¡Gracias! 🤖`;
+    return `https://wa.me/${tel}?text=${encodeURIComponent(msg)}`;
+  }
 
-    function renderizar() {
-      const contenedor = document.getElementById("assignments");
-      contenedor.innerHTML = "";
+  function renderizar() {
+    const contenedor = document.getElementById("assignments");
+    contenedor.innerHTML = "";
 
-      todasLasFilas.forEach(f => {
-        const card = document.createElement("div");
-        card.className = "assignment-card";
-        card.innerHTML = `<div class="header-card"><div class="day-text">${f.fechaStr}</div></div>`;
+    todasLasFilas.forEach(f => {
+      const card = document.createElement("div");
+      card.className = "assignment-card";
+      card.innerHTML = `<div class="assignment-day">${f.fecha}</div>`;
 
-        const roles = [
-          {n: "Audio", v: f.audio, i: "🎧"},
-          {n: "Video", v: f.video, i: "📺"},
-          {n: "Mic 1", v: f.mic1, i: "🎤"},
-          {n: "Mic 2", v: f.mic2, i: "🎤"},
-          {n: "Plataforma", v: f.plat, i: "🛡️"},
-          {n: "Acomodador", v: f.ent, i: "🚪"}
-        ];
+      const roles = [
+        {l: "Audio", v: f.audio, i: "🎧"},
+        {l: "Video", v: f.video, i: "📺"},
+        {l: "Mic 1", v: f.mic1, i: "🎤"},
+        {l: "Mic 2", v: f.mic2, i: "🎤"},
+        {l: "Plataforma", v: f.plat, i: "🛡️"},
+        {l: "Acomodador", v: f.ent, i: "🚪"}
+      ];
 
-        roles.forEach(r => {
-          if(!r.v || r.v === "-") return;
-          const link = buildWA(r.v, r.n, f.fechaStr);
-          const row = document.createElement("div");
-          row.className = "role-row";
-          row.innerHTML = `
-            <div class="role-info">
-              <span class="role-icon">${r.i}</span>
-              <div class="role-name-box">
-                <span class="role-label">${r.n}</span>
-                <span class="person-name">${r.v}</span>
-              </div>
+      roles.forEach(r => {
+        if(!r.v || r.v.trim() === "-" || r.v.trim() === "") return;
+        const row = document.createElement("div");
+        row.className = "role-row";
+        const link = buildWA(r.v, r.l, f.fecha);
+        
+        row.innerHTML = `
+          <div class="role-info">
+            <span class="role-icon">${r.i}</span>
+            <div class="role-text-group">
+              <span class="role-label">${r.l}</span>
+              <span class="person-name">${r.v}</span>
             </div>
-            ${link ? `<a href="${link}" class="btn-wa">WhatsApp</a>` : ''}
-          `;
-          card.appendChild(row);
-        });
-        contenedor.appendChild(card);
+          </div>
+          ${link ? `<a href="${link}" class="btn-wa">WhatsApp</a>` : ''}
+        `;
+        card.appendChild(row);
       });
-    }
+      contenedor.appendChild(card);
+    });
+  }
 
-    document.getElementById("btn-texto-grande").onclick = () => document.body.classList.toggle("modo-texto-grande");
-    document.getElementById("btn-alto-contraste").onclick = () => document.body.classList.toggle("modo-alto-contraste");
+  document.getElementById("btn-texto-grande").onclick = () => document.body.classList.toggle("modo-texto-grande");
+  document.getElementById("btn-alto-contraste").onclick = () => document.body.classList.toggle("modo-alto-contraste");
 
-    cargarDatos();
+  iniciar();
   </script>
 </body>
 </html>
